@@ -1,0 +1,1 @@
+Here add the data files you need to copy with KGQAn project, such as word embeding models 
