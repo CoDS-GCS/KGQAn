@@ -92,6 +92,8 @@ class RelationLabeling(object):
 
         self.machine.add_transition(trigger='NN', source='unacceptable', dest='NN', after='add_word') # 'NN', 'IN',
         self.machine.add_transition(trigger='NN', source='NN', dest='final', after='add_word')  ## Essam cases such as time zone
+        self.machine.add_transition(trigger='NN', source='VBZ NE', dest='NN', after='add_word') ## birth name
+        self.machine.add_transition(trigger='JJ', source='VBZ NE', dest='JJ', after='add_word') ## famous for
         self.machine.add_transition(trigger='IN', source='NN', dest='final', after='add_word')
 
         self.machine.add_transition(trigger='NE', source='unacceptable', dest='NE')
@@ -106,6 +108,11 @@ class RelationLabeling(object):
 
         self.machine.add_transition(trigger='NNS', source='unacceptable', dest='NNS', after='add_word')  # 'NN', 'IN',
         self.machine.add_transition(trigger='IN', source='NNS', dest='final', after='add_word')
+
+        self.machine.add_transition(trigger='NNS', source='JJ', dest='NNS', before='clean_words', after='add_word') # ID 24, 163 produced relations but questions not solved
+        self.machine.add_transition(trigger='VBZ', source='NNS', dest='VBZ', before='clean_words', after='add_word') # ID 136, 111 error solved and nothing was affected
+        self.machine.add_transition(trigger='VBP', source='VBZ NE', dest='VBP', before='clean_words', after='add_word') # ID 10 error solved and nothing was affected
+        self.machine.add_transition(trigger='VBZ', source='JJ', dest='VBZ',  after='add_word') # ID 124 error solved and nothing was affected
 
     def add_word(self, word, pos):
         pos = nltk_POS_map.get(pos, pos)
