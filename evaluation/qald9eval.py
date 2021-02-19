@@ -49,29 +49,11 @@ if __name__ == '__main__':
     kgqan_qald9 = {"dataset": {"id": "qald-9-test-multilingual"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
 
-        # Run time error with these Qs [32, 113, 164, 206, 43]
-        # for example in Q-32 if we detect birth day as a relation it may work
-        # if int(question['id']) in [113, 164, 206, 43]:
-        #     continue
-
-        # if int(question['id']) not in [1, 27, 63, 86, 116, 131, 135, 143, 155, 160, 175, 188, 198, 203]:
-        #     continue
-
         # [27, 63, 86, 116, 160, 198]
         # 63- the correct V is Scarface_(rapper) and we get Scarface
         # 116 - Who was called Rodzilla - use nick predicate
         # if int(question['id']) not in [63, 116]:
         #     continue
-
-        # We managed before to solve this list with F1 = 34
-        # [1, 9, 23, 26, 27, 40, 45, 52, 62, 63, 64, 86, 99, 103, 110, 116, 119, 122, 124, 128, 129, 131, 134, 135, 141,
-        # 143, 144, 145, 154, 155, 156, 160, 175, 181, 183, 187, 188, 198, 203, 8, 159, 25]
-
-        # the current version solves only this list with F1 = 26.17
-        # [103,110,119,122,124,128,129,134,141,144,145,154,156,159,181,183,187,23,25,26,40,45,52,62,64,8,9,99]
-
-        # TODOS: We need to solve this list first
-        # [1,116,131,135,143,155,160,175,188,198,203,27,63,86]
 
         # hard to annotate/link with the KG
         # if int(question['id']) in [167]:
@@ -86,7 +68,7 @@ if __name__ == '__main__':
         #                               129, 183, 181, 7, 135, 50, 71, 105, 52, 102, 21, 34, 145, 154, 198]:
         #     continue
 
-        # if int(question['id']) not in [177, 101, 14]:
+        # if int(question['id']) not in [63]:
         #     continue
 
         # long time queries 51

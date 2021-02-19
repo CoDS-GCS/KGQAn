@@ -61,6 +61,6 @@ def n_similarity(mwe1, mwe2):
 
 
 if __name__ == '__main__':
-    sim = n_similarity(['portrayer'], ['played'])
+    sim = n_similarity(['satellites'], ['moon'])
     # sim = n_similarity(['mohamed'], ['ahmed'])
     print(sim)
