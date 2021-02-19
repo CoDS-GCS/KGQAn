@@ -69,12 +69,14 @@ class KGQAn:
             """
 
     def __init__(self, semantic_affinity_server=None,
-                 n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10):
+                n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400, n_limit_EQuery=400):
         self._ss_server = semantic_affinity_server
         self._n_max_answers = n_max_answers  # this should affect the number of star queries to be executed against TS
         self._current_question = None
         self.n_max_Vs = n_max_Vs
         self.n_max_Es = n_max_Es
+        self.n_limit_VQuery = n_limit_VQuery
+        self.n_limit_EQuery = n_limit_EQuery
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
@@ -107,6 +109,7 @@ class KGQAn:
         self.rephrase_question()
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
+            logger.info("[NO Named-entity or NO Relation Detected]")
             return []
         self.extract_possible_V_and_E()
         self.generate_star_queries()
@@ -173,7 +176,8 @@ class KGQAn:
             if entity == 'var':
                 self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
-            entity_query = make_keyword_unordered_search_query_with_type(entity, limit=100)
+            entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
                 entity_result = json.loads(evaluate_SPARQL_query(entity_query))
@@ -200,15 +204,18 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if source == 'var' or destination == 'var':
-                    URIs_false, names_false = self._get_predicates_and_their_names(subj=comb)
+                    URIs_false, names_false = self._get_predicates_and_their_names(subj=comb,
+                                                                                   nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
                         idx = names_false.index('leadfigures')
                         names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self._get_predicates_and_their_names(obj=comb)
+                    URIs_true, names_true = self._get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     v_uri_1, v_uri_2 = comb
-                    URIs_false, names_false = self._get_predicates_and_their_names(v_uri_1, v_uri_2)
-                    URIs_true, names_true = self._get_predicates_and_their_names(v_uri_2, v_uri_1)
+                    URIs_false, names_false = self._get_predicates_and_their_names(v_uri_1, v_uri_2,
+                                                                                   nlimit=self.n_limit_EQuery)
+                    URIs_true, names_true = self._get_predicates_and_their_names(v_uri_2, v_uri_1,
+                                                                                 nlimit=self.n_limit_EQuery)
                 URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                 URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
                 uris.extend(URIs_false + URIs_true)
@@ -235,6 +242,9 @@ class KGQAn:
             return scores
 
     def __get_chosen_URIs_for_relation(self, relation: str, uris: list, names: list):
+        if not uris:
+            return uris
+
         scores = self.__class__.__compute_semantic_similarity_between_single_word_and_word_list(relation, names)
         # (uri, True) ===>  (uri, True, score)
         l1, l2 = list(zip(*uris))
@@ -345,15 +355,15 @@ class KGQAn:
         return predicate_URIs, predicate_names
 
     @staticmethod
-    def _get_predicates_and_their_names(subj=None, obj=None):
+    def _get_predicates_and_their_names(subj=None, obj=None, nlimit: int = 100):
         if subj and obj:
-            q = sparql_query_to_get_predicates_when_subj_and_obj_are_known(subj, obj, limit=100)
+            q = sparql_query_to_get_predicates_when_subj_and_obj_are_known(subj, obj, limit=nlimit)
             uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
         elif subj:
-            q = make_top_predicates_sbj_query(subj, limit=100)
+            q = make_top_predicates_sbj_query(subj, limit=nlimit)
             uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
         elif obj:
-            q = make_top_predicates_obj_query(obj, limit=100)
+            q = make_top_predicates_obj_query(obj, limit=nlimit)
             uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
         else:
             raise Exception
@@ -362,6 +372,7 @@ class KGQAn:
 
     @staticmethod
     def execute_sparql_query_and_get_uri_and_name_lists(q):
+        cprint(f"== SPARQL Q Find E: {q}")
         result = json.loads(evaluate_SPARQL_query(q))
         return KGQAn.extract_predicate_names(result['results']['bindings'])
 

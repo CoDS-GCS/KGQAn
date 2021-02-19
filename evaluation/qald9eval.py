@@ -36,11 +36,14 @@ if __name__ == '__main__':
     max_Vs = 1
     max_Es = 21
     max_answers = 41
+    limit_VQuery = 600
+    limit_EQuery = 300
 
     with open(file_name) as f:
         qald9_testset = json.load(f)
     dataset_id = qald9_testset['dataset']['id']
-    MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es)
+    MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
+                    n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
     
     kgqan_qald9 = {"dataset": {"id": "qald-9-test-multilingual"}, "questions": []}
@@ -48,10 +51,16 @@ if __name__ == '__main__':
 
         # Run time error with these Qs [32, 113, 164, 206, 43]
         # for example in Q-32 if we detect birth day as a relation it may work
-        if int(question['id']) in [32, 113, 164, 206, 43]:
-            continue
+        # if int(question['id']) in [113, 164, 206, 43]:
+        #     continue
 
-        # if int(question['id']) not in [1, 116, 131, 135, 143, 155, 160, 175, 188, 198, 203, 27, 63, 86]:
+        # if int(question['id']) not in [1, 27, 63, 86, 116, 131, 135, 143, 155, 160, 175, 188, 198, 203]:
+        #     continue
+
+        # [27, 63, 86, 116, 160, 198]
+        # 63- the correct V is Scarface_(rapper) and we get Scarface
+        # 116 - Who was called Rodzilla - use nick predicate
+        # if int(question['id']) not in [63, 116]:
         #     continue
 
         # We managed before to solve this list with F1 = 34
@@ -124,7 +133,7 @@ if __name__ == '__main__':
     cprint(f"== QALD 9 Statistics : {qc} questions, Total Time == {text1}, Average Time == {text2} ")
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
-              f'_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
+              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
               encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')

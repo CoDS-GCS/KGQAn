@@ -46,19 +46,21 @@ def make_keyword_search_query_with_type(keywords_string: str, limit=100):
            f"filter (?auxType != {RDFS_CONCEPT}) }} group by  ?uri }} }} LIMIT {limit}"
 
 
-def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
+def make_keyword_unordered_search_query_with_type_simple(keywords_string: str, limit=500):
     kws = ' AND '.join(keywords_string.strip().split())
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
-# def make_keyword_unordered_search_query_with_type(keywords_string, limit=1000):
-#     kws = keywords_string.strip().replace(' ', ' AND ')
-#     return f"select  ?uri  ?label  ?type  " \
-#            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . " \
-#            f"optional {{ select  ?uri  (MIN(STR(?auxType)) as  ?type) " \
-#            f"where {{  ?uri  {RDF_TYPE} ?auxType filter (?auxType !=  {RDFS_CONCEPT}) }} " \
-#            f"group by  ?uri  }} }} LIMIT {limit}"
-
+def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
+    # for cases such as "Angela Merkel ’s"
+    escape = ['’s']
+    kwlist = []
+    for w in keywords_string.strip().split():
+        if w not in escape:
+            kwlist.append(w)
+    kws = ' AND '.join(kwlist)
+    return f"select distinct ?uri  ?label " \
+           f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
 def make_top_predicates_sbj_query(uri, limit=1000):
     return f"select distinct ?p where {{ <{uri}> ?p ?o . }}  LIMIT {limit}"
@@ -105,7 +107,10 @@ def evaluate_SPARQL_query(query: str, fmt='application/json'):
     # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
 
     # From local http://localhost:8890/sparql
-    query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
+    # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
+
+    # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
+    query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
     # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
     if query_response.status_code in [414]:
         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
