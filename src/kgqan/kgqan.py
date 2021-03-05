@@ -29,9 +29,7 @@ from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
 
-
-
-
+import datetime
 from termcolor import colored, cprint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -308,7 +306,8 @@ class KGQAn:
     def check_if_answers_type_compatiable(self, result):
         if self.question.answer_datatype == 'number':
             for answer in result['results']['bindings']:
-                if answer['var']['type'] == 'typed-literal' and 'integer' in answer['var']['datatype']:
+                if answer['var']['type'] == 'typed-literal' and ('integer' in answer['var']['datatype'] or 'usDollar' in answer['var']['datatype']
+                or 'double' in answer['var']['datatype']):
                     return True
                 else:
                     return False
@@ -317,6 +316,19 @@ class KGQAn:
                 if (answer['var']['type'] == 'typed-literal' and 'langString' in answer['var']['datatype']) \
                         or (answer['var']['type'] == 'uri' and 'resource' in answer['var']['value']):
                     return True
+                else:
+                    return False
+        elif self.question.answer_datatype == 'date':
+            for answer in result['results']['bindings']:
+                if answer['var']['type'] == 'typed-literal':
+                    if 'date' in answer['var']['datatype']:
+                        return True
+                    elif 'gYear' in answer['var']['datatype']:
+                        obj = datetime.datetime.strptime(answer['var']['value'], '%Y')
+                        answer['var']['value'] = str(obj.date())
+                        return True
+                    else:
+                        return False
                 else:
                     return False
         return True

@@ -194,6 +194,8 @@ class Question:
             if token['token'] in punctuation:
                 # TODO: "they" has an indication that the answer is list of people
                 continue
+            if token['token'] in ['many', 'big']:
+                continue
             token['token'] = token['token'].translate(table)
 
             try:
@@ -227,8 +229,9 @@ class Question:
             if entity.startswith('the '):
                 entity = entity[4:]
             self.query_graph.add_node(entity, pos=pos, entity_type=t, uris=[])
+            # workaround to remove be from be + verb from relations  
             for relation in relations:
-                relation_key = self.query_graph.add_edge(entity, 'var', relation=relation, uris=[])
+                relation_key = self.query_graph.add_edge(entity, 'var', relation=relation.replace("be", ""), uris=[])
 
         # Apply Heuristics in case there are no nodes
         # 1) In case of WH questions, the Node is the last noun in the relation
@@ -290,6 +293,8 @@ class Question:
         question_text = question_text.replace("fire", "Fire")
         question_text = question_text.replace(" ice ", " Ice ")
         question_text = question_text.replace("oscar", "Oscar")
+        question_text = question_text.replace("English", "english")
+        question_text = question_text.replace("company", "Company")
         return question_text
 
 
