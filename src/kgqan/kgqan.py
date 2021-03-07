@@ -29,9 +29,7 @@ from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
 
-
-
-
+import datetime
 from termcolor import colored, cprint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -223,6 +221,7 @@ class KGQAn:
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
+
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
@@ -260,6 +259,8 @@ class KGQAn:
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
             node_uris = source_URIs if destination == 'var' else destination_URIs
 
+            if len(node_uris) == 0 or len(relation_uris) == 0:
+                continue
             possible_triples_for_single_relation = utils.get_combination_of_two_lists(node_uris, relation_uris)
             possible_triples_for_all_relations.append(possible_triples_for_single_relation)
         else:
@@ -284,6 +285,10 @@ class KGQAn:
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
                 v_result = json.loads(result)
+                result_compatiable = self.check_if_answers_type_compatiable(v_result)
+                if not result_compatiable:
+                    continue
+
                 possible_answer.update(results=v_result['results'], vars=v_result['head']['vars'])
                 answers = list()
                 for binding in v_result['results']['bindings']:
@@ -297,6 +302,36 @@ class KGQAn:
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
+
+    def check_if_answers_type_compatiable(self, result):
+        if self.question.answer_datatype == 'number':
+            for answer in result['results']['bindings']:
+                if answer['var']['type'] == 'typed-literal' and ('integer' in answer['var']['datatype'] or 'usDollar' in answer['var']['datatype']
+                or 'double' in answer['var']['datatype']):
+                    return True
+                else:
+                    return False
+        elif 'person' in self.question.answer_type:
+            for answer in result['results']['bindings']:
+                if (answer['var']['type'] == 'typed-literal' and 'langString' in answer['var']['datatype']) \
+                        or (answer['var']['type'] == 'uri' and 'resource' in answer['var']['value']):
+                    return True
+                else:
+                    return False
+        elif self.question.answer_datatype == 'date':
+            for answer in result['results']['bindings']:
+                if answer['var']['type'] == 'typed-literal':
+                    if 'date' in answer['var']['datatype']:
+                        return True
+                    elif 'gYear' in answer['var']['datatype']:
+                        obj = datetime.datetime.strptime(answer['var']['value'], '%Y')
+                        answer['var']['value'] = str(obj.date())
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+        return True
 
     @property
     def question(self):
@@ -368,7 +403,17 @@ class KGQAn:
         else:
             raise Exception
 
-        return uris, names
+        escaped_names = ['22-rdf-syntax-ns', 'rdf-schema', 'owl', 'wiki Page External Link', 'wiki Page ID',
+                         'wiki Page Revision ID', 'is Primary Topic Of', 'subject', 'type', 'prov', 'wiki Page Disambiguates',
+                         'wiki Page Redirects', 'primary Topic', 'wiki Articles']
+        filtered_uris = []
+        filtered_names = []
+        for i in range(len(names)):
+            if names[i] not in escaped_names:
+                filtered_names.append(names[i])
+                filtered_uris.append(uris[i])
+
+        return filtered_uris, filtered_names
 
     @staticmethod
     def execute_sparql_query_and_get_uri_and_name_lists(q):

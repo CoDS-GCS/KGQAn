@@ -18,10 +18,12 @@ import networkx as nx
 from .nlp.relation import RelationLabeling
 from transitions.core import MachineError
 from .nlp.utils import nltk_POS_map, traverse_tree, table, punctuation
-from .nlp.models import ner, parser
+from .nlp.models import ner, elmo_ner, parser, WordNetLemmatizer
 from termcolor import colored, cprint
+import nltk
 
 logger = logging.getLogger(__name__)
+lemmatizer = WordNetLemmatizer()
 if not logger.handlers:
     file_handler = logging.FileHandler('kgqan.log')
     formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -50,7 +52,7 @@ class Question:
     def add_possible_answer(self, **kwargs):
         # bisect.insort(self._possible_answers, Answer(**kwargs))  # it is not going to work because some answers are
         # inserted without score at first
-
+        ## TODO check for answer type
         self._possible_answers.append(Answer(**kwargs))
 
     @property
@@ -98,7 +100,11 @@ class Question:
         self.__find_possible_entities_and_relations()
 
     def __parse_sentence(self):
+        self._question_text = self.__rephrase_sentence(self._question_text)
         allannlp_ner_output = ner.predict(sentence=self._question_text)
+        if not self.__check_named_entites_existance(allannlp_ner_output):
+            allannlp_ner_output = elmo_ner.predict(sentence=self._question_text)
+
         allannlp_dep_output = parser.predict(sentence=self._question_text)
 
         words = allannlp_ner_output['words']
@@ -178,11 +184,17 @@ class Question:
         relation_labeling = RelationLabeling()
         # positions = [token['position'] for token in self.question.tokens]
         #  i = word index, w = word_text, h = Dep_head, d
+        question_type = ""
         for token in self.tokens:
             if token['token'].lower() in ['how', 'who', 'when', 'what', 'which', 'where']:
+                question_type = "wh"
                 continue
+            if token['token'].lower() in ['show', 'give']:
+                question_type = 'list'
             if token['token'] in punctuation:
                 # TODO: "they" has an indication that the answer is list of people
+                continue
+            if token['token'] in ['many', 'big']:
                 continue
             token['token'] = token['token'].translate(table)
 
@@ -217,14 +229,73 @@ class Question:
             if entity.startswith('the '):
                 entity = entity[4:]
             self.query_graph.add_node(entity, pos=pos, entity_type=t, uris=[])
+            # workaround to remove be from be + verb from relations  
             for relation in relations:
-                relation_key = self.query_graph.add_edge(entity, 'var', relation=relation, uris=[])
+                relation_key = self.query_graph.add_edge(entity, 'var', relation=relation.replace("be", ""), uris=[])
+
+        # Apply Heuristics in case there are no nodes
+        # 1) In case of WH questions, the Node is the last noun in the relation
+        # 2) In case of listing question (Give all, Show all), The Node is the first noun in the relations
+        if len(s + o) == 0:
+            if question_type == 'wh':
+                found = False
+                for i in range(len(relations) - 1, -1, -1):
+                    if found:
+                        continue
+                    for token in self.tokens:
+                        if (relations[i] in token['token']) and token['pos-tag'] in ['NN', 'NNS']:
+                            s.append(
+                                (token['index'], relations[i], token['head'], token['dependency'], token['position'],
+                                 token['pos-tag'], token['ne-tag']))
+                            relations.remove(relations[i])
+                            found = True
+                            break
+            elif question_type == 'list':
+                found = False
+                all_index = 0
+                for i in range(len(self.tokens)):
+                    if token['token'] == 'all':
+                        all_index = i
+                        break
+                for relation in relations:
+                    if found:
+                        continue
+                    for i in range(all_index, len(self.tokens)):
+                        token = self.tokens[i]
+                        if (lemmatizer.lemmatize(relation) in token['token'] or lemmatizer.lemmatize(token['token']) in relation) and token['pos-tag'] in ['NN', 'NNS']:
+                            s.append(
+                                (token['index'], relation.split(' ')[0], token['head'], token['dependency'], token['position'],
+                                 token['pos-tag'], token['ne-tag']))
+                            relations.remove(relation)
+                            found = True
+                            break
 
         logger.info(f"[NODES:] {s + o}")
         logger.info(f"[RELATIONS:] {relations}")
 
         cprint(colored(f"[NODES:] {s + o}"))
         cprint(colored(f"[RELATIONS:] {relations}"))
+
+
+    def __check_named_entites_existance(self, ner_output) -> bool:
+        for tag in ner_output['tags']:
+            if tag != 'O':
+                return True
+        return False
+
+    def __rephrase_sentence(self, question_text):
+        question_text = question_text.replace("earth", "Earth")
+        question_text = question_text.replace("sun", "Sun")
+        question_text = question_text.replace("sky", "Sky")
+        question_text = question_text.replace("baguette", "Baguette")
+        question_text = question_text.replace("libraries", "Libraries")
+        question_text = question_text.replace("song", "Song")
+        question_text = question_text.replace("fire", "Fire")
+        question_text = question_text.replace(" ice ", " Ice ")
+        question_text = question_text.replace("oscar", "Oscar")
+        question_text = question_text.replace("English", "english")
+        question_text = question_text.replace("company", "Company")
+        return question_text
 
 
 class Answer:

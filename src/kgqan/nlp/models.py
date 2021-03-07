@@ -22,6 +22,9 @@ import nltk
 ner = Predictor.from_path(
     "https://s3-us-west-2.amazonaws.com/allennlp/models/fine-grained-ner-model-elmo-2018.12.21.tar.gz")
 
+elmo_ner = Predictor.from_path(
+    "https://allennlp.s3.amazonaws.com/models/ner-model-2018.12.18.tar.gz")
+
 parser = Predictor.from_path(
     "https://s3-us-west-2.amazonaws.com/allennlp/models/biaffine-dependency-parser-ptb-2018.08.23.tar.gz")
 nltk.download('wordnet')

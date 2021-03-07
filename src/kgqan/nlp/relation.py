@@ -99,6 +99,8 @@ class RelationLabeling(object):
         self.machine.add_transition(trigger='NE', source='unacceptable', dest='NE')
         self.machine.add_transition(trigger='RB', source='NE', dest='final', after='add_word')
         self.machine.add_transition(trigger='NN', source='NE', dest='final', after='add_word')
+        self.machine.add_transition(trigger='NNS', source='NE', dest='final', after='add_word')
+        self.machine.add_transition(trigger='VBD', source='final', dest='final', after='add_word', before='clean_words')
 
         self.machine.add_transition(trigger='VB', source=['VBZ NE', 'VBD NE', 'NE', 'NN', 'NNS'], dest='VB', before='clean_words', after='add_word')
         self.machine.add_transition(trigger='VBD', source=['VBD NE', 'NE', 'NN', 'NNS'], dest='VBD', before='clean_words', after='add_word')
@@ -107,6 +109,7 @@ class RelationLabeling(object):
         self.machine.add_transition(trigger='VBP', source=['VBD NE', 'NE', 'NN', 'NNS'], dest='VBP', before='clean_words', after='add_word')
 
         self.machine.add_transition(trigger='NNS', source='unacceptable', dest='NNS', after='add_word')  # 'NN', 'IN',
+        self.machine.add_transition(trigger='NNS', source='VBN', dest='NNS', after='add_word', before="clean_words")  # bird,
         self.machine.add_transition(trigger='IN', source='NNS', dest='final', after='add_word')
 
         self.machine.add_transition(trigger='NNS', source='JJ', dest='NNS', before='clean_words', after='add_word') # ID 24, 163 produced relations but questions not solved
