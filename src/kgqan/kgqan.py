@@ -95,7 +95,7 @@ class KGQAn:
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
 
-        self.question = question_text
+        self.question = (question_text, question_id)
         # self.question.id = question_id
 
         if answer_type:
@@ -129,7 +129,7 @@ class KGQAn:
         if self.question.text.lower().startswith('who was'):
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'
-            # self.question.add_entity('var', question_type=self.question.answer_type)
+            # self.question.add_entity('uri', question_type=self.question.answer_type)
         elif self.question.text.lower().startswith('who is '):
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'
@@ -171,7 +171,7 @@ class KGQAn:
 
     def extract_possible_V_and_E(self):
         for entity in self.question.query_graph:
-            if entity == 'var':
+            if entity == 'uri':
                 self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
             entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
@@ -201,7 +201,7 @@ class KGQAn:
 
             uris, names = list(), list()
             for comb in combinations:
-                if source == 'var' or destination == 'var':
+                if source == 'uri' or destination == 'uri':
                     URIs_false, names_false = self._get_predicates_and_their_names(subj=comb,
                                                                                    nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
@@ -257,7 +257,7 @@ class KGQAn:
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
-            node_uris = source_URIs if destination == 'var' else destination_URIs
+            node_uris = source_URIs if destination == 'uri' else destination_URIs
 
             if len(node_uris) == 0 or len(relation_uris) == 0:
                 continue
@@ -267,7 +267,7 @@ class KGQAn:
             for star_query in product(*possible_triples_for_all_relations):
                 score = sum([self.v_uri_scores[subj]+predicate[2] for subj, predicate in star_query])
 
-                triple = [f'?var <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?var'
+                triple = [f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri'
                           for v_uri, predicate in star_query]
 
                 query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
@@ -292,7 +292,7 @@ class KGQAn:
                 possible_answer.update(results=v_result['results'], vars=v_result['head']['vars'])
                 answers = list()
                 for binding in v_result['results']['bindings']:
-                    answer = self.__class__.extract_resource_name_from_uri(binding['var']['value'])[0]
+                    answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
                     answers.append(answer)
                 else:
                     if v_result['results']['bindings']:
@@ -306,31 +306,36 @@ class KGQAn:
     def check_if_answers_type_compatiable(self, result):
         if self.question.answer_datatype == 'number':
             for answer in result['results']['bindings']:
-                if answer['var']['type'] == 'typed-literal' and ('integer' in answer['var']['datatype'] or 'usDollar' in answer['var']['datatype']
-                or 'double' in answer['var']['datatype']):
+                if answer['uri']['type'] == 'typed-literal' and ('integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
+                or 'double' in answer['uri']['datatype']):
                     return True
                 else:
                     return False
-        elif 'person' in self.question.answer_type:
-            for answer in result['results']['bindings']:
-                if (answer['var']['type'] == 'typed-literal' and 'langString' in answer['var']['datatype']) \
-                        or (answer['var']['type'] == 'uri' and 'resource' in answer['var']['value']):
-                    return True
-                else:
-                    return False
+        # elif 'string' in self.question.answer_datatype:
+        #     for answer in result['results']['bindings']:
+        #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']:
+        #             return True
+        #         else:
+        #             return False
         elif self.question.answer_datatype == 'date':
             for answer in result['results']['bindings']:
-                if answer['var']['type'] == 'typed-literal':
-                    if 'date' in answer['var']['datatype']:
+                if answer['uri']['type'] == 'typed-literal':
+                    if 'date' in answer['uri']['datatype']:
                         return True
-                    elif 'gYear' in answer['var']['datatype']:
-                        obj = datetime.datetime.strptime(answer['var']['value'], '%Y')
-                        answer['var']['value'] = str(obj.date())
+                    elif 'gYear' in answer['uri']['datatype']:
+                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
+                        answer['uri']['value'] = str(obj.date())
                         return True
                     else:
                         return False
                 else:
                     return False
+        # elif 'resource' in self.question.answer_datatype:
+        #     for answer in result['results']['bindings']:
+        #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
+        #             return True
+        #         else:
+        #             return False
         return True
 
     @property
@@ -338,8 +343,8 @@ class KGQAn:
         return self._current_question
 
     @question.setter
-    def question(self, value: str):
-        self._current_question = Question(question_text=value)
+    def question(self, value: tuple):
+        self._current_question = Question(question_text=value[0], question_id=value[1])
 
     @staticmethod
     def extract_resource_name(result_bindings):
@@ -405,7 +410,7 @@ class KGQAn:
 
         escaped_names = ['22-rdf-syntax-ns', 'rdf-schema', 'owl', 'wiki Page External Link', 'wiki Page ID',
                          'wiki Page Revision ID', 'is Primary Topic Of', 'subject', 'type', 'prov', 'wiki Page Disambiguates',
-                         'wiki Page Redirects', 'primary Topic', 'wiki Articles']
+                         'wiki Page Redirects', 'primary Topic', 'wiki Articles', 'hypernym', 'aliases']
         filtered_uris = []
         filtered_names = []
         for i in range(len(names)):
