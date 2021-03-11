@@ -25,8 +25,38 @@ def start_connection(host, port, sel, request):
     message = libclient.Message(sel, sock, addr, request)
     sel.register(sock, events, data=message)
 
+def drop_common_word(wlist1, wlist2):
+    output1 = []
+    output2 = []
+    for word in wlist1:
+        if word not in wlist2:
+            output1.append(word)
+
+    for word in wlist2:
+        if word not in wlist1:
+            output2.append(word)
+
+    if len(output1) == 0:
+        output1 = wlist1
+
+    if len(output2) == 0:
+        output2 = wlist2
+
+    return output1, output2
+
 
 def n_similarity(mwe1, mwe2):
+    # mwe1 = [w for w in mwe1 if w not in ['of', 'into', 'be']]
+    # mwe2 = [w for w in mwe2 if w not in ['of', 'into', 'be']]
+    # case 1: Department Code, Zip Code
+    # Case 2: mission, next mission
+    # if mwe1 == mwe2:
+    #     return 1
+    #
+    # mwe1, mwe2 = drop_common_word(mwe1, mwe2)
+    # print("Lists ", mwe1)
+    # print(mwe2)
+
     mwe1 = ' '.join(mwe1)
     mwe2 = ' '.join(mwe2)
 

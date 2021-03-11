@@ -57,7 +57,11 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
     kwlist = []
     for w in keywords_string.strip().split():
         if w not in escape:
-            kwlist.append(w)
+            if w.isnumeric():
+                w = '\\\'' + w + '\\\''
+                kwlist.append(w)
+            else:
+                kwlist.append(w)
     kws = ' AND '.join(kwlist)
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
