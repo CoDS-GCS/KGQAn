@@ -89,7 +89,7 @@ if __name__ == '__main__':
         st = time.time()
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
-        answers = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'])
+        answers = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'])
 
         all_bindings = list()
         for answer in answers:
