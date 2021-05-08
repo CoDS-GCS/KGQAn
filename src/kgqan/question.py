@@ -238,6 +238,7 @@ class Question:
             relations.clear()
             relations.append("gold medal")
 
+        # TODO perform this after applying the heuristics, check why it decreases the F1
         for i, entity, h, d, p, pos, t in s + o:
             # TODO: This for-loop does not consider relation between two named entities
             if entity.startswith('the '):

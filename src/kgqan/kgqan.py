@@ -108,14 +108,14 @@ class KGQAn:
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
             logger.info("[NO Named-entity or NO Relation Detected]")
-            return []
+            return [], []
         self.extract_possible_V_and_E()
         self.generate_star_queries()
         self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
-        logger.info(f"\n\n\n\n{'#'*120}")
-        return answers
+        logger.info(f"\n\n\n\n{'#' * 120}")
+        return answers, self.question.query_graph.nodes
 
     def detect_question_and_answer_type(self):
         # question_text = question_text.lower()
@@ -145,7 +145,7 @@ class KGQAn:
         elif self.question.text.lower().startswith('how much '):
             self.question.answer_type = 'price'
             self.question.answer_datatype = 'number'
-        elif self.question.text.lower().startswith('when did '):
+        elif self.question.text.lower().startswith('when did ') or self.question.text.lower().startswith('when was '):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         elif self.question.text.lower().startswith('in which '):  # In which [NNS], In which city
@@ -163,6 +163,7 @@ class KGQAn:
         else:
             pass  # 11,13,75
 
+    # TODO remove this if not needed
     def rephrase_question(self):
         if self.question.text.lower().startswith('who was'):
             pass
@@ -306,14 +307,16 @@ class KGQAn:
     def check_if_answers_type_compatiable(self, result):
         if self.question.answer_datatype == 'number':
             for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal' and ('integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                or 'double' in answer['uri']['datatype']):
+                if answer['uri']['type'] == 'typed-literal' and (
+                        'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
+                        or 'double' in answer['uri']['datatype']):
                     return True
                 else:
                     return False
         # elif 'string' in self.question.answer_datatype:
         #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']:
+        #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']\
+        #                 or answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
         #             return True
         #         else:
         #             return False
@@ -332,7 +335,8 @@ class KGQAn:
                     return False
         # elif 'resource' in self.question.answer_datatype:
         #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
+        #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value'] \
+        #                 or answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']:
         #             return True
         #         else:
         #             return False
@@ -409,7 +413,8 @@ class KGQAn:
             raise Exception
 
         escaped_names = ['22-rdf-syntax-ns', 'rdf-schema', 'owl', 'wiki Page External Link', 'wiki Page ID',
-                         'wiki Page Revision ID', 'is Primary Topic Of', 'subject', 'type', 'prov', 'wiki Page Disambiguates',
+                         'wiki Page Revision ID', 'is Primary Topic Of', 'subject', 'type', 'prov',
+                         'wiki Page Disambiguates',
                          'wiki Page Redirects', 'primary Topic', 'wiki Articles', 'hypernym', 'aliases']
         filtered_uris = []
         filtered_names = []
