@@ -4,7 +4,6 @@ import json
 import io
 from kgqan import KGQAn
 
-
 hostName = "0.0.0.0"
 serverPort = 5050
 
@@ -34,19 +33,26 @@ class MyServer(BaseHTTPRequestHandler):
     def do_POST(self):
         print("In post ")
         print(self.request)
-        content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
-        post_data = self.rfile.read(content_length)  # <--- Gets the data itself
-        print(post_data)
-        fix_bytes_value = post_data.replace(b"'", b'"')
-        data = json.load(io.BytesIO(fix_bytes_value))
-        print(data)
+        try:
+            content_length = int(self.headers['Content-Length'])  # <--- Gets the size of data
+            post_data = self.rfile.read(content_length)  # <--- Gets the data itself
+            print("Before parsing ", post_data)
+            # fix_bytes_value = post_data.replace(b"'", b'"')
+            data = json.load(io.BytesIO(post_data))
+            print("After parsing ", data)
+        except:
+            self.send_error(500, "Failed to parse data from request")
 
-        MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
-                        n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
-        answers, entities = MyKGQAn.ask(question_text=data['question'])
-        result = self.parse_answer(answers, entities)
+        try:
+            MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
+                            n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
+            answers, entities = MyKGQAn.ask(question_text=data['question'])
+            result = self.parse_answer(answers, entities)
+        except:
+            self.send_error(500, "Failed to get the answer to the question")
+            
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin" , "*")
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(bytes(result, "utf-8"))
 
