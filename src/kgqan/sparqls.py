@@ -95,7 +95,7 @@ def construct_answers_query(sub_uri, pred_uri, limit=1000):
     return f"select ?o where {{ <{sub_uri}> <{pred_uri}> ?o . }}  LIMIT {limit}"
 
 
-def evaluate_SPARQL_query(query: str, fmt='application/json'):
+def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='Dbpedia'):
     payload = {
         'default-graph-uri': '',
         'query': query,
@@ -106,20 +106,26 @@ def evaluate_SPARQL_query(query: str, fmt='application/json'):
         'debug': 'on',
         'run': '+Run+Query+',
     }
+    if knowledge_graph == 'Dbpedia':
+        # From public https://dbpedia.org/sparql
+        # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
 
-    # From public https://dbpedia.org/sparql
-    # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
+        # From local http://localhost:8890/sparql
+        # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
 
-    # From local http://localhost:8890/sparql
-    # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
-
-    # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
-    query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
-    # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
-    if query_response.status_code in [414]:
-        return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-    return query_response.text
-
+        # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
+        query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
+        # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
+        if query_response.status_code in [414]:
+            return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
+        print(query_response.text)    
+        return query_response.text
+    elif knowledge_graph == 'MS':
+        query_response = requests.get(f'https://makg.org/sparql', params=payload)
+        if query_response.status_code in [414]:
+            return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
+        print(query_response.text)
+        return query_response.text
 
 def process_SPARQL_query_result(query_response: requests.models.Response):
     pass

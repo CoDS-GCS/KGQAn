@@ -75,11 +75,12 @@ class KGQAn:
         self.n_max_Es = n_max_Es
         self.n_limit_VQuery = n_limit_VQuery
         self.n_limit_EQuery = n_limit_EQuery
+        self.knowledge_graph = ''
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
 
-    def ask(self, question_text: str, question_id: int = 0, answer_type: str = None,
+    def ask(self, question_text: str, knowledge_graph, question_id: int = 0, answer_type: str = None,
             n_max_answers: int =None, n_max_Vs: int =None, n_max_Es: int =None):
         """KGQAn pipeline
 
@@ -97,6 +98,10 @@ class KGQAn:
 
         self.question = (question_text, question_id)
         # self.question.id = question_id
+        if 'dbpedia' in knowledge_graph:
+            self.knowledge_graph = 'Dbpedia'
+        elif 'makg' in knowledge_graph:
+            self.knowledge_graph = 'MS'
 
         if answer_type:
             self.question.answer_datatype = answer_type
@@ -179,7 +184,7 @@ class KGQAn:
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
-                entity_result = json.loads(evaluate_SPARQL_query(entity_query))
+                entity_result = json.loads(evaluate_SPARQL_query(entity_query, knowledge_graph=self.knowledge_graph))
             except:
                 logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
                 continue
@@ -203,17 +208,18 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if source == 'uri' or destination == 'uri':
-                    URIs_false, names_false = self._get_predicates_and_their_names(subj=comb,
+                    URIs_false, names_false = self._get_predicates_and_their_names(self.knowledge_graph,
+                                                                                   subj=comb,
                                                                                    nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
                         idx = names_false.index('leadfigures')
                         names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self._get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
+                    URIs_true, names_true = self._get_predicates_and_their_names(self.knowledge_graph, obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     v_uri_1, v_uri_2 = comb
-                    URIs_false, names_false = self._get_predicates_and_their_names(v_uri_1, v_uri_2,
+                    URIs_false, names_false = self._get_predicates_and_their_names(self.knowledge_graph, v_uri_1, v_uri_2,
                                                                                    nlimit=self.n_limit_EQuery)
-                    URIs_true, names_true = self._get_predicates_and_their_names(v_uri_2, v_uri_1,
+                    URIs_true, names_true = self._get_predicates_and_their_names(self.knowledge_graph, v_uri_2, v_uri_1,
                                                                                  nlimit=self.n_limit_EQuery)
                 URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                 URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
@@ -282,7 +288,7 @@ class KGQAn:
         sparqls = list()
         for i, possible_answer in enumerate(self.question.possible_answers[:self._n_max_answers]):
             logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
-            result = evaluate_SPARQL_query(possible_answer.sparql)
+            result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=self.knowledge_graph)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
                 v_result = json.loads(result)
@@ -399,16 +405,16 @@ class KGQAn:
         return predicate_URIs, predicate_names
 
     @staticmethod
-    def _get_predicates_and_their_names(subj=None, obj=None, nlimit: int = 100):
+    def _get_predicates_and_their_names(knowledge_graph, subj=None, obj=None, nlimit: int = 100):
         if subj and obj:
             q = sparql_query_to_get_predicates_when_subj_and_obj_are_known(subj, obj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
+            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
         elif subj:
             q = make_top_predicates_sbj_query(subj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
+            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
         elif obj:
             q = make_top_predicates_obj_query(obj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q)
+            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
         else:
             raise Exception
 
@@ -426,9 +432,9 @@ class KGQAn:
         return filtered_uris, filtered_names
 
     @staticmethod
-    def execute_sparql_query_and_get_uri_and_name_lists(q):
+    def execute_sparql_query_and_get_uri_and_name_lists(q, kg):
         cprint(f"== SPARQL Q Find E: {q}")
-        result = json.loads(evaluate_SPARQL_query(q))
+        result = json.loads(evaluate_SPARQL_query(q, knowledge_graph=kg))
         return KGQAn.extract_predicate_names(result['results']['bindings'])
 
 

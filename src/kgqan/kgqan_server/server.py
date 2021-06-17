@@ -15,7 +15,7 @@ limit_EQuery = 100
 
 class MyServer(BaseHTTPRequestHandler):
 
-    def parse_answer(self, answers, entities):
+    def parse_answer(self, answers, entities, max_answers):
         nodes = list(entities)
         nodes.remove('uri')
         objs = []
@@ -27,6 +27,9 @@ class MyServer(BaseHTTPRequestHandler):
             if len(values) > 0:
                 obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'nodes': nodes}
                 objs.append(obj)
+
+            if len(objs == max_answers):
+                break
 
         return json.dumps(objs)
 
@@ -46,15 +49,14 @@ class MyServer(BaseHTTPRequestHandler):
         try:
             MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
                             n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
-            answers, entities = MyKGQAn.ask(question_text=data['question'])
-            result = self.parse_answer(answers, entities)
+            answers, entities = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
+            result = self.parse_answer(answers, entities, data['max_answers'])
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(bytes(result, "utf-8"))
         except:
             self.send_error(500, "Failed to get the answer to the question")
-            
-        self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(bytes(result, "utf-8"))
 
 if __name__ == "__main__":
     webServer = HTTPServer((hostName, serverPort), MyServer)
