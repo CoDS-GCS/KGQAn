@@ -1,3 +1,4 @@
+import traceback
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import time
 import json
@@ -58,6 +59,8 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes(result, "utf-8"))
         except Exception as e:
             print("Error from : ", e)
+            print("Stack trace")
+            traceback.print_exc()
             self.send_error(500, "Failed to get the answer to the question")
 
 if __name__ == "__main__":
