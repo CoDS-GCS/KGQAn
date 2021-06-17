@@ -189,7 +189,7 @@ class KGQAn:
                 logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
                 continue
 
-            uris, names = self.__class__.extract_resource_name(entity_result['results']['bindings'])
+            uris, names = self.__class__.extract_resource_name(entity_result['results']['bindings'], self.knowledge_graph)
             scores = self.__compute_semantic_similarity_between_single_word_and_word_list(entity, names)
 
             URIs_with_scores = list(zip(uris, scores))
@@ -357,17 +357,18 @@ class KGQAn:
         self._current_question = Question(question_text=value[0], question_id=value[1])
 
     @staticmethod
-    def extract_resource_name(result_bindings):
+    def extract_resource_name(result_bindings, knowledge_graph):
         resource_names = list()
         resource_URIs = list()
         for binding in result_bindings:
+            resource_name = ''
             resource_URI = binding['uri']['value']
-            uri_path = urlparse(resource_URI).path
-            resource_name = os.path.basename(uri_path)
-            dir_name = os.path.dirname(uri_path)
-            if resource_name.startswith('Category:') or not dir_name.endswith('/resource'):
-                continue
-            resource_name = re.sub(r'(:|_|\(|\))', ' ', resource_name)
+            if knowledge_graph == 'dbpedia':
+                resource_name, skip = result_bindings.extract_resource_name_dbpedia(resource_URI)
+                if skip:
+                    continue
+            elif knowledge_graph == 'MS':
+                resource_name = binding['label']['value']
             # resource_name = re.sub(r'^Category:', '', resource_name)
             # TODO: check for URI validity
             if not resource_name.strip():
@@ -375,6 +376,18 @@ class KGQAn:
             resource_URIs.append(resource_URI)
             resource_names.append(resource_name)
         return resource_URIs, resource_names
+
+    @staticmethod
+    def extract_resource_name_dbpedia(binding):
+        skip = False
+        resource_URI = binding['uri']['value']
+        uri_path = urlparse(resource_URI).path
+        resource_name = os.path.basename(uri_path)
+        dir_name = os.path.dirname(uri_path)
+        if resource_name.startswith('Category:') or not dir_name.endswith('/resource'):
+            skip = True
+        resource_name = re.sub(r'(:|_|\(|\))', ' ', resource_name)
+        return resource_name, skip
 
     @staticmethod
     def extract_resource_name_from_uri(uri: str):
