@@ -18,6 +18,7 @@ import re
 import json
 import operator
 import logging
+import traceback
 from collections import defaultdict
 from itertools import count, product, zip_longest
 from statistics import mean
@@ -305,7 +306,8 @@ class KGQAn:
                     if v_result['results']['bindings']:
                         logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     sparqls.append(possible_answer.sparql)
-            except:
+            except Exception as e:
+                traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
