@@ -365,7 +365,7 @@ class KGQAn:
         for binding in result_bindings:
             resource_name = ''
             resource_URI = binding['uri']['value']
-            if knowledge_graph == 'dbpedia':
+            if knowledge_graph == 'Dbpedia':
                 resource_name, skip = result_bindings.extract_resource_name_dbpedia(resource_URI)
                 if skip:
                     continue
