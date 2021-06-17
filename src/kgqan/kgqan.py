@@ -359,6 +359,18 @@ class KGQAn:
         self._current_question = Question(question_text=value[0], question_id=value[1])
 
     @staticmethod
+    def extract_resource_name_dbpedia(binding):
+        skip = False
+        resource_URI = binding['uri']['value']
+        uri_path = urlparse(resource_URI).path
+        resource_name = os.path.basename(uri_path)
+        dir_name = os.path.dirname(uri_path)
+        if resource_name.startswith('Category:') or not dir_name.endswith('/resource'):
+            skip = True
+        resource_name = re.sub(r'(:|_|\(|\))', ' ', resource_name)
+        return resource_name, skip
+
+    @staticmethod
     def extract_resource_name(result_bindings, knowledge_graph):
         resource_names = list()
         resource_URIs = list()
@@ -366,7 +378,7 @@ class KGQAn:
             resource_name = ''
             resource_URI = binding['uri']['value']
             if knowledge_graph == 'Dbpedia':
-                resource_name, skip = result_bindings.extract_resource_name_dbpedia(resource_URI)
+                resource_name, skip = classmethod.extract_resource_name_dbpedia(resource_URI)
                 if skip:
                     continue
             elif knowledge_graph == 'MS':
@@ -378,18 +390,6 @@ class KGQAn:
             resource_URIs.append(resource_URI)
             resource_names.append(resource_name)
         return resource_URIs, resource_names
-
-    @staticmethod
-    def extract_resource_name_dbpedia(binding):
-        skip = False
-        resource_URI = binding['uri']['value']
-        uri_path = urlparse(resource_URI).path
-        resource_name = os.path.basename(uri_path)
-        dir_name = os.path.dirname(uri_path)
-        if resource_name.startswith('Category:') or not dir_name.endswith('/resource'):
-            skip = True
-        resource_name = re.sub(r'(:|_|\(|\))', ' ', resource_name)
-        return resource_name, skip
 
     @staticmethod
     def extract_resource_name_from_uri(uri: str):
