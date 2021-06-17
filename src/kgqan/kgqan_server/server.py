@@ -17,7 +17,8 @@ class MyServer(BaseHTTPRequestHandler):
 
     def parse_answer(self, answers, entities, max_answers):
         nodes = list(entities)
-        nodes.remove('uri')
+        if 'uri' in nodes:
+            nodes.remove('uri')
         objs = []
         for answer in answers:
             values = []
@@ -55,7 +56,8 @@ class MyServer(BaseHTTPRequestHandler):
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(bytes(result, "utf-8"))
-        except:
+        except Exception as e:
+            print("Error from : ", e)
             self.send_error(500, "Failed to get the answer to the question")
 
 if __name__ == "__main__":
