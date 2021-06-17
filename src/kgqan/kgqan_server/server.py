@@ -29,7 +29,7 @@ class MyServer(BaseHTTPRequestHandler):
                 obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'nodes': nodes}
                 objs.append(obj)
 
-            if len(objs == max_answers):
+            if len(objs) == max_answers:
                 break
 
         return json.dumps(objs)
