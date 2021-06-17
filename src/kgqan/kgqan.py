@@ -378,7 +378,7 @@ class KGQAn:
             resource_name = ''
             resource_URI = binding['uri']['value']
             if knowledge_graph == 'Dbpedia':
-                resource_name, skip = classmethod.extract_resource_name_dbpedia(resource_URI)
+                resource_name, skip = KGQAn.extract_resource_name_dbpedia(resource_URI)
                 if skip:
                     continue
             elif knowledge_graph == 'MS':
