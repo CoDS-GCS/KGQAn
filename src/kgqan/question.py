@@ -21,9 +21,14 @@ from .nlp.utils import nltk_POS_map, traverse_tree, table, punctuation
 from .nlp.models import ner, elmo_ner, parser, WordNetLemmatizer
 from termcolor import colored, cprint
 import nltk
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
+model_path = '/home/rehamomar/PycharmProjects/pythonProject/output_pred/'
+model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(model_path)
+
 if not logger.handlers:
     file_handler = logging.FileHandler('kgqan.log')
     formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -46,6 +51,7 @@ class Question:
         self._answer_datatype = answer_datatype
         self._parse_components = None
         self._possible_answers = list()
+        self.triple_list = list()
 
         self.__process()
 
@@ -97,7 +103,9 @@ class Question:
     def __process(self):
         self.__parse_sentence()
         self.__regroup_named_entities()
-        self.__find_possible_entities_and_relations()
+        self.__find_possible_relations()
+        self.__build_graph_from_triples()
+        # self.__find_possible_entities_and_relations()
 
     def __parse_sentence(self):
         self._question_text = self.__rephrase_sentence(self._question_text)
@@ -176,6 +184,31 @@ class Question:
                                     'ne-tag': t})
             else:
                 logger.info(f"[NAMED-ENTITIES:] {self.tokens}")
+                print(f"[NAMED-ENTITIES:] {self.tokens}")
+
+    def __find_possible_relations(self):
+        generation_input = self.replace_question_words(self._question_text)
+        inputs = tokenizer.encode(generation_input, return_tensors="pt")
+        outputs = model.generate(inputs, max_length=300)
+        outputs = tokenizer.batch_decode(outputs)
+        for output in outputs:
+            triple = self.__parse_triple(output)
+            self.triple_list.append(triple)
+
+    # TODO update to handle multiple triples
+    def __parse_triple(self, triple_str):
+        triple_str = triple_str.replace("\"", "")
+        triple_str = triple_str.replace("_", " ")
+        triple_str = triple_str.replace("<s>", "")
+
+        print("Generated Triple ", triple_str)
+        subj_start = triple_str.index('</s>')
+        pred_start = triple_str.index('<p>')
+        obj_start = triple_str.index('<o>')
+        subject = triple_str[subj_start + 4: pred_start].strip()
+        predicate = triple_str[pred_start + 3: obj_start].strip()
+        object = triple_str[obj_start + 3: -4].strip()
+        return {"subject": subject, "predicate": predicate, "object": object}
 
     def __find_possible_entities_and_relations(self):
         s, pred, o = list(), list(), list()
@@ -244,7 +277,7 @@ class Question:
             if entity.startswith('the '):
                 entity = entity[4:]
             self.query_graph.add_node(entity, pos=pos, entity_type=t, uris=[])
-            # workaround to remove be from be + verb from relations  
+            # workaround to remove be from be + verb from relations
             for relation in relations:
                 relation_key = self.query_graph.add_edge(entity, 'uri', relation=relation.replace("be", ""), uris=[])
 
@@ -298,6 +331,7 @@ class Question:
                 return True
         return False
 
+    # TODO this should be removed by getting a new way of extracting entities that are not named entities
     def __rephrase_sentence(self, question_text):
         question_text = question_text.replace("earth", "Earth")
         question_text = question_text.replace("sun", "Sun")
@@ -312,6 +346,59 @@ class Question:
         question_text = question_text.replace("company", "Company")
         # question_text = question_text.replace("moon", "Moon")
         return question_text
+
+    def replace_question_words(self, question_text):
+        question_text = question_text.replace("Who ", "?var ")
+        question_text = question_text.replace("What ", "?var ")
+        question_text = question_text.replace("Which ", "?var ")
+        question_text = question_text.replace("Where ", "?var ")
+        question_text = question_text.replace("When ", "?var ")
+        question_text = question_text.replace("How many ", "?var ")
+        question_text = question_text.replace("In which ", "?var ")
+        question_text = question_text.replace("Give me ", "?var ")
+        return question_text
+
+    def __build_graph_from_triples(self):
+        for triple in self.triple_list:
+            subject = triple['subject']
+            predicate = triple['predicate']
+            object = triple['object']
+
+            if 'var' in subject.lower() or 'v-2' in subject.lower():
+                self.query_graph.add_node('uri', uris=[], answers=[])
+                for token in self.tokens:
+                    if token['token'].lower() == object.lower():
+                        entity_exist = True
+                        self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+                        self.query_graph.add_edge('uri', object, relation=predicate, uris=[])
+            elif 'var' in object.lower() or 'v-2' in object.lower():
+                self.query_graph.add_node('uri', uris=[], answers=[])
+                for token in self.tokens:
+                    if token['token'].lower() == subject.lower():
+                        entity_exist = True
+                        self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+                        self.query_graph.add_edge(subject, 'uri', relation=predicate, uris=[])
+            else:
+                subject_found = False
+                for token in self.tokens:
+                    if token['token'].lower() == subject.lower():
+                        subject_found = True
+                        self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+                # if not entity_found:
+                #     self.query_graph.add_node(subject, uris=[])
+
+                object_found = False
+                for token in self.tokens:
+                    if token['token'].lower() == object.lower():
+                        object_found = True
+                        self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+                # if not entity_found:
+                #     self.query_graph.add_node(object, uris=[])
+                if subject_found and object_found:
+                    self.query_graph.add_edge(subject, object, relation=predicate, uris=[])
+        else:
+            cprint(f"[GRAPH NODES WITH URIs:] {self.query_graph.nodes(data=True)}")
+            cprint(f"[GRAPH EDGES WITH URIs:] {self.query_graph.edges(data=True)}")
 
 
 class Answer:
