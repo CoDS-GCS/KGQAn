@@ -184,7 +184,7 @@ class KGQAn:
                 continue
             entity_query = ''
             if self.knowledge_graph == 'fact_forge':
-                entity_query = make_keyword_unordered_search_query_with_type_fact_forge(entity, imit=self.n_limit_VQuery)
+                entity_query = make_keyword_unordered_search_query_with_type_fact_forge(entity, limit=self.n_limit_VQuery)
             else:
                 entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
