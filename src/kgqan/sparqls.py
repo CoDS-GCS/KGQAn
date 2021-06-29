@@ -118,13 +118,11 @@ def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='D
         # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
         if query_response.status_code in [414]:
             return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-        # print(query_response.text)
         return query_response.text
     elif knowledge_graph == 'MS':
         query_response = requests.get(f'https://makg.org/sparql', params=payload)
         if query_response.status_code in [414]:
             return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-        # print(query_response.text)
         return query_response.text
 
 def process_SPARQL_query_result(query_response: requests.models.Response):

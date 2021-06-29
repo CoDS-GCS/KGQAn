@@ -51,6 +51,11 @@ sh.setFormatter(formatter)
 logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 
+#TODO check best place to have these updates and send either uri or key according to usecase
+knowledge_graph_to_uri = {"dbpedia": "http://206.12.92.210:8890/sparql",
+                          "microsoft_academic": "https://makg.org/sparql",
+                          "yago": "https://yago-knowledge.org/sparql",
+                          "fact_forge": "http://factforge.net/sparql"}
 
 class KGQAn:
     """A Natural Language Platform For Querying RDF-Based Graphs
@@ -99,10 +104,6 @@ class KGQAn:
 
         self.question = (question_text, question_id)
         # self.question.id = question_id
-        if 'dbpedia' in knowledge_graph:
-            self.knowledge_graph = 'Dbpedia'
-        elif 'makg' in knowledge_graph:
-            self.knowledge_graph = 'MS'
 
         if answer_type:
             self.question.answer_datatype = answer_type
@@ -185,7 +186,7 @@ class KGQAn:
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
-                entity_result = json.loads(evaluate_SPARQL_query(entity_query, knowledge_graph=self.knowledge_graph))
+                entity_result = json.loads(evaluate_SPARQL_query(entity_query, knowledge_graph=knowledge_graph_to_uri[self.knowledge_graph]))
             except:
                 logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
                 continue
@@ -209,18 +210,18 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if source == 'uri' or destination == 'uri':
-                    URIs_false, names_false = self._get_predicates_and_their_names(self.knowledge_graph,
+                    URIs_false, names_false = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph],
                                                                                    subj=comb,
                                                                                    nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
                         idx = names_false.index('leadfigures')
                         names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self._get_predicates_and_their_names(self.knowledge_graph, obj=comb, nlimit=self.n_limit_EQuery)
+                    URIs_true, names_true = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     v_uri_1, v_uri_2 = comb
-                    URIs_false, names_false = self._get_predicates_and_their_names(self.knowledge_graph, v_uri_1, v_uri_2,
+                    URIs_false, names_false = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], v_uri_1, v_uri_2,
                                                                                    nlimit=self.n_limit_EQuery)
-                    URIs_true, names_true = self._get_predicates_and_their_names(self.knowledge_graph, v_uri_2, v_uri_1,
+                    URIs_true, names_true = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], v_uri_2, v_uri_1,
                                                                                  nlimit=self.n_limit_EQuery)
                 URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                 URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
@@ -289,7 +290,7 @@ class KGQAn:
         sparqls = list()
         for i, possible_answer in enumerate(self.question.possible_answers[:self._n_max_answers]):
             logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
-            result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=self.knowledge_graph)
+            result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=knowledge_graph_to_uri[self.knowledge_graph])
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
                 v_result = json.loads(result)
@@ -377,11 +378,11 @@ class KGQAn:
         for binding in result_bindings:
             resource_name = ''
             resource_URI = binding['uri']['value']
-            if knowledge_graph == 'Dbpedia':
+            if knowledge_graph == 'dbpedia':
                 resource_name, skip = KGQAn.extract_resource_name_dbpedia(binding)
                 if skip:
                     continue
-            elif knowledge_graph == 'MS':
+            elif knowledge_graph == 'microsoft_academic':
                 resource_name = binding['label']['value']
             # resource_name = re.sub(r'^Category:', '', resource_name)
             # TODO: check for URI validity
