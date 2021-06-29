@@ -66,6 +66,23 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
+#TODO refactor this and its calling code
+def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: str, limit=500):
+    # for cases such as "Angela Merkel ’s"
+    escape = ['’s']
+    kwlist = []
+    for w in keywords_string.strip().split():
+        if w not in escape:
+            if w.isnumeric():
+                w = '\\\'' + w + '\\\''
+                kwlist.append(w)
+            else:
+                kwlist.append(w)
+    kws = ' AND '.join(kwlist)
+    return f"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select distinct ?uri  ?label " \
+           f"where {{ ?uri ?p  ?label . ?label rdfs:label '{kws}'@en . }}  LIMIT {limit}"
+
+
 def make_top_predicates_sbj_query(uri, limit=1000):
     return f"select distinct ?p where {{ <{uri}> ?p ?o . }}  LIMIT {limit}"
 
@@ -110,7 +127,7 @@ def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='h
     if query_response.status_code in [414]:
         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
     return query_response.text
-    
+
     # if knowledge_graph == 'Dbpedia':
     #     # From public https://dbpedia.org/sparql
     #     # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
