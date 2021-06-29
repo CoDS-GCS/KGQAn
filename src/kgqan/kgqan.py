@@ -293,6 +293,8 @@ class KGQAn:
             result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=knowledge_graph_to_uri[self.knowledge_graph])
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
+                print("Result is")
+                print(result)
                 v_result = json.loads(result)
                 result_compatiable = self.check_if_answers_type_compatiable(v_result)
                 if not result_compatiable:
