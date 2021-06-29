@@ -104,7 +104,7 @@ class KGQAn:
 
         self.question = (question_text, question_id)
         # self.question.id = question_id
-
+        self.knowledge_graph = knowledge_graph
         if answer_type:
             self.question.answer_datatype = answer_type
         self._n_max_answers = n_max_answers if n_max_answers else self._n_max_answers
