@@ -122,7 +122,7 @@ class KGQAn:
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
         logger.info(f"\n\n\n\n{'#' * 120}")
-        return answers, self.question.query_graph.nodes
+        return answers, self.question.query_graph.nodes, self.question.query_graph.edges
 
     def detect_question_and_answer_type(self):
         # question_text = question_text.lower()

@@ -16,8 +16,9 @@ limit_EQuery = 100
 
 class MyServer(BaseHTTPRequestHandler):
 
-    def parse_answer(self, answers, entities, max_answers):
+    def parse_answer(self, answers, entities, max_answers, edges):
         nodes = list(entities)
+        relations = list(edges(data='relation'))
         if 'uri' in nodes:
             nodes.remove('uri')
         objs = []
@@ -27,7 +28,7 @@ class MyServer(BaseHTTPRequestHandler):
                 for value in answer['results']['bindings']:
                     values.append(value['uri']['value'])
             if len(values) > 0:
-                obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'nodes': nodes}
+                obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'nodes': nodes, 'relations': relations, 'score': answer['score']}
                 objs.append(obj)
 
             if len(objs) == max_answers:
@@ -51,8 +52,8 @@ class MyServer(BaseHTTPRequestHandler):
         try:
             MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
                             n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
-            answers, entities = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
-            result = self.parse_answer(answers, entities, data['max_answers'])
+            answers, entities, edges = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
+            result = self.parse_answer(answers, entities, data['max_answers'], edges)
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
