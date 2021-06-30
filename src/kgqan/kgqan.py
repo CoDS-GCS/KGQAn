@@ -246,7 +246,6 @@ class KGQAn:
     @staticmethod
     def camel_case_split(str):
         words = [[str[0]]]
-
         for c in str[1:]:
             if words[-1][-1].islower() and c.isupper():
                 words.append(list(c))
@@ -259,7 +258,7 @@ class KGQAn:
     def __compute_semantic_similarity_between_single_word_and_word_list(word, word_list):
 
         if KGQAn.is_camel_case(word):
-            word = ' '.join(KGQAn.camel_case_split(str))
+            word = ' '.join(KGQAn.camel_case_split(word))
 
         scores = list()
         score = 0.0
