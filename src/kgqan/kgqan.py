@@ -53,8 +53,8 @@ logger2.setLevel(logging.DEBUG)
 
 #TODO check best place to have these updates and send either uri or key according to usecase
 knowledge_graph_to_uri = {"dbpedia": "http://206.12.92.210:8890/sparql",
-                          "microsoft_academic": "https://makg.org/sparql",
-                          "yago": "https://yago-knowledge.org/sparql",
+                          "microsoft_academic": "http://www.scholarlydata.org/sparql/",
+                          "yago": "https://yago-knowledge.org/sparql/query",
                           "fact_forge": "http://factforge.net/sparql"}
 
 class KGQAn:
