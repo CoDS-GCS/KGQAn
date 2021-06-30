@@ -124,8 +124,8 @@ def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='h
         'run': '+Run+Query+',
     }
     query_response = requests.get(knowledge_graph, params=payload)
-    print("query_response for ", knowledge_graph)
-    print(query_response)
+    # print("query_response for ", knowledge_graph)
+    # print(query_response)
     if query_response.status_code in [414]:
         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
     return query_response.text
