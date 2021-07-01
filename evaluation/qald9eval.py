@@ -68,7 +68,17 @@ if __name__ == '__main__':
         #                               129, 183, 181, 7, 135, 50, 71, 105, 52, 102, 21, 34, 145, 154, 198]:
         #     continue
 
-        # if int(question['id']) not in [63]:
+        # if int(question['id']) not in [81]:
+        #     continue
+
+        # if int(question['id'] <= 1097):
+        #     continue
+        # if int(question['id']) in [10, 45, 64, 69, 70, 100, 106, 114, 126, 132, 153, 165, 167, 182, 189, 194, 207,
+        #                            221, 248, 258, 268, 279, 289, 340, 359, 362, 366, 377, 394, 398, 427, 516, 520,
+        #                            524, 536, 547, 549, 553, 563, 584, 588, 594, 598, 622, 625, 641, 664, 669, 713,
+        #                            721, 729, 742, 743, 753, 756, 758, 760, 768, 769, 779, 801, 802, 815, 826, 838,
+        #                            844, 887, 896, 914, 929, 934, 938, 942, 1016, 1017, 1024, 1066, 1077, 1082, 1093,
+        #                            1097]:
         #     continue
 
         # long time queries 51
@@ -89,8 +99,14 @@ if __name__ == '__main__':
         st = time.time()
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
-        answers, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'])
-
+        try:
+            answers, _, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'], knowledge_graph='https://dbpedia.org/sparql')
+        except:
+            continue
+        # try:
+        #     answers, _ = MyKGQAn.ask(question_text=question_text, question_id=question['id'], knowledge_graph='https://dbpedia.org/sparql')
+        # except:
+        #     continue
         all_bindings = list()
         for answer in answers:
             if answer['results'] and answer['results']['bindings']:
