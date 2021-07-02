@@ -17,8 +17,13 @@ limit_EQuery = 100
 class MyServer(BaseHTTPRequestHandler):
 
     def parse_answer(self, answers, entities, max_answers, edges):
-        nodes = list(entities)
-        relations = list(edges(data='relation'))
+        nodes = []
+        if len(entities) != 0:
+            nodes = list(entities)
+
+        relations = []
+        if len(edges) != 0:
+            relations = list(edges(data='relation'))
         if 'uri' in nodes:
             nodes.remove('uri')
         objs = []
