@@ -15,12 +15,16 @@ __created__ = "2020-02-07"
 
 import json
 import time
+import traceback
+
 from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 
 file_name = r"qald9/qald-9-test-multilingual.json"
+# file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"
+
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -100,8 +104,9 @@ if __name__ == '__main__':
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
         try:
-            answers, _, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'], knowledge_graph='https://dbpedia.org/sparql')
-        except:
+            answers, _, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'], knowledge_graph='dbpedia')
+        except Exception as e:
+            traceback.print_exc()
             continue
         # try:
         #     answers, _ = MyKGQAn.ask(question_text=question_text, question_id=question['id'], knowledge_graph='https://dbpedia.org/sparql')

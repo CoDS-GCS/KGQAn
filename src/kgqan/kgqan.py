@@ -265,6 +265,7 @@ class KGQAn:
         # self.uri_scores.update(URIs_with_scores)
         return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
+    #TODO revise score calculation
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
@@ -280,11 +281,17 @@ class KGQAn:
             for star_query in product(*possible_triples_for_all_relations):
                 score = sum([self.v_uri_scores[subj]+predicate[2] for subj, predicate in star_query])
 
-                triple = [f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri'
-                          for v_uri, predicate in star_query]
+                #TODO update the calculation for mapping between different nodes and uris
+                triple = []
+                node_uris = []
+                relation_uris = []
+                for v_uri, predicate in star_query:
+                    triple.append(f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri')
+                    node_uris.append(v_uri)
+                    relation_uris.append(predicate[0])
 
                 query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
-                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score)
+                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris)
 
     def evaluate_star_queries(self):
         self.question.possible_answers.sort(reverse=True)

@@ -33,7 +33,9 @@ class MyServer(BaseHTTPRequestHandler):
                 for value in answer['results']['bindings']:
                     values.append(value['uri']['value'])
             if len(values) > 0:
-                obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'nodes': nodes, 'relations': relations, 'score': answer['score']}
+                obj = {'question': answer['question'], 'sparql': answer['sparql'], 'values': values, 'named_entites': nodes,
+                       'extracted_relation': relations, 'score': answer['score'], "nodes": answer['nodes'],
+                       'edges': answer['edges']}
                 objs.append(obj)
 
             if len(objs) == max_answers:
