@@ -55,8 +55,8 @@ def make_keyword_unordered_search_query_with_type_simple(keywords_string: str, l
 def make_keyword_unordered_search_query_with_type_simple_for_open_citations(keywords_string: str, limit=500):
     kws = ' AND '.join(keywords_string.strip().split())
 
-    return f"PREFIX cito: <http://purl.org/spar/cito/> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX datacite: <http://purl.org/spar/datacite/> PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/> PREFIX biro: <http://purl.org/spar/biro/> PREFIX frbr: <http://purl.org/vocab/frbr/core#> PREFIX c4o: <http://purl.org/spar/c4o/> SELECT ?cited ?s ?o  " \
-           f"where {{ ?s dcterms:title ?o . ?label  filter regex(?o, '{kws}' ) . }}  LIMIT {limit}"
+    return f"PREFIX cito: <http://purl.org/spar/cito/> PREFIX dcterms: <http://purl.org/dc/terms/> PREFIX datacite: <http://purl.org/spar/datacite/> PREFIX literal: <http://www.essepuntato.it/2010/06/literalreification/> PREFIX biro: <http://purl.org/spar/biro/> PREFIX frbr: <http://purl.org/vocab/frbr/core#> PREFIX c4o: <http://purl.org/spar/c4o/> SELECT ?s ?o  " \
+           f"where {{ ?s dcterms:title ?o . filter regex(?o, '{kws}' ) . }}  LIMIT {limit}"
 
 def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
     # for cases such as "Angela Merkel ’s"
