@@ -185,6 +185,8 @@ class KGQAn:
             entity_query = ''
             if self.knowledge_graph == 'fact_forge':
                 entity_query = make_keyword_unordered_search_query_with_type_fact_forge(entity, limit=self.n_limit_VQuery)
+            elif self.knowledge_graph == 'microsoft_academic':
+                entity_query = make_keyword_unordered_search_query_with_type_simple_for_open_citations(entity, limit=self.n_limit_VQuery)
             else:
                 entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
