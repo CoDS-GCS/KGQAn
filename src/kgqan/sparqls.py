@@ -121,14 +121,14 @@ def construct_answers_query(sub_uri, pred_uri, limit=1000):
 
 def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='http://206.12.92.210:8890/sparql'):
     payload = {
-        'default-graph-uri': '',
+        # 'default-graph-uri': '',
         'query': query,
         'format': fmt,  # application/rdf+xml
-        'CXML_redir_for_subjs': '121',
-        'CXML_redir_for_hrefs': '',
-        'timeout': '30000',
-        'debug': 'on',
-        'run': '+Run+Query+',
+        # 'CXML_redir_for_subjs': '121',
+        # 'CXML_redir_for_hrefs': '',
+        # 'timeout': '30000',
+        # 'debug': 'on',
+        # 'run': '+Run+Query+',
     }
     query_response = requests.get(knowledge_graph, params=payload)
     # print("query_response for ", knowledge_graph)
