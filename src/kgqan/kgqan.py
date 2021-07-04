@@ -337,7 +337,11 @@ class KGQAn:
                     return True
                 else:
                     return False
-        # elif 'string' in self.question.answer_datatype:
+        elif 'string' in self.question.answer_datatype:
+            for answer in result['results']['bindings']:
+                if self.is_number(answer):
+                    return False
+        #     return True
         #     for answer in result['results']['bindings']:
         #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']\
         #                 or answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
@@ -357,6 +361,14 @@ class KGQAn:
                         return False
                 else:
                     return False
+        elif 'resource' in self.question.answer_datatype:
+            for answer in result['results']['bindings']:
+                if self.is_number(answer):
+                    return False
+                #TODO remove after the demo
+                if answer['uri']['type'] == 'literal':
+                    return False
+            return True
         # elif 'resource' in self.question.answer_datatype:
         #     for answer in result['results']['bindings']:
         #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value'] \
@@ -365,6 +377,14 @@ class KGQAn:
         #         else:
         #             return False
         return True
+
+    #TODO add similar function for date
+    def is_number(self, answer):
+        if answer['uri']['type'] == 'typed-literal' and (
+                'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
+                or 'double' in answer['uri']['datatype']):
+            return True
+        return False
 
     @property
     def question(self):

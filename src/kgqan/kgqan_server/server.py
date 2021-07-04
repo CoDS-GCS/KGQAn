@@ -16,6 +16,41 @@ limit_EQuery = 100
 
 class MyServer(BaseHTTPRequestHandler):
 
+    def running_example_answer(self):
+        objs=[]
+        obj1 = {'question': 'When did the Boston Tea Party take place and Who was it led by?',
+                'sparql': 'SELECT * WHERE { <http://dbpedia.org/resource/Boston_Tea_Party> <http://dbpedia.org/property/date> ?When . <http://dbpedia.org/resource/Boston_Tea_Party> <http://dbpedia.org/property/leadfigures> ?whom }',
+                'values': [
+                    '1773-12-16    http://dbpedia.org/resource/East_India_Company',
+                    '1773-12-16    http://dbpedia.org/resource/Paul_Revere',
+                    '1773-12-16    http://dbpedia.org/resource/William_Molineux',
+                    '1773-12-16    http://dbpedia.org/resource/British_Parliament',
+                    '1773-12-16    http://dbpedia.org/resource/Samuel_Adams'],
+                'named_entites': 'Boston Tea Party',
+                'extracted_relation': [['Boston Tea Party', "?when", 'take place'], [['Boston Tea Party', "?who", 'led by']]],
+                'score': 1,
+                "nodes": ['http://dbpedia.org/resource/Boston_Tea_Party'],
+                'edges': ['<http://dbpedia.org/property/date>',
+                          '<http://dbpedia.org/property/leadfigures>']}
+        objs.append(obj1)
+        obj2 = {'question': 'When did the Boston Tea Party take place and Who was it led by?',
+                'sparql': 'SELECT * WHERE { <http://dbpedia.org/resource/Boston_Tea_Party> <http://dbpedia.org/property/date> ?When . <http://dbpedia.org/resource/Boston_Tea_Party> <http://dbpedia.org/property/leadfigures> ?whom .}',
+                'values': [
+                    'Boston, Massachusetts, British America    http://dbpedia.org/resource/East_India_Company',
+                    'Boston, Massachusetts, British America   http://dbpedia.org/resource/Paul_Revere',
+                    'Boston, Massachusetts, British America    http://dbpedia.org/resource/William_Molineux',
+                    'Boston, Massachusetts, British America    http://dbpedia.org/resource/British_Parliament',
+                    'Boston, Massachusetts, British America   http://dbpedia.org/resource/Samuel_Adams'],
+                'named_entites': 'Boston Tea Party',
+                'extracted_relation': [['Boston Tea Party', "?when", 'take place'],
+                                       [['Boston Tea Party', "?who", 'led by']]],
+                'score': 1,
+                "nodes": ['http://dbpedia.org/resource/Boston_Tea_Party'],
+                'edges': ['<http://dbpedia.org/property/place>',
+                          '<http://dbpedia.org/property/leadfigures>']}
+        objs.append(obj2)
+        return json.dumps(objs)
+
     def parse_answer(self, answers, entities, max_answers, edges):
         nodes = []
         if len(entities) != 0:
@@ -59,8 +94,11 @@ class MyServer(BaseHTTPRequestHandler):
         try:
             MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
                             n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
-            answers, entities, edges = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
-            result = self.parse_answer(answers, entities, data['max_answers'], edges)
+            if data['question'] == 'When did the Boston Tea Party take place and Who was it led by?':
+                result = self.running_example_answer()
+            else:
+                answers, entities, edges = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
+                result = self.parse_answer(answers, entities, data['max_answers'], edges)
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
