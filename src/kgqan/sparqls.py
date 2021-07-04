@@ -120,6 +120,9 @@ def construct_answers_query(sub_uri, pred_uri, limit=1000):
 
 
 def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='http://206.12.92.210:8890/sparql'):
+    if knowledge_graph == 'https://opencitations.net/sparql':
+        fmt = 'application/rdf+xml'
+
     payload = {
         # 'default-graph-uri': '',
         'query': query,
