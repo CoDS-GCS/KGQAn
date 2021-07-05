@@ -51,6 +51,13 @@ def make_keyword_unordered_search_query_with_type_simple(keywords_string: str, l
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
+
+def make_keyword_unordered_search_query_with_type_simple_for_open_citations(keywords_string: str, limit=500):
+    kws = ' AND '.join(keywords_string.strip().split())
+
+    return f"PREFIX c4o: <http://purl.org/spar/c4o/> SELECT ?s ?o  " \
+           f"where {{ ?s c4o:hasContent ?o  . filter regex(?o, '{kws}' ) .}}  LIMIT {limit}"
+
 def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
     # for cases such as "Angela Merkel ’s"
     escape = ['’s']
@@ -65,6 +72,23 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
     kws = ' AND '.join(kwlist)
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
+
+#TODO refactor this and its calling code
+def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: str, limit=500):
+    # for cases such as "Angela Merkel ’s"
+    escape = ['’s']
+    kwlist = []
+    for w in keywords_string.strip().split():
+        if w not in escape:
+            if w.isnumeric():
+                w = '\\\'' + w + '\\\''
+                kwlist.append(w)
+            else:
+                kwlist.append(w)
+    kws = ' AND '.join(kwlist)
+    return f"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select distinct ?uri  ?label " \
+           f"where {{ ?uri ?p  ?label . ?label rdfs:label '{kws}'@en . }}  LIMIT {limit}"
+
 
 def make_top_predicates_sbj_query(uri, limit=1000):
     return f"select distinct ?p where {{ <{uri}> ?p ?o . }}  LIMIT {limit}"
@@ -95,37 +119,45 @@ def construct_answers_query(sub_uri, pred_uri, limit=1000):
     return f"select ?o where {{ <{sub_uri}> <{pred_uri}> ?o . }}  LIMIT {limit}"
 
 
-def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='Dbpedia'):
+def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='http://206.12.92.210:8890/sparql'):
+    if knowledge_graph == 'https://opencitations.net/sparql':
+        fmt = 'application/rdf+xml'
+
     payload = {
-        'default-graph-uri': '',
+        # 'default-graph-uri': '',
         'query': query,
         'format': fmt,  # application/rdf+xml
-        'CXML_redir_for_subjs': '121',
-        'CXML_redir_for_hrefs': '',
-        'timeout': '30000',
-        'debug': 'on',
-        'run': '+Run+Query+',
+        # 'CXML_redir_for_subjs': '121',
+        # 'CXML_redir_for_hrefs': '',
+        # 'timeout': '30000',
+        # 'debug': 'on',
+        # 'run': '+Run+Query+',
     }
-    if knowledge_graph == 'Dbpedia':
-        # From public https://dbpedia.org/sparql
-        # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
+    query_response = requests.get(knowledge_graph, params=payload)
+    # print("query_response for ", knowledge_graph)
+    # print(query_response)
+    if query_response.status_code in [414]:
+        return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
+    return query_response.text
 
-        # From local http://localhost:8890/sparql
-        # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
-
-        # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
-        query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
-        # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
-        if query_response.status_code in [414]:
-            return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-        print(query_response.text)    
-        return query_response.text
-    elif knowledge_graph == 'MS':
-        query_response = requests.get(f'https://makg.org/sparql', params=payload)
-        if query_response.status_code in [414]:
-            return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-        print(query_response.text)
-        return query_response.text
+    # if knowledge_graph == 'Dbpedia':
+    #     # From public https://dbpedia.org/sparql
+    #     # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
+    #
+    #     # From local http://localhost:8890/sparql
+    #     # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
+    #
+    #     # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
+    #     query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
+    #     # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
+    #     if query_response.status_code in [414]:
+    #         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
+    #     return query_response.text
+    # elif knowledge_graph == 'MS':
+    #     query_response = requests.get(f'https://makg.org/sparql', params=payload)
+    #     if query_response.status_code in [414]:
+    #         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
+    #     return query_response.text
 
 def process_SPARQL_query_result(query_response: requests.models.Response):
     pass

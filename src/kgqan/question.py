@@ -310,6 +310,7 @@ class Question:
         question_text = question_text.replace("oscar", "Oscar")
         question_text = question_text.replace("English", "english")
         question_text = question_text.replace("company", "Company")
+        question_text = question_text.replace("moon", "Moon")
         return question_text
 
 
