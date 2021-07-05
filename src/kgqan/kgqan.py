@@ -398,7 +398,7 @@ class KGQAn:
                     return True
                 else:
                     return False
-        elif 'string' in self.question.answer_datatype:
+        elif self.question.answer_datatype and 'string' in self.question.answer_datatype:
             for answer in result['results']['bindings']:
                 if self.is_number(answer):
                     return False
@@ -422,7 +422,7 @@ class KGQAn:
                         return False
                 else:
                     return False
-        elif 'resource' in self.question.answer_datatype:
+        elif self.question.answer_datatype and 'resource' in self.question.answer_datatype:
             for answer in result['results']['bindings']:
                 if self.is_number(answer):
                     return False
