@@ -552,6 +552,7 @@ class KGQAn:
             predicates_xml = root.findall(
                 ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/{http://www.w3.org/2005/sparql-results#}uri")
             result = []
+            # print("Predicates ", [p.text for p in predicates_xml])
             for predicate in predicates_xml:
                 result.append({"p": {"value": predicate.text}})
             return KGQAn.extract_predicate_names(result)
