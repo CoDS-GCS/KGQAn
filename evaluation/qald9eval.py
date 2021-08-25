@@ -108,10 +108,7 @@ if __name__ == '__main__':
         except Exception as e:
             traceback.print_exc()
             continue
-        # try:
-        #     answers, _ = MyKGQAn.ask(question_text=question_text, question_id=question['id'], knowledge_graph='https://dbpedia.org/sparql')
-        # except:
-        #     continue
+
         all_bindings = list()
         for answer in answers:
             if answer['results'] and answer['results']['bindings']:
