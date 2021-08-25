@@ -15,25 +15,21 @@ __created__ = "2020-02-07"
 
 import os
 import re
-import json
 import operator
-import logging
 import traceback
 from collections import defaultdict
 from itertools import count, product, zip_longest
-from statistics import mean
 from urllib.parse import urlparse
-from gensim.parsing.preprocessing import remove_stopwords, STOPWORDS
-import xml.etree.ElementTree as ET
 
+from .sparql_end_points.EndPoint import EndPoint
+from .sparql_end_points.XML_EndPoint import XML_EndPoint
 
 from .sparqls import *
 from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
 
-import datetime
-from termcolor import colored, cprint
+from termcolor import cprint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -53,11 +49,13 @@ sh.setFormatter(formatter)
 logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 
-#TODO check best place to have these updates and send either uri or key according to usecase
+# TODO check best place to have these updates and send either uri or key according to usecase
 knowledge_graph_to_uri = {"dbpedia": "http://206.12.92.210:8890/sparql",
-                          "microsoft_academic": "https://opencitations.net/sparql",
+                          "microsoft_academic": "https://makg.org/sparql",
+                          "open_citations": "https://opencitations.net/sparql",
                           "yago": "https://yago-knowledge.org/sparql/query",
                           "fact_forge": "http://factforge.net/sparql"}
+
 
 class KGQAn:
     """A Natural Language Platform For Querying RDF-Based Graphs
@@ -75,7 +73,7 @@ class KGQAn:
             """
 
     def __init__(self, semantic_affinity_server=None,
-                n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400, n_limit_EQuery=400):
+                 n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400, n_limit_EQuery=400):
         self._ss_server = semantic_affinity_server
         self._n_max_answers = n_max_answers  # this should affect the number of star queries to be executed against TS
         self._current_question = None
@@ -84,6 +82,7 @@ class KGQAn:
         self.n_limit_VQuery = n_limit_VQuery
         self.n_limit_EQuery = n_limit_EQuery
         self.knowledge_graph = ''
+        self.sparql_end_point = None
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
@@ -112,6 +111,11 @@ class KGQAn:
         self._n_max_answers = n_max_answers if n_max_answers else self._n_max_answers
         self.n_max_Vs = n_max_Vs if n_max_Vs else self.n_max_Vs
         self.n_max_Es = n_max_Es if n_max_Es else self.n_max_Es
+        if knowledge_graph in ['open_citations']:
+            self.sparql_end_point = XML_EndPoint(knowledge_graph, knowledge_graph_to_uri[knowledge_graph])
+        else:
+            self.sparql_end_point = EndPoint(knowledge_graph, knowledge_graph_to_uri[knowledge_graph])
+
         self.detect_question_and_answer_type()
         self.rephrase_question()
         # if no named entity you should return here
@@ -120,10 +124,7 @@ class KGQAn:
             return [], [], []
         self.extract_possible_V_and_E()
         self.generate_star_queries()
-        if knowledge_graph == 'microsoft_academic':
-            self.evaluate_xml_queries()
-        else:
-            self.evaluate_star_queries()
+        self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
         logger.info(f"\n\n\n\n{'#' * 120}")
@@ -187,36 +188,15 @@ class KGQAn:
             if entity == 'uri':
                 self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
-            entity_query = ''
-            if self.knowledge_graph == 'fact_forge':
-                entity_query = make_keyword_unordered_search_query_with_type_fact_forge(entity, limit=self.n_limit_VQuery)
-            elif self.knowledge_graph == 'microsoft_academic':
-                entity_query = make_keyword_unordered_search_query_with_type_simple_for_open_citations(entity, limit=self.n_limit_VQuery)
-            else:
-                entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
-            #TODO last minute change needs revision
-            if self.knowledge_graph == 'microsoft_academic':
-                root = ET.fromstring(evaluate_SPARQL_query(entity_query, knowledge_graph=knowledge_graph_to_uri[
-                                                                         self.knowledge_graph]))
-                uris_xml = root.findall(
-                    ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/[@name='s']/{http://www.w3.org/2005/sparql-results#}uri")
-                names_xml = root.findall(
-                    ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/[@name='o']/{http://www.w3.org/2005/sparql-results#}literal")
-                uris = [uri.text for uri in uris_xml]
-                names = [name.text for name in names_xml]
-            else:
-                try:
-                    entity_result = json.loads(evaluate_SPARQL_query(entity_query,
-                                                                     knowledge_graph=knowledge_graph_to_uri[
-                                                                         self.knowledge_graph]))
-                except:
-                    logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
-                    continue
+            try:
+                uris, names = self.sparql_end_point.get_names_and_uris(entity_query)
+            except:
+                logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
+                continue
 
-                uris, names = self.__class__.extract_resource_name(entity_result['results']['bindings'],
-                                                                   self.knowledge_graph)
             scores = self.__compute_semantic_similarity_between_single_word_and_word_list(entity, names)
 
             URIs_with_scores = list(zip(uris, scores))
@@ -235,19 +215,18 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if source == 'uri' or destination == 'uri':
-                    URIs_false, names_false = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph],
-                                                                                   subj=comb,
-                                                                                   nlimit=self.n_limit_EQuery)
+                    URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
+                                                                                                   nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
                         idx = names_false.index('leadfigures')
                         names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], obj=comb, nlimit=self.n_limit_EQuery)
+                    URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     v_uri_1, v_uri_2 = comb
-                    URIs_false, names_false = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], v_uri_1, v_uri_2,
-                                                                                   nlimit=self.n_limit_EQuery)
-                    URIs_true, names_true = self._get_predicates_and_their_names(knowledge_graph_to_uri[self.knowledge_graph], v_uri_2, v_uri_1,
-                                                                                 nlimit=self.n_limit_EQuery)
+                    URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names( v_uri_1, v_uri_2,
+                                                                                                    nlimit=self.n_limit_EQuery)
+                    URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
+                                                                                                 nlimit=self.n_limit_EQuery)
                 URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                 URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
                 uris.extend(URIs_false + URIs_true)
@@ -314,138 +293,35 @@ class KGQAn:
                 query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
                 self.question.add_possible_answer(question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris)
 
-    #TODO Last minute change needs to be revised and removed
-    def evaluate_xml_queries(self):
-        self.question.possible_answers.sort(reverse=True)
-        # for i, possible_answer in enumerate(self.question.possible_answers):
-        #     print(i, possible_answer.sparql, possible_answer.score)
-        qc = count(1)
-        sparqls = list()
-        for i, possible_answer in enumerate(self.question.possible_answers[:self._n_max_answers]):
-            logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
-            result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=knowledge_graph_to_uri[self.knowledge_graph])
-            logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
-            try:
-                root = ET.fromstring(result)
-                result_uri = root.findall(
-                    ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/{http://www.w3.org/2005/sparql-results#}uri")
-                result_literal = root.findall(
-                    ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/{http://www.w3.org/2005/sparql-results#}literal")
-                result_text = [r.text for r in result_uri + result_literal]
-                bindings = []
-                for r in result_uri + result_literal:
-                    el = {"uri": {"type": "uri", "value": r.text}}
-                    bindings.append(el)
-                # v_result = json.loads(result)
-                # result_compatiable = self.check_if_answers_type_compatiable(v_result)
-                # if not result_compatiable:
-                #     continue
-
-                possible_answer.update(results={"bindings": bindings}, vars=["uri"])
-                # answers = list()
-                # for binding in v_result['results']['bindings']:
-                #     answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
-                #     answers.append(answer)
-                # else:
-                #     if v_result['results']['bindings']:
-                #         logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
-                sparqls.append(possible_answer.sparql)
-            except Exception as e:
-                traceback.print_exc()
-                print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
-        else:
-            self.question.sparqls = sparqls
-
     def evaluate_star_queries(self):
         self.question.possible_answers.sort(reverse=True)
-        # for i, possible_answer in enumerate(self.question.possible_answers):
-        #     print(i, possible_answer.sparql, possible_answer.score)
         qc = count(1)
         sparqls = list()
         for i, possible_answer in enumerate(self.question.possible_answers[:self._n_max_answers]):
             logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
-            result = evaluate_SPARQL_query(possible_answer.sparql, knowledge_graph=knowledge_graph_to_uri[self.knowledge_graph])
+            result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                # print("Result is")
-                # print(result)
-                v_result = json.loads(result)
-                result_compatiable = self.check_if_answers_type_compatiable(v_result)
-                if not result_compatiable:
+                result_compatible, v_result, get_answers = self.sparql_end_point.parse_result(result, self.question.answer_datatype)
+                if not result_compatible:
                     continue
 
                 possible_answer.update(results=v_result['results'], vars=v_result['head']['vars'])
-                answers = list()
-                for binding in v_result['results']['bindings']:
-                    answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
-                    answers.append(answer)
-                else:
-                    if v_result['results']['bindings']:
-                        logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
-                    sparqls.append(possible_answer.sparql)
+                sparqls.append(possible_answer.sparql)
+
+                if get_answers:
+                    answers = list()
+                    for binding in v_result['results']['bindings']:
+                        answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
+                        answers.append(answer)
+                    else:
+                        if v_result['results']['bindings']:
+                            logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
             except Exception as e:
                 traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
-
-    def check_if_answers_type_compatiable(self, result):
-        if self.question.answer_datatype == 'number':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal' and (
-                        'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                        or 'double' in answer['uri']['datatype']):
-                    return True
-                else:
-                    return False
-        elif self.question.answer_datatype and 'string' in self.question.answer_datatype:
-            for answer in result['results']['bindings']:
-                if self.is_number(answer):
-                    return False
-        #     return True
-        #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']\
-        #                 or answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
-        #             return True
-        #         else:
-        #             return False
-        elif self.question.answer_datatype == 'date':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal':
-                    if 'date' in answer['uri']['datatype']:
-                        return True
-                    elif 'gYear' in answer['uri']['datatype']:
-                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
-                        answer['uri']['value'] = str(obj.date())
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
-        elif self.question.answer_datatype and 'resource' in self.question.answer_datatype:
-            for answer in result['results']['bindings']:
-                if self.is_number(answer):
-                    return False
-                #TODO remove after the demo
-                if answer['uri']['type'] == 'literal':
-                    return False
-            return True
-        # elif 'resource' in self.question.answer_datatype:
-        #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value'] \
-        #                 or answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']:
-        #             return True
-        #         else:
-        #             return False
-        return True
-
-    #TODO add similar function for date
-    def is_number(self, answer):
-        if answer['uri']['type'] == 'typed-literal' and (
-                'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                or 'double' in answer['uri']['datatype']):
-            return True
-        return False
 
     @property
     def question(self):
@@ -497,68 +373,6 @@ class KGQAn:
         # resource_name = re.sub(r'^Category:', '', resource_name)
         # TODO: check for URI validity
         return resource_URI, resource_name
-
-    @staticmethod
-    def extract_predicate_names(result_bindings):
-        predicate_URIs = list()
-        predicate_names = list()
-        for binding in result_bindings:
-            predicate_URI = binding['p']['value']
-            uri_path = urlparse(predicate_URI).path
-            predicate_name = os.path.basename(uri_path)
-            p = re.compile(r'(_|\([^()]*\))')
-            predicate_name = p.sub(' ', predicate_name)
-            p2 = re.compile(r'([a-z0-9])([A-Z])')
-            predicate_name = p2.sub(r"\1 \2", predicate_name)
-            if not predicate_name.strip():
-                continue
-            predicate_names.append(predicate_name)
-            predicate_URIs.append(predicate_URI)
-        return predicate_URIs, predicate_names
-
-    @staticmethod
-    def _get_predicates_and_their_names(knowledge_graph, subj=None, obj=None, nlimit: int = 100):
-        if subj and obj:
-            q = sparql_query_to_get_predicates_when_subj_and_obj_are_known(subj, obj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
-        elif subj:
-            q = make_top_predicates_sbj_query(subj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
-        elif obj:
-            q = make_top_predicates_obj_query(obj, limit=nlimit)
-            uris, names = KGQAn.execute_sparql_query_and_get_uri_and_name_lists(q, knowledge_graph)
-        else:
-            raise Exception
-
-        escaped_names = ['22-rdf-syntax-ns', 'rdf-schema', 'owl', 'wiki Page External Link', 'wiki Page ID',
-                         'wiki Page Revision ID', 'is Primary Topic Of', 'subject', 'type', 'prov',
-                         'wiki Page Disambiguates',
-                         'wiki Page Redirects', 'primary Topic', 'wiki Articles', 'hypernym', 'aliases']
-        filtered_uris = []
-        filtered_names = []
-        for i in range(len(names)):
-            if names[i] not in escaped_names:
-                filtered_names.append(names[i])
-                filtered_uris.append(uris[i])
-
-        return filtered_uris, filtered_names
-
-    #TODO revise last min change
-    @staticmethod
-    def execute_sparql_query_and_get_uri_and_name_lists(q, kg):
-        cprint(f"== SPARQL Q Find E: {q}")
-        if kg == 'https://opencitations.net/sparql':
-            root = ET.fromstring(evaluate_SPARQL_query(q, knowledge_graph=kg))
-            predicates_xml = root.findall(
-                ".//{http://www.w3.org/2005/sparql-results#}results/{http://www.w3.org/2005/sparql-results#}result/{http://www.w3.org/2005/sparql-results#}binding/{http://www.w3.org/2005/sparql-results#}uri")
-            result = []
-            # print("Predicates ", [p.text for p in predicates_xml])
-            for predicate in predicates_xml:
-                result.append({"p": {"value": predicate.text}})
-            return KGQAn.extract_predicate_names(result)
-        else:
-            result = json.loads(evaluate_SPARQL_query(q, knowledge_graph=kg))
-            return KGQAn.extract_predicate_names(result['results']['bindings'])
 
 
 if __name__ == '__main__':

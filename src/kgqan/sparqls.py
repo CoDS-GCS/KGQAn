@@ -51,7 +51,7 @@ def make_keyword_unordered_search_query_with_type_simple(keywords_string: str, l
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
-
+# TODO its calling is removed for now till having a way of dealing with each KG with its compatible queries
 def make_keyword_unordered_search_query_with_type_simple_for_open_citations(keywords_string: str, limit=500):
     kws = ' AND '.join(keywords_string.strip().split())
 
@@ -73,7 +73,7 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
     return f"select distinct ?uri  ?label " \
            f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
-#TODO refactor this and its calling code
+# TODO its calling is removed for now till having a way of dealing with each KG with its compatible queries
 def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: str, limit=500):
     # for cases such as "Angela Merkel ’s"
     escape = ['’s']
