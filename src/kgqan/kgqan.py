@@ -18,6 +18,7 @@ import re
 import json
 import operator
 import logging
+import traceback
 from collections import defaultdict
 from itertools import count, product, zip_longest
 from statistics import mean
@@ -30,6 +31,7 @@ from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
 
 import datetime
+from .filteration import *
 from termcolor import colored, cprint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
@@ -144,6 +146,9 @@ class KGQAn:
         elif self.question.text.lower().startswith('who '):  # Who [V]
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('whom '):  # Who [V]
+            self.question.answer_type = 'person'
+            self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('how many '):
             self.question.answer_type = 'count'
             self.question.answer_datatype = 'number'
@@ -153,17 +158,37 @@ class KGQAn:
         elif self.question.text.lower().startswith('when did ') or self.question.text.lower().startswith('when was '):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
+        # TODO Start workarouds
+        # elif self.question.text.lower().startswith('what is the highest'):  # where do
+        #     self.question.answer_type = 'place'
+        #     self.question.answer_datatype = 'resource'  # of list
+        # elif 'which U.S. state' in self.question.text.lower():  # where do
+        #     self.question.answer_type = 'place'
+        #     self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which rivers '):  # where do
+            self.question.answer_type = 'place'
+            self.question.answer_datatype = 'resource'  # of list
+        # elif self.question.text.lower().startswith('which museum '):  # where do
+        #     self.question.answer_type = 'place'
+        #     self.question.answer_datatype = 'resource'  # of list
+        # elif self.question.text.lower().startswith('which languages '):  # where do
+        #     self.question.answer_type = 'language'
+        #     self.question.answer_datatype = 'resource'  # of list
+        # elif self.question.text.lower().startswith('which professional surfers '):  # where do
+        #     self.question.answer_type = 'person'
+        #     self.question.answer_datatype = 'resource'  # of list
+        # TODO End workarouds
         elif self.question.text.lower().startswith('in which '):  # In which [NNS], In which city
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('which '):  # which [NNS], which actors
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'other'
             self.question.answer_datatype = 'list'  # of list
         elif self.question.text.lower().startswith('where '):  # where do
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('show '):  # Show ... all
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'other'
             self.question.answer_datatype = 'list'  # of list
         else:
             pass  # 11,13,75
@@ -194,10 +219,14 @@ class KGQAn:
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
+            # print("URIs_with_scores ", URIs_with_scores)
             self.v_uri_scores.update(URIs_with_scores)
-            URIs_sorted = list(zip(*URIs_with_scores))[0]
+            URIs_sorted = []
+            if len(list(zip(*URIs_with_scores))) > 0:
+                URIs_sorted = list(zip(*URIs_with_scores))[0]
             URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
+            # print("Nodes ", URIs_chosen)
 
         # Find E for all relations
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
@@ -228,6 +257,7 @@ class KGQAn:
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
+                # print("Edges ", URIs_chosen)
 
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
@@ -278,6 +308,7 @@ class KGQAn:
                           for v_uri, predicate in star_query]
 
                 query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
+                # print("Query ", query)
                 self.question.add_possible_answer(question=self.question.text, sparql=query, score=score)
 
     def evaluate_star_queries(self):
@@ -296,29 +327,35 @@ class KGQAn:
                 if not result_compatiable:
                     continue
 
-                possible_answer.update(results=v_result['results'], vars=v_result['head']['vars'])
+                filtered_results = update_results(v_result['results'], self.question.answer_type)
+                possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
                 answers = list()
                 for binding in v_result['results']['bindings']:
                     answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
+                    # if is_type_compatabile(answer, binding['uri']['type'], self.question.answer_type):
                     answers.append(answer)
                 else:
                     if v_result['results']['bindings']:
                         logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
+                        # print("Answers ", answers)
                     sparqls.append(possible_answer.sparql)
-            except:
+            except Exception as e:
+                traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
 
     def check_if_answers_type_compatiable(self, result):
+        if not self.question.answer_datatype:
+            return True
+
         if self.question.answer_datatype == 'number':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal' and (
-                        'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                        or 'double' in answer['uri']['datatype']):
-                    return True
-                else:
-                    return False
+            return self.is_number(result)
+        elif 'string' in self.question.answer_datatype:
+            if self.is_number(result) or self.is_date(result):
+                return False
+            else:
+                return True
         # elif 'string' in self.question.answer_datatype:
         #     for answer in result['results']['bindings']:
         #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']\
@@ -327,18 +364,12 @@ class KGQAn:
         #         else:
         #             return False
         elif self.question.answer_datatype == 'date':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal':
-                    if 'date' in answer['uri']['datatype']:
-                        return True
-                    elif 'gYear' in answer['uri']['datatype']:
-                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
-                        answer['uri']['value'] = str(obj.date())
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
+            return self.is_date(result)
+        elif 'resource' in self.question.answer_datatype:
+            if self.is_number(result) or self.is_date(result):
+                return False
+            else:
+                return True
         # elif 'resource' in self.question.answer_datatype:
         #     for answer in result['results']['bindings']:
         #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value'] \
@@ -347,6 +378,27 @@ class KGQAn:
         #         else:
         #             return False
         return True
+
+    def is_number(self, result):
+        for answer in result['results']['bindings']:
+            if answer['uri']['type'] == 'typed-literal' and (
+                    'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
+                    or 'double' in answer['uri']['datatype']):
+                    # or 'nonNegativeInteger' in answer['uri']['datatype']):
+                return True
+        return False
+
+    def is_date(self, result):
+        for answer in result['results']['bindings']:
+            if answer['uri']['type'] == 'typed-literal':
+                if 'date' in answer['uri']['datatype']:
+                    return True
+                elif 'gYear' in answer['uri']['datatype']:
+                    if int(answer['uri']['value']) > 0:
+                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
+                        answer['uri']['value'] = str(obj.date())
+                    return True
+        return False
 
     @property
     def question(self):

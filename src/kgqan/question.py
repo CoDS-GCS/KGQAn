@@ -25,7 +25,9 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
-model_path = '/home/rehamomar/PycharmProjects/pythonProject/output_pred/'
+# model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred10/'
+#best
+model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred7/'
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 
@@ -39,7 +41,7 @@ if not logger.handlers:
 
 
 class Question:
-    types = ('person', 'price', 'count', 'date')  # it should be populated by the types of ontology
+    types = ('person', 'price', 'count', 'date', 'place', 'other')  # it should be populated by the types of ontology
     datatypes = ('number', 'date', 'string', 'boolean', 'resource', 'list')
 
     def __init__(self, question_text, question_id=None, answer_datatype=None):
@@ -187,8 +189,8 @@ class Question:
                 print(f"[NAMED-ENTITIES:] {self.tokens}")
 
     def __find_possible_relations(self):
-        generation_input = self.replace_question_words(self._question_text)
-        inputs = tokenizer.encode(generation_input, return_tensors="pt")
+        # generation_input = self.replace_question_words(self._question_text)
+        inputs = tokenizer.encode(self._question_text, return_tensors="pt")
         outputs = model.generate(inputs, max_length=300)
         outputs = tokenizer.batch_decode(outputs)
         for output in outputs:
@@ -357,6 +359,7 @@ class Question:
         question_text = question_text.replace("Give me ", "?var ")
         return question_text
 
+    # TODO check for a more efficient way to create the graph dynamically
     def __build_graph_from_triples(self):
         for triple in self.triple_list:
             subject = triple['subject']
@@ -372,11 +375,12 @@ class Question:
                         self.query_graph.add_edge('uri', object, relation=predicate, uris=[])
             elif 'var' in object.lower() or 'v-2' in object.lower():
                 self.query_graph.add_node('uri', uris=[], answers=[])
-                for token in self.tokens:
-                    if token['token'].lower() == subject.lower():
-                        entity_exist = True
-                        self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
-                        self.query_graph.add_edge(subject, 'uri', relation=predicate, uris=[])
+                # for token in self.tokens:
+                #     if token['token'].lower() == subject.lower():
+                #         entity_exist = True
+                #         self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+                self.query_graph.add_node(subject, uris=[])
+                self.query_graph.add_edge(subject, 'uri', relation=predicate, uris=[])
             else:
                 subject_found = False
                 for token in self.tokens:
