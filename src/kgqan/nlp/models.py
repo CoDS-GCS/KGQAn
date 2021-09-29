@@ -20,12 +20,12 @@ import nltk
 # oie = Predictor.from_path("https://s3-us-west-2.amazonaws.com/allennlp/models/openie-model.2018-08-20.tar.gz")
 # ner = Predictor.from_path("https://s3-us-west-2.amazonaws.com/allennlp/models/ner-model-2018.12.18.tar.gz")
 ner = Predictor.from_path(
-    "https://s3-us-west-2.amazonaws.com/allennlp/models/fine-grained-ner-model-elmo-2018.12.21.tar.gz")
+    "https://storage.googleapis.com/allennlp-public-models/fine-grained-ner.2021-02-11.tar.gz")
 
 elmo_ner = Predictor.from_path(
-    "https://allennlp.s3.amazonaws.com/models/ner-model-2018.12.18.tar.gz")
+    "https://storage.googleapis.com/allennlp-public-models/ner-elmo.2021-02-12.tar.gz")
 
 parser = Predictor.from_path(
-    "https://s3-us-west-2.amazonaws.com/allennlp/models/biaffine-dependency-parser-ptb-2018.08.23.tar.gz")
+    "https://storage.googleapis.com/allennlp-public-models/biaffine-dependency-parser-ptb-2020.04.06.tar.gz")
 nltk.download('wordnet')
 lemmatizer = WordNetLemmatizer()

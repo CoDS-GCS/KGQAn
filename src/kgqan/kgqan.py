@@ -16,6 +16,7 @@ __created__ = "2020-02-07"
 import os
 import re
 import operator
+import logging
 import traceback
 from collections import defaultdict
 from itertools import count, product, zip_longest
@@ -29,7 +30,9 @@ from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
 
-from termcolor import cprint
+import datetime
+from .filteration import *
+from termcolor import colored, cprint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -40,6 +43,7 @@ file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 logger.setLevel(logging.INFO)
+logger.propagate = False
 
 # LOGGER 2 for DEBUGGING
 logger2 = logging.getLogger("Dos logger")
@@ -50,7 +54,7 @@ logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 
 # TODO check best place to have these updates and send either uri or key according to usecase
-knowledge_graph_to_uri = {"dbpedia": "http://206.12.92.210:8890/sparql",
+knowledge_graph_to_uri = {"dbpedia": "http://localhost:8899/sparql",
                           "microsoft_academic": "https://makg.org/sparql",
                           "open_citations": "https://opencitations.net/sparql",
                           "yago": "https://yago-knowledge.org/sparql/query",
@@ -152,6 +156,9 @@ class KGQAn:
         elif self.question.text.lower().startswith('who '):  # Who [V]
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('whom '):  # Who [V]
+            self.question.answer_type = 'person'
+            self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('how many '):
             self.question.answer_type = 'count'
             self.question.answer_datatype = 'number'
@@ -161,17 +168,34 @@ class KGQAn:
         elif self.question.text.lower().startswith('when did ') or self.question.text.lower().startswith('when was '):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
-        elif self.question.text.lower().startswith('in which '):  # In which [NNS], In which city
+        # TODO Start workarouds
+        elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
             self.question.answer_type = 'person'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which airports '):  # where do
+            self.question.answer_type = 'place'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which languages '):  # where do
+            self.question.answer_type = 'language'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('what languages '):  # where do
+            self.question.answer_type = 'language'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which countries '):  # where do
+            self.question.answer_type = 'place'
+            self.question.answer_datatype = 'resource'  # of list
+        # TODO End workarouds
+        elif self.question.text.lower().startswith('in which '):  # In which [NNS], In which city
+            self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('which '):  # which [NNS], which actors
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'other'
             self.question.answer_datatype = 'list'  # of list
         elif self.question.text.lower().startswith('where '):  # where do
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('show '):  # Show ... all
-            self.question.answer_type = 'person'
+            self.question.answer_type = 'other'
             self.question.answer_datatype = 'list'  # of list
         else:
             pass  # 11,13,75
@@ -202,7 +226,9 @@ class KGQAn:
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
             self.v_uri_scores.update(URIs_with_scores)
-            URIs_sorted = list(zip(*URIs_with_scores))[0]
+            URIs_sorted = []
+            if len(list(zip(*URIs_with_scores))) > 0:
+                URIs_sorted = list(zip(*URIs_with_scores))[0]
             URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
 
@@ -234,7 +260,6 @@ class KGQAn:
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
-
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
@@ -306,7 +331,8 @@ class KGQAn:
                 if not result_compatible:
                     continue
 
-                possible_answer.update(results=v_result['results'], vars=v_result['head']['vars'])
+                filtered_results = update_results(v_result['results'], self.question.answer_type)
+                possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
                 sparqls.append(possible_answer.sparql)
 
                 if get_answers:

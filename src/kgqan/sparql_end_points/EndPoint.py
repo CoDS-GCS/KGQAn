@@ -56,60 +56,44 @@ class EndPoint:
         return uris, names
 
     def check_if_answers_type_compatible(self, result, answer_datatype):
-        if answer_datatype == 'number':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal' and (
-                        'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                        or 'double' in answer['uri']['datatype']):
-                    return True
-                else:
-                    return False
-        elif answer_datatype and 'string' in answer_datatype:
-            for answer in result['results']['bindings']:
-                if self.is_number(answer):
-                    return False
-        #     return True
-        #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']\
-        #                 or answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value']:
-        #             return True
-        #         else:
-        #             return False
-        elif answer_datatype == 'date':
-            for answer in result['results']['bindings']:
-                if answer['uri']['type'] == 'typed-literal':
-                    if 'date' in answer['uri']['datatype']:
-                        return True
-                    elif 'gYear' in answer['uri']['datatype']:
-                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
-                        answer['uri']['value'] = str(obj.date())
-                        return True
-                    else:
-                        return False
-                else:
-                    return False
-        elif answer_datatype and 'resource' in answer_datatype:
-            for answer in result['results']['bindings']:
-                if self.is_number(answer):
-                    return False
+        if not answer_datatype:
             return True
-        # elif 'resource' in self.question.answer_datatype:
-        #     for answer in result['results']['bindings']:
-        #         if answer['uri']['type'] == 'uri' and 'resource' in answer['uri']['value'] \
-        #                 or answer['uri']['type'] == 'typed-literal' and 'langString' in answer['uri']['datatype']:
-        #             return True
-        #         else:
-        #             return False
+
+        if answer_datatype == 'number':
+            return self.is_number(result)
+        elif 'string' in answer_datatype:
+            if self.is_number(result) or self.is_date(result):
+                return False
+            else:
+                return True
+        elif answer_datatype == 'date':
+            return self.is_date(result)
+        elif 'resource' in answer_datatype:
+            if self.is_number(result) or self.is_date(result):
+                return False
+            else:
+                return True
         return True
 
-    # TODO add similar function for date
-    def is_number(self, answer):
-        if answer['uri']['type'] == 'typed-literal' and (
-                'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
-                or 'double' in answer['uri']['datatype']):
-            return True
+    def is_number(self, result):
+        for answer in result['results']['bindings']:
+            if answer['uri']['type'] == 'typed-literal' and (
+                    'integer' in answer['uri']['datatype'] or 'usDollar' in answer['uri']['datatype']
+                    or 'double' in answer['uri']['datatype']):
+                return True
         return False
 
+    def is_date(self, result):
+        for answer in result['results']['bindings']:
+            if answer['uri']['type'] == 'typed-literal':
+                if 'date' in answer['uri']['datatype']:
+                    return True
+                elif 'gYear' in answer['uri']['datatype']:
+                    if int(answer['uri']['value']) > 0:
+                        obj = datetime.datetime.strptime(answer['uri']['value'], '%Y')
+                        answer['uri']['value'] = str(obj.date())
+                    return True
+        return False
 
     def extract_resource_name(self, result_bindings):
         resource_names = list()
