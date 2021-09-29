@@ -43,6 +43,7 @@ file_handler.setFormatter(formatter)
 file_handler.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 logger.setLevel(logging.INFO)
+logger.propagate = False
 
 # LOGGER 2 for DEBUGGING
 logger2 = logging.getLogger("Dos logger")
@@ -159,24 +160,21 @@ class KGQAn:
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         # TODO Start workarouds
-        # elif self.question.text.lower().startswith('what is the highest'):  # where do
-        #     self.question.answer_type = 'place'
-        #     self.question.answer_datatype = 'resource'  # of list
-        # elif 'which U.S. state' in self.question.text.lower():  # where do
-        #     self.question.answer_type = 'place'
-        #     self.question.answer_datatype = 'resource'  # of list
-        elif self.question.text.lower().startswith('which rivers '):  # where do
+        elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
+            self.question.answer_type = 'person'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which airports '):  # where do
             self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
-        # elif self.question.text.lower().startswith('which museum '):  # where do
-        #     self.question.answer_type = 'place'
-        #     self.question.answer_datatype = 'resource'  # of list
-        # elif self.question.text.lower().startswith('which languages '):  # where do
-        #     self.question.answer_type = 'language'
-        #     self.question.answer_datatype = 'resource'  # of list
-        # elif self.question.text.lower().startswith('which professional surfers '):  # where do
-        #     self.question.answer_type = 'person'
-        #     self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which languages '):  # where do
+            self.question.answer_type = 'language'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('what languages '):  # where do
+            self.question.answer_type = 'language'
+            self.question.answer_datatype = 'resource'  # of list
+        elif self.question.text.lower().startswith('which countries '):  # where do
+            self.question.answer_type = 'place'
+            self.question.answer_datatype = 'resource'  # of list
         # TODO End workarouds
         elif self.question.text.lower().startswith('in which '):  # In which [NNS], In which city
             self.question.answer_type = 'place'
@@ -219,14 +217,12 @@ class KGQAn:
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
-            # print("URIs_with_scores ", URIs_with_scores)
             self.v_uri_scores.update(URIs_with_scores)
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
             URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
-            # print("Nodes ", URIs_chosen)
 
         # Find E for all relations
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
@@ -257,8 +253,6 @@ class KGQAn:
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
-                # print("Edges ", URIs_chosen)
-
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
@@ -308,13 +302,10 @@ class KGQAn:
                           for v_uri, predicate in star_query]
 
                 query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
-                # print("Query ", query)
                 self.question.add_possible_answer(question=self.question.text, sparql=query, score=score)
 
     def evaluate_star_queries(self):
         self.question.possible_answers.sort(reverse=True)
-        # for i, possible_answer in enumerate(self.question.possible_answers):
-        #     print(i, possible_answer.sparql, possible_answer.score)
         qc = count(1)
         sparqls = list()
         for i, possible_answer in enumerate(self.question.possible_answers[:self._n_max_answers]):
@@ -337,7 +328,6 @@ class KGQAn:
                 else:
                     if v_result['results']['bindings']:
                         logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
-                        # print("Answers ", answers)
                     sparqls.append(possible_answer.sparql)
             except Exception as e:
                 traceback.print_exc()
