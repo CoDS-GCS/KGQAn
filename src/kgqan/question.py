@@ -25,8 +25,8 @@ from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
-# model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred10/'
-#best
+# model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred11/'
+# best 39.7
 model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred7/'
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
@@ -189,28 +189,42 @@ class Question:
                 print(f"[NAMED-ENTITIES:] {self.tokens}")
 
     def __find_possible_relations(self):
-        # generation_input = self.replace_question_words(self._question_text)
         inputs = tokenizer.encode(self._question_text, return_tensors="pt")
         outputs = model.generate(inputs, max_length=300)
         outputs = tokenizer.batch_decode(outputs)
         for output in outputs:
-            triple = self.__parse_triple(output)
-            self.triple_list.append(triple)
+            self.__parse_triple(output)
 
-    # TODO update to handle multiple triples
-    def __parse_triple(self, triple_str):
-        triple_str = triple_str.replace("\"", "")
-        triple_str = triple_str.replace("_", " ")
-        triple_str = triple_str.replace("<s>", "")
+    # Parses the triple strings given to create the graph
+    # In case there is a missing part of the triple, the triple is bypassed
+    def __parse_triple(self, triples_str):
+        triples_str = triples_str.replace("\"", "")
+        triples_str = triples_str.replace("_", " ")
+        triples_str = triples_str.replace("<s>", "")
 
-        print("Generated Triple ", triple_str)
-        subj_start = triple_str.index('</s>')
-        pred_start = triple_str.index('<p>')
-        obj_start = triple_str.index('<o>')
-        subject = triple_str[subj_start + 4: pred_start].strip()
-        predicate = triple_str[pred_start + 3: obj_start].strip()
-        object = triple_str[obj_start + 3: -4].strip()
-        return {"subject": subject, "predicate": predicate, "object": object}
+        print("Generated Triple ", triples_str)
+        triples = triples_str.split("|")
+        for triple_str in triples:
+            if '</s>' in triple_str:
+                subj_start = triple_str.index('</s>')
+            else:
+                print("Triple ", triple_str, "has no subject")
+                continue
+            if '<p>' in triple_str:
+                pred_start = triple_str.index('<p>')
+            else:
+                print("Triple ", triple_str, "has no predicate")
+                continue
+            if '<o>' in triple_str:
+                obj_start = triple_str.index('<o>')
+            else:
+                print("Triple ", triple_str, "has no Object")
+                continue
+
+            subject = triple_str[subj_start + 4: pred_start].strip() if triple_str.startswith("</s>") else triple_str[: pred_start].strip()
+            predicate = triple_str[pred_start + 3: obj_start].strip()
+            object = triple_str[obj_start + 3: -4].strip() if triple_str.endswith("</s>") else triple_str[obj_start + 3:].strip()
+            self.triple_list.append({"subject": subject, "predicate": predicate, "object": object})
 
     def __find_possible_entities_and_relations(self):
         s, pred, o = list(), list(), list()
@@ -326,7 +340,6 @@ class Question:
         cprint(colored(f"[NODES:] {s + o}"))
         cprint(colored(f"[RELATIONS:] {relations}"))
 
-
     def __check_named_entites_existance(self, ner_output) -> bool:
         for tag in ner_output['tags']:
             if tag != 'O':
@@ -349,17 +362,6 @@ class Question:
         # question_text = question_text.replace("moon", "Moon")
         return question_text
 
-    def replace_question_words(self, question_text):
-        question_text = question_text.replace("Who ", "?var ")
-        question_text = question_text.replace("What ", "?var ")
-        question_text = question_text.replace("Which ", "?var ")
-        question_text = question_text.replace("Where ", "?var ")
-        question_text = question_text.replace("When ", "?var ")
-        question_text = question_text.replace("How many ", "?var ")
-        question_text = question_text.replace("In which ", "?var ")
-        question_text = question_text.replace("Give me ", "?var ")
-        return question_text
-
     # TODO check for a more efficient way to create the graph dynamically
     def __build_graph_from_triples(self):
         for triple in self.triple_list:
@@ -367,43 +369,50 @@ class Question:
             predicate = triple['predicate']
             object = triple['object']
 
-            if 'var' in subject.lower() or 'v-2' in subject.lower():
-                self.query_graph.add_node('uri', uris=[], answers=[])
-                for token in self.tokens:
-                    if token['token'].lower() == object.lower():
-                        entity_exist = True
-                        self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
-                        self.query_graph.add_edge('uri', object, relation=predicate, uris=[])
-            elif 'var' in object.lower() or 'v-2' in object.lower():
-                self.query_graph.add_node('uri', uris=[], answers=[])
-                # for token in self.tokens:
-                #     if token['token'].lower() == subject.lower():
-                #         entity_exist = True
-                #         self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
-                self.query_graph.add_node(subject, uris=[])
-                self.query_graph.add_edge(subject, 'uri', relation=predicate, uris=[])
-            else:
-                subject_found = False
-                for token in self.tokens:
-                    if token['token'].lower() == subject.lower():
-                        subject_found = True
-                        self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
-                # if not entity_found:
-                #     self.query_graph.add_node(subject, uris=[])
+            subject_node = self.__add_node_or_retrieve_existing_node(subject)
+            object_node = self.__add_node_or_retrieve_existing_node(object)
+            self.query_graph.add_edge(subject_node, object_node, relation=predicate, uris=[])
 
-                object_found = False
-                for token in self.tokens:
-                    if token['token'].lower() == object.lower():
-                        object_found = True
-                        self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
-                # if not entity_found:
-                #     self.query_graph.add_node(object, uris=[])
-                if subject_found and object_found:
-                    self.query_graph.add_edge(subject, object, relation=predicate, uris=[])
+            # if 'var' in subject.lower() or 'v-2' in subject.lower():
+            #     self.query_graph.add_node('uri', uris=[], answers=[])
+            #     for token in self.tokens:
+            #         if token['token'].lower() == object.lower():
+            #             self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+            #             self.query_graph.add_edge('uri', object, relation=predicate, uris=[])
+            # elif 'var' in object.lower() or 'v-2' in object.lower():
+            #     self.query_graph.add_node('uri', uris=[], answers=[])
+            #     self.query_graph.add_node(subject, uris=[])
+            #     self.query_graph.add_edge(subject, 'uri', relation=predicate, uris=[])
+            # else:
+            #     subject_found = False
+            #     for token in self.tokens:
+            #         if token['token'].lower() == subject.lower():
+            #             subject_found = True
+            #             self.query_graph.add_node(subject, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+            #     object_found = False
+            #     for token in self.tokens:
+            #         if token['token'].lower() == object.lower():
+            #             object_found = True
+            #             self.query_graph.add_node(object, pos=token['pos-tag'], entity_type=token['ne-tag'], uris=[])
+            #     if subject_found and object_found:
+            #         self.query_graph.add_edge(subject, object, relation=predicate, uris=[])
         else:
             cprint(f"[GRAPH NODES WITH URIs:] {self.query_graph.nodes(data=True)}")
             cprint(f"[GRAPH EDGES WITH URIs:] {self.query_graph.edges(data=True)}")
 
+    def __add_node_or_retrieve_existing_node(self, node_label):
+        for node in self.query_graph.nodes():
+            if node == node_label:
+                return node
+        if 'var' in node_label:
+            self.query_graph.add_node(node_label, uris=[], answers=[], type="variable")
+        else:
+            self.query_graph.add_node(node_label, uris=[], answers=[], type="entity")
+
+        # we must return from here because we just added the node
+        for node in self.query_graph.nodes():
+            if node == node_label:
+                return node
 
 class Answer:
     def __init__(self, **kwargs):

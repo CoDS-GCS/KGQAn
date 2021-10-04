@@ -54,7 +54,7 @@ logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 
 # TODO check best place to have these updates and send either uri or key according to usecase
-knowledge_graph_to_uri = {"dbpedia": "http://localhost:8899/sparql",
+knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
                           "microsoft_academic": "https://makg.org/sparql",
                           "open_citations": "https://opencitations.net/sparql",
                           "yago": "https://yago-knowledge.org/sparql/query",
@@ -209,8 +209,8 @@ class KGQAn:
 
     def extract_possible_V_and_E(self):
         for entity in self.question.query_graph:
-            if entity == 'uri':
-                self.question.query_graph.add_node(entity, uris=[], answers=[])
+            if self.is_variable(entity):
+                # self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
             entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
@@ -240,7 +240,7 @@ class KGQAn:
 
             uris, names = list(), list()
             for comb in combinations:
-                if source == 'uri' or destination == 'uri':
+                if self.is_variable(source) or self.is_variable(destination):
                     URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
                                                                                                    nlimit=self.n_limit_EQuery)
                     if 'leadfigures' in names_false:
@@ -296,7 +296,7 @@ class KGQAn:
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
-            node_uris = source_URIs if destination == 'uri' else destination_URIs
+            node_uris = source_URIs if self.is_variable(destination) else destination_URIs
 
             if len(node_uris) == 0 or len(relation_uris) == 0:
                 continue
@@ -344,10 +344,13 @@ class KGQAn:
                         if v_result['results']['bindings']:
                             logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
             except Exception as e:
-                traceback.print_exc()
+                # traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
+
+    def is_variable(self, label):
+        return 'var' in label
 
     @property
     def question(self):
