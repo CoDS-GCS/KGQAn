@@ -105,7 +105,7 @@ class EndPoint:
                 resource_name, skip = self.extract_resource_name_dbpedia(binding)
                 if skip:
                     continue
-            elif self.knowledge_graph == 'microsoft_academic':
+            else:
                 resource_name = binding['label']['value']
             # resource_name = re.sub(r'^Category:', '', resource_name)
             # TODO: check for URI validity

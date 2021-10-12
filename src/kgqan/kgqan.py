@@ -54,10 +54,12 @@ logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 
 # TODO check best place to have these updates and send either uri or key according to usecase
+
 knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
+                          "lc_quad": "http://206.12.95.86:8891/sparql",
                           "microsoft_academic": "https://makg.org/sparql",
                           "open_citations": "https://opencitations.net/sparql",
-                          "yago": "https://yago-knowledge.org/sparql/query",
+                          "yago": "http://206.12.95.86:8892/sparql",
                           "fact_forge": "http://factforge.net/sparql"}
 
 
@@ -234,6 +236,9 @@ class KGQAn:
 
         # Find E for all relations
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
+            if not relation:
+                continue
+
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
             combinations = utils.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
@@ -248,11 +253,13 @@ class KGQAn:
                         names_false[idx] = 'lead figures'
                     URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
                 else:
-                    v_uri_1, v_uri_2 = comb
-                    URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names( v_uri_1, v_uri_2,
-                                                                                                    nlimit=self.n_limit_EQuery)
-                    URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
-                                                                                                 nlimit=self.n_limit_EQuery)
+                    URIs_false, names_false, URIs_true, names_true = [], [], [], []
+                    if len(source_URIs) > 0 and len(destination_URIs) > 0:
+                        v_uri_1, v_uri_2 = comb
+                        URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names( v_uri_1, v_uri_2,
+                                                                                                       nlimit=self.n_limit_EQuery)
+                        URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
+                                                                                                     nlimit=self.n_limit_EQuery)
                 URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                 URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
                 uris.extend(URIs_false + URIs_true)

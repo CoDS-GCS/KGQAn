@@ -13,6 +13,9 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
+import sys
+sys.path.append('../src/')
+
 import json
 import time
 import traceback
@@ -21,6 +24,8 @@ from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
+
+
 
 file_name = r"qald9/qald-9-test-multilingual.json"
 # file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"

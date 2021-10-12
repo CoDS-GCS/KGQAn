@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
 # model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred11/'
 # best 39.7
-model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred7/'
+model_path = '/mnt/KGQAn_Project/app_storage/output_pred13/'
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 
@@ -184,9 +184,9 @@ class Question:
             for i, w, h, d, p, pos, t in l2:
                 self.tokens.append({'index': i, 'token': w, 'head': h, 'dependency': d, 'position': p, 'pos-tag': pos,
                                     'ne-tag': t})
-            else:
-                logger.info(f"[NAMED-ENTITIES:] {self.tokens}")
-                print(f"[NAMED-ENTITIES:] {self.tokens}")
+            # else:
+            #    logger.info(f"[NAMED-ENTITIES:] {self.tokens}")
+            #    print(f"[NAMED-ENTITIES:] {self.tokens}")
 
     def __find_possible_relations(self):
         inputs = tokenizer.encode(self._question_text, return_tensors="pt")
@@ -201,6 +201,8 @@ class Question:
         triples_str = triples_str.replace("\"", "")
         triples_str = triples_str.replace("_", " ")
         triples_str = triples_str.replace("<s>", "")
+        triples_str = triples_str.replace("<P>", "<p>")
+        triples_str = triples_str.replace("<O>", "<o>")
 
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")

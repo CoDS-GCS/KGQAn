@@ -6,7 +6,7 @@ import struct
 from wordembeddings import WordEmbeddings
 
 
-wiki_model = WordEmbeddings(r'/Users/emansour/elab/concordia/cods/app_storage/glove/wiki-news-300d-1M.txt')
+wiki_model = WordEmbeddings(r'/mnt/KGQAn_Project/app_storage/wiki-news-300d-1M.txt')
 
 wiki_model.load_model()
 print('Done loading')

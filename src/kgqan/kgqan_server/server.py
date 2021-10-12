@@ -6,7 +6,7 @@ import io
 from kgqan import KGQAn
 
 hostName = "0.0.0.0"
-serverPort = 5050
+serverPort = 8899
 
 max_Vs = 1
 max_Es = 10
