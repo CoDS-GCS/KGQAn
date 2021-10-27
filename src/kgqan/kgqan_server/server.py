@@ -95,11 +95,11 @@ class MyServer(BaseHTTPRequestHandler):
             MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
                             n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
             # TODO should be removed
-            if data['question'] == 'When did the Boston Tea Party take place and who was it led by?':
-                result = self.running_example_answer()
-            else:
-                answers, entities, edges = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
-                result = self.parse_answer(answers, entities, data['max_answers'], edges)
+            #if data['question'].lower() == 'when did the boston tea party take place and who was it led by?':
+            #    result = self.running_example_answer()
+            #else:
+            answers, entities, edges = MyKGQAn.ask(question_text=data['question'], knowledge_graph=data['knowledge_graph'])
+            result = self.parse_answer(answers, entities, data['max_answers'], edges)
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()

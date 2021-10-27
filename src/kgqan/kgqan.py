@@ -144,6 +144,8 @@ class KGQAn:
         properties = ['name', 'capital', 'country']
         # what is the name
         # what country
+        self.question.answer_type = 'string'
+        self.question.answer_datatype = 'string'
 
         if self.question.text.lower().startswith('who was'):
             self.question.answer_type = 'person'
@@ -232,6 +234,8 @@ class KGQAn:
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
             URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
+            #if entity.lower() == 'boston tea party':
+            #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
 
         # Find E for all relations
