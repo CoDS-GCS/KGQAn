@@ -21,6 +21,7 @@ import traceback
 from collections import defaultdict
 from itertools import count, product, zip_longest
 from urllib.parse import urlparse
+from SPARQLBurger.SPARQLQueryBuilder import *
 
 from .sparql_end_points.EndPoint import EndPoint
 from .sparql_end_points.XML_EndPoint import XML_EndPoint
@@ -52,6 +53,7 @@ sh = logging.StreamHandler()
 sh.setFormatter(formatter)
 logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
+logger2.propagate = False
 
 # TODO check best place to have these updates and send either uri or key according to usecase
 
@@ -79,7 +81,8 @@ class KGQAn:
             """
 
     def __init__(self, semantic_affinity_server=None,
-                 n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400, n_limit_EQuery=400):
+                 n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400,
+                 n_limit_EQuery=400):
         self._ss_server = semantic_affinity_server
         self._n_max_answers = n_max_answers  # this should affect the number of star queries to be executed against TS
         self._current_question = None
@@ -94,7 +97,7 @@ class KGQAn:
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
 
     def ask(self, question_text: str, knowledge_graph, question_id: int = 0, answer_type: str = None,
-            n_max_answers: int =None, n_max_Vs: int =None, n_max_Es: int =None):
+            n_max_answers: int = None, n_max_Vs: int = None, n_max_Es: int = None):
         """KGQAn pipeline
 
         Usage::
@@ -144,6 +147,7 @@ class KGQAn:
         properties = ['name', 'capital', 'country']
         # what is the name
         # what country
+        #TODO revise
         self.question.answer_type = 'string'
         self.question.answer_datatype = 'string'
 
@@ -170,6 +174,9 @@ class KGQAn:
             self.question.answer_type = 'price'
             self.question.answer_datatype = 'number'
         elif self.question.text.lower().startswith('when did ') or self.question.text.lower().startswith('when was '):
+            self.question.answer_type = 'date'
+            self.question.answer_datatype = 'date'
+        elif self.question.text.lower().startswith('when'):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         # TODO Start workarouds
@@ -242,7 +249,6 @@ class KGQAn:
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
             if not relation:
                 continue
-
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
             combinations = utils.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
@@ -301,7 +307,7 @@ class KGQAn:
         # self.uri_scores.update(URIs_with_scores)
         return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
-    #TODO revise score calculation
+    # TODO revise score calculation
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
@@ -315,19 +321,44 @@ class KGQAn:
             possible_triples_for_all_relations.append(possible_triples_for_single_relation)
         else:
             for star_query in product(*possible_triples_for_all_relations):
-                score = sum([self.v_uri_scores[subj]+predicate[2] for subj, predicate in star_query])
+                score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
 
-                #TODO update the calculation for mapping between different nodes and uris
-                triple = []
-                node_uris = []
-                relation_uris = []
-                for v_uri, predicate in star_query:
-                    triple.append(f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri')
-                    node_uris.append(v_uri)
-                    relation_uris.append(predicate[0])
+                # TODO update the calculation for mapping between different nodes and uris
+                query, node_uris, relation_uris = self.generate_sparql_query(star_query)
+                query = query.replace("\n", " ")
+                # print(query.replace("\n", " "))
+                # triple = []
+                # node_uris = []
+                # relation_uris = []
+                # for v_uri, predicate in star_query:
+                #     triple.append(
+                #         f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri')
+                #     node_uris.append(v_uri)
+                #     relation_uris.append(predicate[0])
+                #
+                # query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
+                # print("Correct")
+                # print(query)
+                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
+                                                  nodes=node_uris, edges=relation_uris)
 
-                query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
-                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris)
+    def generate_sparql_query(self, star_query):
+        select_query = SPARQLSelectQuery()
+        select_query.add_variables(variables=["?uri"])
+        where_pattern = SPARQLGraphPattern()
+        node_uris = []
+        relation_uris = []
+
+        for v_uri, predicate in star_query:
+            if predicate[1]:
+                where_pattern.add_triples(triples=[Triple(subject='?uri', predicate=f'<{predicate[0]}>', object=f'<{v_uri}>')])
+            else:
+                where_pattern.add_triples(triples=[Triple(subject=f'<{v_uri}>', predicate=f'<{predicate[0]}>', object='?uri')])
+            node_uris.append(v_uri)
+            relation_uris.append(predicate[0])
+
+        select_query.set_where_pattern(graph_pattern=where_pattern)
+        return select_query.get_text(), node_uris, relation_uris
 
     def evaluate_star_queries(self):
         self.question.possible_answers.sort(reverse=True)
@@ -338,7 +369,8 @@ class KGQAn:
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                result_compatible, v_result, get_answers = self.sparql_end_point.parse_result(result, self.question.answer_datatype)
+                result_compatible, v_result, get_answers = self.sparql_end_point.parse_result(result,
+                                                                                              self.question.answer_datatype)
                 if not result_compatible:
                     continue
 

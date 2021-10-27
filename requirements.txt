@@ -4,3 +4,5 @@ networkx
 termcolor
 gensim
 allennlp
+allennlp-models
+SPARQL-Burger
