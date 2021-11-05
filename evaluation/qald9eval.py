@@ -61,8 +61,8 @@ if __name__ == '__main__':
         # [27, 63, 86, 116, 160, 198]
         # 63- the correct V is Scarface_(rapper) and we get Scarface
         # 116 - Who was called Rodzilla - use nick predicate
-        # if int(question['id']) not in [63, 116]:
-        #     continue
+         if int(question['id']) not in [92,8,21]:
+             continue
 
         # hard to annotate/link with the KG
         # if int(question['id']) in [167]:

@@ -158,6 +158,15 @@ class KGQAn:
         elif self.question.text.lower().startswith('who is '):
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'
+        elif self.question.text.lower().startswith('are'):
+            self.question.answer_type = 'boolean'
+            self.question.answer_datatype = 'boolean'
+        elif self.question.text.lower().startswith('is'):
+            self.question.answer_type = 'boolean'
+            self.question.answer_datatype = 'boolean'
+        elif self.question.text.lower().startswith('does'):
+            self.question.answer_type = 'boolean'
+            self.question.answer_datatype = 'boolean'
         elif self.question.text.lower().startswith('who are '):
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'list'
@@ -343,6 +352,9 @@ class KGQAn:
                                                   nodes=node_uris, edges=relation_uris)
 
     def generate_sparql_query(self, star_query):
+        if(self.question.answer_datatype=='boolean'):
+            print("Query is: ", star_query)
+
         select_query = SPARQLSelectQuery()
         select_query.add_variables(variables=["?uri"])
         where_pattern = SPARQLGraphPattern()
