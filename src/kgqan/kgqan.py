@@ -164,6 +164,12 @@ class KGQAn:
         elif self.question.text.lower().startswith('is'):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
+        elif self.question.text.lower().startswith('did'):
+            self.question.answer_type = 'boolean'
+            self.question.answer_datatype = 'boolean'
+        elif self.question.text.lower().startswith('do'):
+            self.question.answer_type = 'boolean'
+            self.question.answer_datatype = 'boolean'
         elif self.question.text.lower().startswith('does'):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
