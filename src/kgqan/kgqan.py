@@ -279,10 +279,20 @@ class KGQAn:
                                                                                                        nlimit=self.n_limit_EQuery)
                         URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
                                                                                                      nlimit=self.n_limit_EQuery)
-                URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                uris.extend(URIs_false + URIs_true)
-                names.extend(names_false + names_true)
+                if len(URIs_false) > 0 and len(URIs_true) > 0:
+                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                    uris.extend(URIs_false + URIs_true)
+                    names.extend(names_false + names_true)
+                elif(len(URIs_false) > 0):
+                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                    uris.extend(URIs_false)
+                    names.extend(names_false)
+                else:
+                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                    uris.extend(URIs_true)
+                    names.extend(names_true)
+
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
@@ -325,52 +335,61 @@ class KGQAn:
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
             if(self.is_variable(source) or self.is_variable(destination)):
                 node_uris = source_URIs if self.is_variable(destination) else destination_URIs
+                if len(node_uris) == 0 or len(relation_uris) == 0:
+                    continue
+                possible_triples_for_single_relation = utils.get_combination_of_two_lists(node_uris, relation_uris)
+                possible_triples_for_all_relations.append(possible_triples_for_single_relation)
             else:
-                possible_triples_for_ask_query.append(utils.get_combination_of_three_lists(source_URIs, destination_URIs, relation_uris))
-                for star_query in possible_triples_for_ask_query:
-                    query = self.generate_ask_sparql_query(star_query)
-
-
-            if len(node_uris) == 0 or len(relation_uris) == 0:
-                continue
-            possible_triples_for_single_relation = utils.get_combination_of_two_lists(node_uris, relation_uris)
-            possible_triples_for_all_relations.append(possible_triples_for_single_relation)
+                possible_triples_for_ask_query = utils.get_combination_of_three_lists(source_URIs, destination_URIs, relation_uris)
+                possible_triples_for_all_relations.append(possible_triples_for_ask_query)
+                # for star_query in possible_triples_for_ask_query:
+                #     query = self.generate_ask_sparql_query(star_query)
         else:
             for star_query in product(*possible_triples_for_all_relations):
-                score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
 
-                # TODO update the calculation for mapping between different nodes and uris
-                query, node_uris, relation_uris = self.generate_sparql_query(star_query)
-                query = query.replace("\n", " ")
-                # print(query.replace("\n", " "))
-                # triple = []
-                # node_uris = []
-                # relation_uris = []
-                # for v_uri, predicate in star_query:
-                #     triple.append(
-                #         f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri')
-                #     node_uris.append(v_uri)
-                #     relation_uris.append(predicate[0])
-                #
-                # query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
-                # print("Correct")
-                # print(query)
-                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
-                                                  nodes=node_uris, edges=relation_uris)
+
+                if len(star_query) == 2:
+                    score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
+                    # TODO update the calculation for mapping between different nodes and uris
+                    query, node_uris, relation_uris = self.generate_sparql_query(star_query)
+                    query = query.replace("\n", " ")
+                    # print(query.replace("\n", " "))
+                    # triple = []
+                    # node_uris = []
+                    # relation_uris = []
+                    # for v_uri, predicate in star_query:
+                    #     triple.append(
+                    #         f'?uri <{predicate[0]}> <{v_uri}>' if predicate[1] else f'<{v_uri}> <{predicate[0]}> ?uri')
+                    #     node_uris.append(v_uri)
+                    #     relation_uris.append(predicate[0])
+                    #
+                    # query = f"SELECT * WHERE {{ {' . '.join(triple)} }}"
+                    # print("Correct")
+                    # print(query)
+                    self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
+                                                      nodes=node_uris, edges=relation_uris)
+                else:
+                    query, node1_uris, node2_uris, relation_uris = self.generate_ask_sparql_query(star_query)
+                    query = query.replace("\n", " ")
+                    self.question.add_possible_answer(question=self.question.text, sparql=query, score=1,
+                                                      node1=node1_uris, node2=node2_uris, edges=relation_uris)
     def generate_ask_sparql_query(self, triple):
         ask_triple = []
         node1_uris = []
         node2_uris = []
         relation_uris = []
         for n1_uri, predicate, n2_uri in triple:
-            ask_triple.append(f'<{n1_uri}> <{predicate}> <{n2_uri}>')
+            if predicate[1]:
+                ask_triple.append(f'<{n2_uri}> <{predicate[0]}> <{n1_uri}>')
+            else:
+                ask_triple.append(f'<{n1_uri}> <{predicate[0]}> <{n2_uri}>')
             node1_uris.append(n1_uri)
             node2_uris.append(n2_uri)
-            relation_uris.append(predicate)
-        query = f"ASK{ {ask_triple} }"
-        print("Ask query is: ", query)
-        ask_query, node1_uris,node2_uris, relation_uris = self.generate_sparql_query(query)
-        ask_query = query.replace("\n", " ")
+            relation_uris.append(predicate[0])
+        query = f"ASK {{ {' . '.join(ask_triple)} }}"
+        # ask_query, node1_uris,node2_uris, relation_uris = self.generate_sparql_query(query)
+        # ask_query = query.replace("\n", " ")
+        return query, node1_uris, node2_uris, relation_uris
 
     def generate_sparql_query(self, star_query):
         if(self.question.answer_datatype=='boolean'):
@@ -406,19 +425,25 @@ class KGQAn:
                                                                                               self.question.answer_datatype)
                 if not result_compatible:
                     continue
-
-                filtered_results = update_results(v_result['results'], self.question.answer_type)
-                possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
+                # The else is for boolean questions
+                if 'results' in v_result:
+                    filtered_results = update_results(v_result['results'], self.question.answer_type)
+                    possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
+                else:
+                    possible_answer.update(results=[], boolean=v_result['boolean'])
                 sparqls.append(possible_answer.sparql)
 
                 if get_answers:
                     answers = list()
-                    for binding in v_result['results']['bindings']:
-                        answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
-                        answers.append(answer)
+                    if 'results' in v_result:
+                        for binding in v_result['results']['bindings']:
+                            answer = self.__class__.extract_resource_name_from_uri(binding['uri']['value'])[0]
+                            answers.append(answer)
+                        else:
+                            if v_result['results']['bindings']:
+                                logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     else:
-                        if v_result['results']['bindings']:
-                            logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
+                        answers.append(v_result['boolean'])
             except Exception as e:
                 # traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
