@@ -374,7 +374,7 @@ class KGQAn:
                     # print(query)
                     self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
                                                       nodes=node_uris, edges=relation_uris)
-                else:
+                elif len(star_query) == 3:
                     query, node1_uris, node2_uris, relation_uris = self.generate_ask_sparql_query(star_query)
                     query = query.replace("\n", " ")
                     self.question.add_possible_answer(question=self.question.text, sparql=query, score=1,
