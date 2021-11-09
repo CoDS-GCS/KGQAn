@@ -319,10 +319,17 @@ class KGQAn:
     # TODO revise score calculation
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
+        possible_triples_for_ask_query = []
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
-            node_uris = source_URIs if self.is_variable(destination) else destination_URIs
+            if(self.is_variable(source) or self.is_variable(destination)):
+                node_uris = source_URIs if self.is_variable(destination) else destination_URIs
+            else:
+                possible_triples_for_ask_query.append(utils.get_combination_of_three_lists(source_URIs, destination_URIs, relation_uris))
+                for star_query in possible_triples_for_ask_query:
+                    query = self.generate_ask_sparql_query(star_query)
+
 
             if len(node_uris) == 0 or len(relation_uris) == 0:
                 continue
@@ -350,6 +357,20 @@ class KGQAn:
                 # print(query)
                 self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
                                                   nodes=node_uris, edges=relation_uris)
+    def generate_ask_sparql_query(self, triple):
+        ask_triple = []
+        node1_uris = []
+        node2_uris = []
+        relation_uris = []
+        for n1_uri, predicate, n2_uri in triple:
+            ask_triple.append(f'<{n1_uri}> <{predicate}> <{n2_uri}>')
+            node1_uris.append(n1_uri)
+            node2_uris.append(n2_uri)
+            relation_uris.append(predicate)
+        query = f"ASK{ {ask_triple} }"
+        print("Ask query is: ", query)
+        ask_query, node1_uris,node2_uris, relation_uris = self.generate_sparql_query(query)
+        ask_query = query.replace("\n", " ")
 
     def generate_sparql_query(self, star_query):
         if(self.question.answer_datatype=='boolean'):
