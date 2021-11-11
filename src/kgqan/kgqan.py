@@ -335,7 +335,6 @@ class KGQAn:
     # TODO revise score calculation
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
-        possible_triples_for_ask_query = []
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
@@ -352,9 +351,7 @@ class KGQAn:
                 #     query = self.generate_ask_sparql_query(star_query)
         else:
             for star_query in product(*possible_triples_for_all_relations):
-
-
-                if len(star_query) == 2:
+                if len(star_query[0]) == 2:
                     score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
                     # TODO update the calculation for mapping between different nodes and uris
                     query, node_uris, relation_uris = self.generate_sparql_query(star_query)
@@ -374,11 +371,13 @@ class KGQAn:
                     # print(query)
                     self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
                                                       nodes=node_uris, edges=relation_uris)
-                elif len(star_query) == 3:
+                elif len(star_query[0]) == 3:
                     query, node1_uris, node2_uris, relation_uris = self.generate_ask_sparql_query(star_query)
                     query = query.replace("\n", " ")
                     self.question.add_possible_answer(question=self.question.text, sparql=query, score=1,
                                                       node1=node1_uris, node2=node2_uris, edges=relation_uris)
+                else:
+                    print("Error dealing with query, ", star_query)
     def generate_ask_sparql_query(self, triple):
         ask_triple = []
         node1_uris = []
@@ -398,9 +397,6 @@ class KGQAn:
         return query, node1_uris, node2_uris, relation_uris
 
     def generate_sparql_query(self, star_query):
-        if(self.question.answer_datatype=='boolean'):
-            print("Query is: ", star_query)
-
         select_query = SPARQLSelectQuery()
         select_query.add_variables(variables=["?uri"])
         where_pattern = SPARQLGraphPattern()
