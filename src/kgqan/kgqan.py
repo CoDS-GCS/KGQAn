@@ -351,6 +351,9 @@ class KGQAn:
                 #     query = self.generate_ask_sparql_query(star_query)
         else:
             for star_query in product(*possible_triples_for_all_relations):
+                if len(star_query) == 0:
+                    continue
+
                 if len(star_query[0]) == 2:
                     score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
                     # TODO update the calculation for mapping between different nodes and uris
@@ -378,6 +381,7 @@ class KGQAn:
                                                       node1=node1_uris, node2=node2_uris, edges=relation_uris)
                 else:
                     print("Error dealing with query, ", star_query)
+
     def generate_ask_sparql_query(self, triple):
         ask_triple = []
         node1_uris = []
