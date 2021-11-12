@@ -345,7 +345,7 @@ class KGQAn:
                     continue
                 possible_triples_for_single_relation = utils.get_combination_of_two_lists(node_uris, relation_uris)
                 possible_triples_for_all_relations.append(possible_triples_for_single_relation)
-            else:
+            elif len(source_URIs) > 0 and len(destination_URIs) > 0:
                 possible_triples_for_ask_query = utils.get_combination_of_three_lists(source_URIs, destination_URIs, relation_uris)
                 possible_triples_for_all_relations.append(possible_triples_for_ask_query)
                 # for star_query in possible_triples_for_ask_query:
