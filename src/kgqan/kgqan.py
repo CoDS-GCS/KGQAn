@@ -148,8 +148,9 @@ class KGQAn:
         # what is the name
         # what country
         #TODO revise
-        self.question.answer_type = 'string'
-        self.question.answer_datatype = 'string'
+        if not self.question.answer_datatype:
+            self.question.answer_type = 'string'
+            self.question.answer_datatype = 'string'
 
         if self.question.text.lower().startswith('who was'):
             self.question.answer_type = 'person'
