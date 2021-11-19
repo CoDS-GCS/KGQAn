@@ -70,8 +70,9 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
             else:
                 kwlist.append(w)
     kws = ' AND '.join(kwlist)
-    return f"select distinct ?uri  ?label " \
-           f"where {{ ?uri ?p  ?label . ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
+    return f"prefix rdf: <http://www.w3.org/2000/01/rdf-schema#> " \
+           f"select distinct ?uri  ?label " \
+           f"where {{ ?uri rdf:label ?label. ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
 # TODO its calling is removed for now till having a way of dealing with each KG with its compatible queries
 def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: str, limit=500):

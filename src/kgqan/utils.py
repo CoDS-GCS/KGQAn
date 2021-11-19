@@ -45,6 +45,14 @@ def get_combination_of_two_lists(list1, list2, directed=False, with_reversed=Fal
 
         return set(combinations_selected)
 
+def get_combination_of_three_lists(list1, list2, list3, directed=False, with_reversed=False):
+    lists = []
+    # lists = [n1, p, n2]
+    for node1 in list1:
+        for node2 in list2:
+            for predicate in list3:
+                lists.append([node1, predicate, node2])
+        return lists
 
 def powerset(iterable, lower_bound=2, upper_bound=3):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"

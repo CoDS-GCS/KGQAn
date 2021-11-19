@@ -87,10 +87,11 @@ if __name__ == '__main__':
         try:
             if 'results' in question['answers'][0]:
                 question['answers'][0]['results']['bindings'] = all_bindings.copy()
-                kgqan_qald9['questions'].append(question)
                 all_bindings.clear()
         except:
             question['answers'] = []
+
+        kgqan_qald9['questions'].append(question)
 
         et = time.time()
         total_time = total_time + (et - st)

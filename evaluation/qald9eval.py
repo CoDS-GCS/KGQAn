@@ -14,6 +14,7 @@ __status__ = "debug"
 __created__ = "2020-02-07"
 
 import sys
+
 sys.path.append('../src/')
 
 import json
@@ -24,8 +25,6 @@ from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
-
-
 
 file_name = r"qald9/qald-9-test-multilingual.json"
 # file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"
@@ -54,14 +53,14 @@ if __name__ == '__main__':
     MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
-    
+
     kgqan_qald9 = {"dataset": {"id": "qald-9-test-multilingual"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
 
         # [27, 63, 86, 116, 160, 198]
         # 63- the correct V is Scarface_(rapper) and we get Scarface
         # 116 - Who was called Rodzilla - use nick predicate
-        # if int(question['id']) not in [63, 116]:
+        # if int(question['id']) not in [1, 14, 31, 88, 164, 177]:
         #     continue
 
         # hard to annotate/link with the KG
@@ -109,7 +108,8 @@ if __name__ == '__main__':
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
         try:
-            answers, _, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'], question_id=question['id'], knowledge_graph='dbpedia')
+            answers, _, _ = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'],
+                                        question_id=question['id'], knowledge_graph='dbpedia')
         except Exception as e:
             traceback.print_exc()
             continue
@@ -122,14 +122,15 @@ if __name__ == '__main__':
         try:
             if 'results' in question['answers'][0]:
                 question['answers'][0]['results']['bindings'] = all_bindings.copy()
-                kgqan_qald9['questions'].append(question)
                 all_bindings.clear()
         except:
             question['answers'] = []
 
+        kgqan_qald9['questions'].append(question)
+
         et = time.time()
         total_time = total_time + (et - st)
-        text = colored(f'[DONE!! in {et-st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
+        text = colored(f'[DONE!! in {et - st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
         cprint(f"== {text} ==")
 
         # break

@@ -56,7 +56,7 @@ class EndPoint:
         return uris, names
 
     def check_if_answers_type_compatible(self, result, answer_datatype):
-        if not answer_datatype:
+        if not answer_datatype or not 'results' in result:
             return True
 
         if answer_datatype == 'number':
