@@ -30,10 +30,15 @@ from .sparqls import *
 from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
+from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
+import pickle
 
 import datetime
 from .filteration import *
 from termcolor import colored, cprint
+
+model_path = "C:\Users\ishika\KGQAn"
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -125,7 +130,8 @@ class KGQAn:
         else:
             self.sparql_end_point = EndPoint(knowledge_graph, knowledge_graph_to_uri[knowledge_graph])
 
-        self.detect_question_and_answer_type()
+        #self.detect_question_and_answer_type()
+        self.filter_ans_type()
         self.rephrase_question()
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
@@ -138,6 +144,24 @@ class KGQAn:
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
         logger.info(f"\n\n\n\n{'#' * 120}")
         return answers, self.question.query_graph.nodes, self.question.query_graph.edges
+
+    def filter_ans_type(self):
+        ques = list
+        ques.append(self)
+        cv = CountVectorizer()
+        ques = cv.transform(ques)
+
+        model = pickle.load(open('filter_model.sav', 'rb'))
+        ans_type = np.argmax(model.predict(ques), axis=1)
+        if ans_type == 0:
+            self.question.answer_datatype = 'boolean'
+        elif ans_type == 1:
+            self.question.answer_datatype = 'date'
+        elif ans_type == 2:
+            self.question.answer_datatype = 'number'
+        else:
+            self.question.answer_datatype = 'string'
+
 
     def detect_question_and_answer_type(self):
         # question_text = question_text.lower()
