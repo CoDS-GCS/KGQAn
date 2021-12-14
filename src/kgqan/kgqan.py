@@ -30,7 +30,6 @@ from .sparqls import *
 from .question import Question
 from .nlp.utils import remove_duplicates
 from . import embeddings_client as w2v, utils
-from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 import pickle
 
@@ -38,7 +37,7 @@ import datetime
 from .filteration import *
 from termcolor import colored, cprint
 
-model_path = "C:\Users\ishika\KGQAn"
+
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -69,6 +68,7 @@ knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
                           "yago": "http://206.12.95.86:8892/sparql",
                           "fact_forge": "http://factforge.net/sparql"}
 
+model_path = "/home/rehamomar/Project/KGQAn/"
 
 class KGQAn:
     """A Natural Language Platform For Querying RDF-Based Graphs
@@ -145,13 +145,14 @@ class KGQAn:
         logger.info(f"\n\n\n\n{'#' * 120}")
         return answers, self.question.query_graph.nodes, self.question.query_graph.edges
 
+
     def filter_ans_type(self):
-        ques = list
-        ques.append(self)
-        cv = CountVectorizer()
+        ques = list()
+        ques.append(self.question.text)
+        cv = pickle.load(open(model_path + 'filter_vectorizer.obj', 'rb'))
         ques = cv.transform(ques)
 
-        model = pickle.load(open('filter_model.sav', 'rb'))
+        model = pickle.load(open(model_path + 'filter_model.sav', 'rb'))
         ans_type = np.argmax(model.predict(ques), axis=1)
         if ans_type == 0:
             self.question.answer_datatype = 'boolean'
