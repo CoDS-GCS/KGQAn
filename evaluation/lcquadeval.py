@@ -54,7 +54,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "lcquad_qaldformat"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "lcquad-qaldformat-test"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
 
         # if int(question['id']) not in [5]:
