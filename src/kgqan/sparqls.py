@@ -59,8 +59,12 @@ def make_keyword_unordered_search_query_with_type_simple_for_open_citations(keyw
            f"where {{ ?s c4o:hasContent ?o  . filter regex(?o, '{kws}' ) .}}  LIMIT {limit}"
 
 def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
+    keywords_string = keywords_string.replace(',', '')
+    keywords_string = keywords_string.replace('.', '')
+    keywords_string = keywords_string.replace(':', '')
+    keywords_string = keywords_string.replace('&', '')
     # for cases such as "Angela Merkel ’s"
-    escape = ['’s']
+    escape = ['’s', 'and']
     kwlist = []
     for w in keywords_string.strip().split():
         if w not in escape:
