@@ -371,7 +371,23 @@ class Question:
         question_text = question_text.replace(" nad ", " and ")
         question_text = question_text.replace("Fuountain", "Fountain")
         question_text = question_text.replace("Hanses", "Hansen")
-        # question_text = question_text.replace("momoko", "momoko")
+
+        # Adjusted GT
+        question_text = question_text.replace("momoki", "momoko")
+        question_text = question_text.replace("Gombitov", "Gombitova")
+        question_text = question_text.replace("Demiville", "Demieville")
+        question_text = question_text.replace("prochzka", "prochazka")
+        question_text = question_text.replace("Tedd", "Teddy")
+        question_text = question_text.replace("Merendin", "Merendon")
+        question_text = question_text.replace("Institue", "Institute")
+        question_text = question_text.replace("Toru", "Torun")
+        question_text = question_text.replace("Piqu", "Pique")
+        question_text = question_text.replace("Ramerez", "Ramirez")
+        question_text = question_text.replace("Gdask", "Gdansk")
+        question_text = question_text.replace("Bhler", "Buhler")
+        question_text = question_text.replace("Uniamsi", "Uniamesi")
+        question_text = question_text.replace("Raa", "Rasa")
+        question_text = question_text.replace("Trn Vit Hng", "Tran Viet Huong")
 
 
         return question_text
