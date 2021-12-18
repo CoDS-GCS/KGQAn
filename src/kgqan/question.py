@@ -207,6 +207,14 @@ class Question:
         triples_str = triples_str.replace("<o|", "<o>")
         triples_str = triples_str.replace("<e> ", "<o>")
 
+        triples_str = triples_str.replace("<pp> ", "<p>")
+        triples_str = triples_str.replace("<oo> ", "<o>")
+        triples_str = triples_str.replace("<os> ", "<o>")
+        triples_str = triples_str.replace("<ol> ", "<o>")
+        triples_str = triples_str.replace("<o1 ", "<o>")
+        triples_str = triples_str.replace("<o] ", "<o>")
+        triples_str = triples_str.replace("<p1 ", "<p>")
+
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:
@@ -367,7 +375,7 @@ class Question:
         # question_text = question_text.replace("moon", "Moon")
         # For LCquad wrong questions
         # ID: 762, 848, 2265, 2449, 4516, 2730, 3019, 3242, 3330, 3461, 4659, 4706,
-        # question_text = question_text.replace("Whitney", "Whitey")
+        question_text = question_text.replace("Whitney", "Whitey")
         question_text = question_text.replace(" nad ", " and ")
         question_text = question_text.replace("Fuountain", "Fountain")
         question_text = question_text.replace("Hanses", "Hansen")

@@ -295,7 +295,7 @@ class KGQAn:
                     URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                     uris.extend(URIs_false)
                     names.extend(names_false)
-                else:
+                elif(len(URIs_true) > 0):
                     URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
                     uris.extend(URIs_true)
                     names.extend(names_true)
