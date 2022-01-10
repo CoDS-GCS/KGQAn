@@ -23,6 +23,7 @@ from itertools import count, product, zip_longest
 from urllib.parse import urlparse
 from SPARQLBurger.SPARQLQueryBuilder import *
 
+from kgqan.vertex import Vertex
 from .sparql_end_points.EndPoint import EndPoint
 from .sparql_end_points.XML_EndPoint import XML_EndPoint
 
@@ -256,10 +257,13 @@ class KGQAn:
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
-            URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
+            updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
+            URIs_chosen = updated_vertex.get_vertex_uris()
+            # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             #if entity.lower() == 'boston tea party':
             #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
+            self.question.query_graph.nodes[entity]['vertex'] = updated_vertex
 
         # Find E for all relations
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
@@ -272,12 +276,16 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if self.is_variable(source) or self.is_variable(destination):
-                    URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
-                                                                                                   nlimit=self.n_limit_EQuery)
-                    if 'leadfigures' in names_false:
-                        idx = names_false.index('leadfigures')
-                        names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
+                    if self.is_variable(source):
+                        uris, names = self.question.query_graph.nodes[destination]['vertex'].get_predicates()
+                    else:
+                        uris, names = self.question.query_graph.nodes[source]['vertex'].get_predicates()
+                    # URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
+                    #                                                                                nlimit=self.n_limit_EQuery)
+                    # if 'leadfigures' in names_false:
+                    #     idx = names_false.index('leadfigures')
+                    #     names_false[idx] = 'lead figures'
+                    # URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     URIs_false, names_false, URIs_true, names_true = [], [], [], []
                     if len(source_URIs) > 0 and len(destination_URIs) > 0:
@@ -286,20 +294,19 @@ class KGQAn:
                                                                                                        nlimit=self.n_limit_EQuery)
                         URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
                                                                                                      nlimit=self.n_limit_EQuery)
-                if len(URIs_false) > 0 and len(URIs_true) > 0:
-                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                    uris.extend(URIs_false + URIs_true)
-                    names.extend(names_false + names_true)
-                elif(len(URIs_false) > 0):
-                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                    uris.extend(URIs_false)
-                    names.extend(names_false)
-                elif(len(URIs_true) > 0):
-                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                    uris.extend(URIs_true)
-                    names.extend(names_true)
-
+                    if len(URIs_false) > 0 and len(URIs_true) > 0:
+                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                        uris.extend(URIs_false + URIs_true)
+                        names.extend(names_false + names_true)
+                    elif(len(URIs_false) > 0):
+                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                        uris.extend(URIs_false)
+                        names.extend(names_false)
+                    elif(len(URIs_true) > 0):
+                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                        uris.extend(URIs_true)
+                        names.extend(names_true)
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)

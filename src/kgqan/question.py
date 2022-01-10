@@ -396,7 +396,7 @@ class Question:
         question_text = question_text.replace("Uniamsi", "Uniamesi")
         question_text = question_text.replace("Raa", "Rasa")
         question_text = question_text.replace("Trn Vit Hng", "Tran Viet Huong")
-
+        question_text = question_text.replace("I'Isle", "l'Isle")
 
         return question_text
 
