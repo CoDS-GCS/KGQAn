@@ -26,16 +26,23 @@ class Vertex:
             uris, names = self.process_vertex(current_uri)
             if len(uris) == 0:
                 redirected_uri = self.get_redirected_uri(current_uri)
-                uris, names = self.process_vertex(redirected_uri)
-                if len(uris) != 0:
-                    processed = processed + 1
-                    self.vertices.append(redirected_uri)
+                if redirected_uri == None:
+                    self.vertices.append(current_uri)
                     self.predicates_names.append(names)
                     self.predicates_uris.append(uris)
+                    processed = processed + 1
+                else:
+                    uris, names = self.process_vertex(redirected_uri)
+                    if len(uris) != 0:
+                        processed = processed + 1
+                        self.vertices.append(redirected_uri)
+                        self.predicates_names.append(names)
+                        self.predicates_uris.append(uris)
             else:
                 self.vertices.append(current_uri)
                 self.predicates_names.append(names)
                 self.predicates_uris.append(uris)
+                processed = processed + 1
             counter = counter + 1
 
     def process_vertex(self, uri: str):
@@ -78,6 +85,8 @@ class Vertex:
         }
         query_response = requests.get("https://dbpedia.org/sparql", params=payload)
         response = json.loads(query_response.text)
+        if len(response['results']['bindings']) == 0:
+            return None
         return response['results']['bindings'][0]['uri']['value']
 
     def get_vertex_uris(self):
