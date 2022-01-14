@@ -197,9 +197,9 @@ class KGQAn:
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         # TODO Start workarouds
-        elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
-            self.question.answer_type = 'person'
-            self.question.answer_datatype = 'resource'  # of list
+        # elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
+        #     self.question.answer_type = 'person'
+        #     self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('which airports '):  # where do
             self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
@@ -313,6 +313,7 @@ class KGQAn:
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
+
 
     @staticmethod
     def __compute_semantic_similarity_between_single_word_and_word_list(word, word_list):
