@@ -408,9 +408,11 @@ class KGQAn:
         # ask_query = query.replace("\n", " ")
         return query, node1_uris, node2_uris, relation_uris
 
+    #TODO update with 2 variables
     def generate_sparql_query(self, star_query):
         select_query = SPARQLSelectQuery()
-        select_query.add_variables(variables=["?uri"])
+        # select_query.add_variables(variables=["?uri"])
+        select_query.add_variables(variables=["?uri", "?type"])
         where_pattern = SPARQLGraphPattern()
         node_uris = []
         relation_uris = []
@@ -423,6 +425,13 @@ class KGQAn:
             node_uris.append(v_uri)
             relation_uris.append(predicate[0])
 
+        optional_pattern = SPARQLGraphPattern(optional=True)
+        optional_pattern.add_triples(
+            triples=[
+                Triple(subject='?uri', predicate='<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>', object='?type')
+            ]
+        )
+        where_pattern.add_nested_graph_pattern(optional_pattern)
         select_query.set_where_pattern(graph_pattern=where_pattern)
         return select_query.get_text(), node_uris, relation_uris
 
@@ -435,13 +444,13 @@ class KGQAn:
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                result_compatible, v_result, get_answers = self.sparql_end_point.parse_result(result,
+                result_compatible, v_result, get_answers, types = self.sparql_end_point.parse_result(result,
                                                                                               self.question.answer_datatype)
                 if not result_compatible:
                     continue
                 # The else is for boolean questions
                 if 'results' in v_result:
-                    filtered_results = update_results(v_result['results'], self.question.answer_type)
+                    filtered_results = update_results(v_result['results'], self.question.answer_type, types)
                     possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
                 else:
                     possible_answer.update(results=[], boolean=v_result['boolean'])

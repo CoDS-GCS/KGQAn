@@ -31,14 +31,43 @@ def extract_resource_name_from_uri(uri: str):
     return resource_name
 
 
-def update_results(results, answer_type):
+# def update_results(results, answer_type):
+#     filtered_bindings = []
+#     if 'person' in answer_type:
+#         return filter_person(results)
+#     elif 'place' in answer_type:
+#         return filter_place(results)
+#     elif 'language' in answer_type:
+#         return filter_language(results)
+#     return results
+
+
+def test_is_person(types):
+    # if len(types) == 0:
+    #     return True
+
+    for type in types:
+        if '/Person' in type:
+            return True
+    return False
+
+
+def test_filter_person(results, types):
     filtered_bindings = []
+    for i in range(len(results['bindings'])):
+        if test_is_person(types[i]):
+            filtered_bindings.append(results['bindings'][i])
+
+    return {'bindings': filtered_bindings}
+
+
+def update_results(results, answer_type, types):
     if 'person' in answer_type:
-        return filter_person(results)
-    elif 'place' in answer_type:
-        return filter_place(results)
-    elif 'language' in answer_type:
-        return filter_language(results)
+        return test_filter_person(results, types)
+    # elif 'place' in answer_type:
+    #     return filter_place(results)
+    # elif 'language' in answer_type:
+    #     return filter_language(results)
     return results
 
 def filter_person(results):
