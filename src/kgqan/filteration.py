@@ -47,6 +47,7 @@ def test_is_person(types):
     #     return True
 
     for type in types:
+        # or '/Organization' in type
         if '/Person' in type:
             return True
     return False
@@ -61,13 +62,45 @@ def test_filter_person(results, types):
     return {'bindings': filtered_bindings}
 
 
+def test_is_place(types):
+    for type in types:
+        if '/Place' in type or '/Location' in type:
+            return True
+    return False
+
+
+def test_filter_place(results, types):
+    filtered_bindings = []
+    for i in range(len(results['bindings'])):
+        if test_is_place(types[i]):
+            filtered_bindings.append(results['bindings'][i])
+
+    return {'bindings': filtered_bindings}
+
+
+def test_is_language(types):
+    for type in types:
+        if '/Language' in type:
+            return True
+    return False
+
+
+def test_filter_language(results, types):
+    filtered_bindings = []
+    for i in range(len(results['bindings'])):
+        if test_is_language(types[i]):
+            filtered_bindings.append(results['bindings'][i])
+
+    return {'bindings': filtered_bindings}
+
+
 def update_results(results, answer_type, types):
     if 'person' in answer_type:
         return test_filter_person(results, types)
-    # elif 'place' in answer_type:
-    #     return filter_place(results)
-    # elif 'language' in answer_type:
-    #     return filter_language(results)
+    elif 'place' in answer_type:
+        return test_filter_place(results, types)
+    elif 'language' in answer_type:
+        return test_filter_language(results, types)
     return results
 
 def filter_person(results):

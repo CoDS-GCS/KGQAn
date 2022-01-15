@@ -179,6 +179,9 @@ class EndPoint:
         answers = list()
         current = -1
         current_types = []
+        if not 'results' in json_object:
+            return json_object, types
+
         for binding in json_object['results']['bindings']:
             if not binding['uri'] in answers:
                 current = current + 1
