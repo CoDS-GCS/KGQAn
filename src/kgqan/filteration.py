@@ -117,7 +117,7 @@ def update_results(results, answer_type, types):
         return test_filter_place(results, types)
     elif 'language' in answer_type:
         return test_filter_language(results, types)
-    elif answer_type[0] not in ['boolean', 'date', 'count', 'other', 'string', 'price']:
+    elif len(answer_type) > 0 and answer_type[0] not in ['boolean', 'date', 'count', 'other', 'string', 'price']:
         return test_filter_general(results, answer_type, types)
     return results
 
