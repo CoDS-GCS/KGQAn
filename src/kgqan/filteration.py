@@ -94,6 +94,22 @@ def test_filter_language(results, types):
     return {'bindings': filtered_bindings}
 
 
+def test_is_general(types, answer_type):
+    for type in types:
+        if '/' + answer_type[0] in type.lower():
+            return True
+    return False
+
+
+def test_filter_general(results, answer_type, types):
+    filtered_bindings = []
+    for i in range(len(results['bindings'])):
+        if test_is_general(types[i], answer_type):
+            filtered_bindings.append(results['bindings'][i])
+
+    return {'bindings': filtered_bindings}
+
+
 def update_results(results, answer_type, types):
     if 'person' in answer_type:
         return test_filter_person(results, types)
@@ -101,6 +117,8 @@ def update_results(results, answer_type, types):
         return test_filter_place(results, types)
     elif 'language' in answer_type:
         return test_filter_language(results, types)
+    elif answer_type[0] not in ['boolean', 'date', 'count', 'other', 'string', 'price']:
+        return test_filter_general(results, answer_type, types)
     return results
 
 def filter_person(results):

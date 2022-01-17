@@ -30,6 +30,7 @@ from .sparql_end_points.XML_EndPoint import XML_EndPoint
 from .sparqls import *
 from .question import Question
 from .nlp.utils import remove_duplicates
+from .nlp.models import cons_parser, WordNetLemmatizer
 from . import embeddings_client as w2v, utils
 
 import datetime
@@ -93,6 +94,7 @@ class KGQAn:
         self.n_limit_EQuery = n_limit_EQuery
         self.knowledge_graph = ''
         self.sparql_end_point = None
+        self.lemmatizer = WordNetLemmatizer()
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
@@ -228,6 +230,13 @@ class KGQAn:
         else:
             pass  # 11,13,75
 
+        # Which Trial
+        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which '):
+            allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
+            for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
+                if tag[0] in ['NN', 'NNS']:
+                    self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
+                    break
     # TODO remove this if not needed
     def rephrase_question(self):
         if self.question.text.lower().startswith('who was'):

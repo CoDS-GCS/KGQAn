@@ -27,5 +27,8 @@ elmo_ner = Predictor.from_path(
 
 parser = Predictor.from_path(
     "https://storage.googleapis.com/allennlp-public-models/biaffine-dependency-parser-ptb-2020.04.06.tar.gz")
+
+cons_parser = Predictor.from_path(
+    "https://storage.googleapis.com/allennlp-public-models/elmo-constituency-parser-2020.02.10.tar.gz")
 nltk.download('wordnet')
 lemmatizer = WordNetLemmatizer()

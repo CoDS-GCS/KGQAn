@@ -102,6 +102,10 @@ class Question:
     def get_relations(self):
         pass
 
+    def set_answer_type(self, answer_type):
+        self._answer_type.clear()
+        self._answer_type.append(answer_type)
+
     def __process(self):
         self.__parse_sentence()
         self.__regroup_named_entities()
