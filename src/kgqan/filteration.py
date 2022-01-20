@@ -3,6 +3,8 @@ import re
 from urllib.parse import urlparse
 
 from .nlp.models import ner
+from . import embeddings_client as w2v, utils
+
 
 def is_person(output):
     for tag in output['tags']:
@@ -95,9 +97,16 @@ def test_filter_language(results, types):
 
 
 def test_is_general(types, answer_type):
+    max_score = 0
     for type in types:
-        if '/' + answer_type[0] in type.lower():
-            return True
+        name = extract_type_names(type)
+        score = w2v.n_similarity(answer_type, [name])
+        max_score = max(max_score, score)
+
+    if max_score > 0.5:
+        return True
+        # if '/' + answer_type[0] in type.lower():
+        #     return True
     return False
 
 
@@ -178,3 +187,16 @@ def filter_language(results):
                 filtered_bindings.append(binding)
           
     return {'bindings': filtered_bindings}
+
+
+def extract_type_names(uri):
+    uri_path = urlparse(uri).path
+    name = os.path.basename(uri_path)
+    p = re.compile(r'(_|\([^()]*\))')
+    name = p.sub(' ', name)
+    p2 = re.compile(r'([a-z0-9])([A-Z])')
+    predicate_name = p2.sub(r"\1 \2", name)
+    if not name.strip():
+        return ''
+
+    return name.lower()
