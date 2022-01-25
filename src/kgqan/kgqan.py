@@ -231,7 +231,10 @@ class KGQAn:
             pass  # 11,13,75
 
         # Which Trial
-        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which '):
+        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which ')\
+                or self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
+                or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
+                or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
             allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
             for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
                 if tag[0] in ['NN', 'NNS']:

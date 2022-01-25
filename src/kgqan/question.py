@@ -376,6 +376,7 @@ class Question:
         question_text = question_text.replace("oscar", "Oscar")
         question_text = question_text.replace("English", "english")
         question_text = question_text.replace("company", "Company")
+        question_text = question_text.replace("Whichlocation", "Which location")
         # question_text = question_text.replace("moon", "Moon")
         # For LCquad wrong questions
         # ID: 762, 848, 2265, 2449, 4516, 2730, 3019, 3242, 3330, 3461, 4659, 4706,

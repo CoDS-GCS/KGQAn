@@ -58,8 +58,8 @@ def test_is_person(types):
 def test_filter_person(results, types):
     filtered_bindings = []
     for i in range(len(results['bindings'])):
-        if test_is_general(types[i], ['person']):
-        # if test_is_person(types[i]):
+        # if test_is_general(types[i], ['person']):
+        if test_is_person(types[i]):
             filtered_bindings.append(results['bindings'][i])
 
     return {'bindings': filtered_bindings}
@@ -75,8 +75,8 @@ def test_is_place(types):
 def test_filter_place(results, types):
     filtered_bindings = []
     for i in range(len(results['bindings'])):
-        if test_is_general(types[i], ['place']):
-        # if test_is_place(types[i]):
+        # if test_is_general(types[i], ['place']):
+        if test_is_place(types[i]):
             filtered_bindings.append(results['bindings'][i])
 
     return {'bindings': filtered_bindings}
@@ -92,8 +92,8 @@ def test_is_language(types):
 def test_filter_language(results, types):
     filtered_bindings = []
     for i in range(len(results['bindings'])):
-        if test_is_general(types[i], ['language']):
-        # if test_is_language(types[i]):
+        # if test_is_general(types[i], ['language']):
+        if test_is_language(types[i]):
             filtered_bindings.append(results['bindings'][i])
 
     return {'bindings': filtered_bindings}
@@ -102,8 +102,8 @@ def test_filter_language(results, types):
 def test_is_general(types, answer_type):
     max_score = 0
     for type in types:
-        if type == 'http://www.w3.org/2002/07/owl#Thing' or 'wikidata' in type or 'DUL.owl' in type:
-            continue
+        # if type == 'http://www.w3.org/2002/07/owl#Thing' or 'wikidata' in type or 'DUL.owl' in type:
+        #     continue
         name = extract_type_names(type)
         score = w2v.n_similarity(answer_type, [name])
         max_score = max(max_score, score)
