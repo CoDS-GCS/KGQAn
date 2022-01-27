@@ -102,8 +102,6 @@ def test_filter_language(results, types):
 def test_is_general(types, answer_type):
     max_score = 0
     for type in types:
-        # if type == 'http://www.w3.org/2002/07/owl#Thing' or 'wikidata' in type or 'DUL.owl' in type:
-        #     continue
         name = extract_type_names(type)
         score = w2v.n_similarity(answer_type, [name])
         max_score = max(max_score, score)
@@ -195,13 +193,16 @@ def filter_language(results):
 
 
 def extract_type_names(uri):
-    uri_path = urlparse(uri).path
-    name = os.path.basename(uri_path)
+    uri_path = urlparse(uri)
+    if uri_path.fragment:
+        name = uri_path.fragment
+    else:
+        name = os.path.basename(uri_path.path)
+
     p = re.compile(r'(_|\([^()]*\))')
     name = p.sub(' ', name)
     p2 = re.compile(r'([a-z0-9])([A-Z])')
-    predicate_name = p2.sub(r"\1 \2", name)
+    name = p2.sub(r"\1 \2", name)
     if not name.strip():
         return ''
-
     return name.lower()
