@@ -24,56 +24,6 @@ logger.setLevel(logging.INFO)
 logger.propagate = False
 
 
-def start_connection(host, port, sel, request):
-    addr = (host, port)
-    # print("starting connection to", addr)
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setblocking(False)
-    sock.connect_ex(addr)
-    events = selectors.EVENT_READ | selectors.EVENT_WRITE
-    message = libclient.Message(sel, sock, addr, request)
-    sel.register(sock, events, data=message)
-
-
-def remove_duplicates(sequence):
-    seen = set()
-    return [x for x in sequence if not (x in seen or seen.add(x))]
-
-
-def n_similarity(mwe1, mwe2):
-    mwe1 = ' '.join(mwe1)
-    mwe2 = ' '.join(mwe2)
-
-    sel = selectors.DefaultSelector()
-    host, port = '127.0.0.1', 9600
-    request = dict(type="text/json", encoding="utf-8", content=dict(word1=mwe1, word2=mwe2), )
-
-    start_connection(host, port, sel, request)
-
-    result = 0.0
-    try:
-        while True:
-            events = sel.select(timeout=1)
-            for key, mask in events:
-                message = key.data
-                try:
-                    message.process_events(mask)
-                except Exception:
-                    print(
-                        "main: error: exception for",
-                        f"{message.addr}:\n{traceback.format_exc()}",
-                    )
-                    message.close()
-            # Check for a socket being monitored to continue.
-            if not sel.get_map():
-                break
-    except KeyboardInterrupt:
-        print("caught keyboard interrupt, exiting")
-    finally:
-        sel.close()
-    return message.response['result']
-
-
 class linking():
 
     def __init__(self, max_num: int, candidate_uris: list, sparql_end_point: EndPoint, n_limit_EQuery: int):
@@ -85,8 +35,51 @@ class linking():
         self.candidate_uris = candidate_uris
         self.sparql_end_point = sparql_end_point
         self.n_limit_EQuery = n_limit_EQuery
-
+        self.v_uri_scores = defaultdict(float)
         self.process_all_vertices()
+
+    def start_connection(host, port, sel, request):
+        addr = (host, port)
+        # print("starting connection to", addr)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setblocking(False)
+        sock.connect_ex(addr)
+        events = selectors.EVENT_READ | selectors.EVENT_WRITE
+        message = libclient.Message(sel, sock, addr, request)
+        sel.register(sock, events, data=message)
+
+    def n_similarity(self, mwe1, mwe2):
+        mwe1 = ' '.join(mwe1)
+        mwe2 = ' '.join(mwe2)
+
+        sel = selectors.DefaultSelector()
+        host, port = '127.0.0.1', 9600
+        request = dict(type="text/json", encoding="utf-8", content=dict(word1=mwe1, word2=mwe2), )
+
+        self.start_connection(host, port, sel, request)
+
+        result = 0.0
+        try:
+            while True:
+                events = sel.select(timeout=1)
+                for key, mask in events:
+                    message = key.data
+                    try:
+                        message.process_events(mask)
+                    except Exception:
+                        print(
+                            "main: error: exception for",
+                            f"{message.addr}:\n{traceback.format_exc()}",
+                        )
+                        message.close()
+                # Check for a socket being monitored to continue.
+                if not sel.get_map():
+                    break
+        except KeyboardInterrupt:
+            print("caught keyboard interrupt, exiting")
+        finally:
+            sel.close()
+        return message.response['result']
 
     def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
         # for cases such as "Angela Merkel ’s"
@@ -133,19 +126,13 @@ class linking():
 
             return set(combinations_selected)
 
-    def is_variable(self, label):
-        return 'var' in label
-
-    def get_vertex_uris(self):
-        return self.vertices
-
     @staticmethod
-    def __compute_semantic_similarity_between_single_word_and_word_list(word, word_list):
+    def __compute_semantic_similarity_between_single_word_and_word_list(self, word, word_list):
         scores = list()
         score = 0.0
         for w in word_list:
             try:
-                score = n_similarity(word.lower().split(), w.lower().split())
+                score = self.n_similarity(word.lower().split(), w.lower().split())
             except KeyError:
                 score = 0.0
             finally:
@@ -153,6 +140,9 @@ class linking():
         else:
             return scores
 
+    def remove_duplicates(sequence):
+        seen = set()
+        return [x for x in sequence if not (x in seen or seen.add(x))]
 
     def __get_chosen_URIs_for_relation(self, relation: str, uris: list, names: list):
         if not uris:
@@ -163,14 +153,15 @@ class linking():
         URIs_with_scores = list(zip(l1, l2, scores))
         URIs_with_scores.sort(key=operator.itemgetter(2), reverse=True)
         # self.uri_scores.update(URIs_with_scores)
-        return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
+        return self.remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
+    def is_variable(self, label):
+        return 'var' in label
 
+    def get_vertex_uris(self):
+        return self.vertices
 
     def extract_possible_V_and_E(question):
-        question.vertices = list()
-        question.v_uri_scores = defaultdict(float)
-
         # for entity in self.question.query_graph:
         question.query_graph= nx.MultiGraph()
         for entity in question.query_graph:
@@ -196,11 +187,11 @@ class linking():
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
 
 
-            ####CONFIRM
-            # updated_vertex = Vertex(question, question.n_max_Vs, URIs_sorted, question.sparql_end_point, question.n_limit_EQuery)
-            # URIs_chosen = updated_vertex.vertices
+            #### NEED to CONFIRM
+            # updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
+            # URIs_chosen = updated_vertex.get_vertex_uris()
             updated_vertex = [question, question.n_max_Vs, URIs_sorted, question.sparql_end_point, question.n_limit_EQuery]
-            URIs_chosen = updated_vertex
+            URIs_chosen = updated_vertex.get_vertex_uris()
             # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             # if entity.lower() == 'boston tea party':
             #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
