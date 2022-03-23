@@ -1,16 +1,13 @@
-
 import logging
 import operator
-import selectors
-import traceback
-from collections import defaultdict
-from socket import socket
-
 import networkx as nx
+import requests
 from itertools import chain, product, zip_longest
+from collections import defaultdict
 from termcolor import cprint
 
-from KGQAn.src.kgqan.sparql_end_points import EndPoint
+from kgqan.vertex import Vertex
+from kgqan.sparql_end_points import EndPoint
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -24,64 +21,18 @@ logger.setLevel(logging.INFO)
 logger.propagate = False
 
 
-class linking():
-
-    def __init__(self, max_num: int, candidate_uris: list, sparql_end_point: EndPoint, n_limit_EQuery: int):
+class Linking:
+    def __init__(self,  sparql_end_point: EndPoint, n_limit_EQuery: int, n_max_Es: int = 10):
         self.n_max_Vs = 1
-        self.max_num = max_num
+        self.n_max_Es = n_max_Es
         self.vertices = list()
         self.predicates_uris = list()
         self.predicates_names = list()
-        self.candidate_uris = candidate_uris
         self.sparql_end_point = sparql_end_point
         self.n_limit_EQuery = n_limit_EQuery
         self.v_uri_scores = defaultdict(float)
-        self.process_all_vertices()
 
-    def start_connection(host, port, sel, request):
-        addr = (host, port)
-        # print("starting connection to", addr)
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.setblocking(False)
-        sock.connect_ex(addr)
-        events = selectors.EVENT_READ | selectors.EVENT_WRITE
-        message = libclient.Message(sel, sock, addr, request)
-        sel.register(sock, events, data=message)
-
-    def n_similarity(self, mwe1, mwe2):
-        mwe1 = ' '.join(mwe1)
-        mwe2 = ' '.join(mwe2)
-
-        sel = selectors.DefaultSelector()
-        host, port = '127.0.0.1', 9600
-        request = dict(type="text/json", encoding="utf-8", content=dict(word1=mwe1, word2=mwe2), )
-
-        self.start_connection(host, port, sel, request)
-
-        result = 0.0
-        try:
-            while True:
-                events = sel.select(timeout=1)
-                for key, mask in events:
-                    message = key.data
-                    try:
-                        message.process_events(mask)
-                    except Exception:
-                        print(
-                            "main: error: exception for",
-                            f"{message.addr}:\n{traceback.format_exc()}",
-                        )
-                        message.close()
-                # Check for a socket being monitored to continue.
-                if not sel.get_map():
-                    break
-        except KeyboardInterrupt:
-            print("caught keyboard interrupt, exiting")
-        finally:
-            sel.close()
-        return message.response['result']
-
-    def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
+    def make_keyword_unordered_search_query_with_type(self, keywords_string: str, limit=500):
         # for cases such as "Angela Merkel ’s"
         escape = ['’s']
         kwlist = []
@@ -97,7 +48,7 @@ class linking():
                f"select distinct ?uri  ?label " \
                f"where {{ ?uri rdf:label ?label. ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
-    def get_combination_of_two_lists(list1, list2, directed=False, with_reversed=False):
+    def get_combination_of_two_lists(self, list1, list2, directed=False, with_reversed=False):
         lists = [l for l in (list1, list2) if l]
 
         if len(lists) < 2:
@@ -127,12 +78,12 @@ class linking():
             return set(combinations_selected)
 
     @staticmethod
-    def __compute_semantic_similarity_between_single_word_and_word_list(self, word, word_list):
+    def __compute_semantic_similarity_between_single_word_and_word_list(word, word_list):
         scores = list()
         score = 0.0
         for w in word_list:
             try:
-                score = self.n_similarity(word.lower().split(), w.lower().split())
+                score = Linking.n_similarity(word.lower().split(), w.lower().split())
             except KeyError:
                 score = 0.0
             finally:
@@ -140,7 +91,16 @@ class linking():
         else:
             return scores
 
-    def remove_duplicates(sequence):
+    @staticmethod
+    def n_similarity( mwe1, mwe2):
+        mwe1 = ' '.join(mwe1)
+        mwe2 = ' '.join(mwe2)
+
+        data = {"word1": mwe1, "word2": mwe2}
+        r = requests.post('http://127.0.0.1:5050/', json=data)
+        return r.json()['similarity']
+
+    def remove_duplicates(self, sequence):
         seen = set()
         return [x for x in sequence if not (x in seen or seen.add(x))]
 
@@ -161,36 +121,32 @@ class linking():
     def get_vertex_uris(self):
         return self.vertices
 
-    def extract_possible_V_and_E(question):
+    def extract_possible_V_and_E(self, question):
         # for entity in self.question.query_graph:
-        question.query_graph= nx.MultiGraph()
         for entity in question.query_graph:
-            if question.is_variable(entity):
+            if self.is_variable(entity):
                 # self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
-            entity_query = question.make_keyword_unordered_search_query_with_type(entity, limit=400)
+            entity_query = self.make_keyword_unordered_search_query_with_type(entity, limit=400)
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
-                uris, names = question.sparql_end_point.get_names_and_uris(entity_query)
+                uris, names = self.sparql_end_point.get_names_and_uris(entity_query)
             except:
                 logger.error(f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} ")
                 continue
 
-            scores = question.__compute_semantic_similarity_between_single_word_and_word_list(entity, names)
+            scores = self.__compute_semantic_similarity_between_single_word_and_word_list(entity, names)
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
-            question.v_uri_scores.update(URIs_with_scores)
+            self.v_uri_scores.update(URIs_with_scores)
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
 
 
-            #### NEED to CONFIRM
-            # updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
-            # URIs_chosen = updated_vertex.get_vertex_uris()
-            updated_vertex = [question, question.n_max_Vs, URIs_sorted, question.sparql_end_point, question.n_limit_EQuery]
+            updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
             URIs_chosen = updated_vertex.get_vertex_uris()
             # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             # if entity.lower() == 'boston tea party':
@@ -204,12 +160,12 @@ class linking():
                 continue
             source_URIs = question.query_graph.nodes[source]['uris']
             destination_URIs = question.query_graph.nodes[destination]['uris']
-            combinations = question.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
+            combinations = self.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
 
             uris, names = list(), list()
             for comb in combinations:
-                if question.is_variable(source) or question.is_variable(destination):
-                    if question.is_variable(source):
+                if self.is_variable(source) or self.is_variable(destination):
+                    if self.is_variable(source):
                         uris, names = question.query_graph.nodes[destination]['vertex'].get_predicates()
                     else:
                         uris, names = question.query_graph.nodes[source]['vertex'].get_predicates()
@@ -223,10 +179,10 @@ class linking():
                     URIs_false, names_false, URIs_true, names_true = [], [], [], []
                     if len(source_URIs) > 0 and len(destination_URIs) > 0:
                         v_uri_1, v_uri_2 = comb
-                        URIs_false, names_false = question.sparql_end_point.get_predicates_and_their_names(v_uri_1, v_uri_2,
-                                                                                                       nlimit=question.n_limit_EQuery)
-                        URIs_true, names_true = question.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
-                                                                                                     nlimit=question.n_limit_EQuery)
+                        URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(v_uri_1, v_uri_2,
+                                                                                                       nlimit=self.n_limit_EQuery)
+                        URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
+                                                                                                     nlimit=self.n_limit_EQuery)
                     if len(URIs_false) > 0 and len(URIs_true) > 0:
                         URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
                         URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
@@ -241,7 +197,7 @@ class linking():
                         uris.extend(URIs_true)
                         names.extend(names_true)
             else:
-                URIs_chosen = question.__get_chosen_URIs_for_relation(relation, uris, names)
+                URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {question.query_graph.nodes(data=True)}")
