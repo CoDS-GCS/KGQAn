@@ -27,7 +27,8 @@ logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
 # model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred11/'
 # best 39.7
-model_path = '/mnt/KGQAn_Project/app_storage/output_pred18/'
+# model_path = '/mnt/KGQAn_Project/app_storage/output_pred18/'
+model_path = '/mnt/KGQAn_Project/app_storage/output_pred21_8_30/'
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 
