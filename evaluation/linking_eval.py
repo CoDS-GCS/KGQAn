@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
         kgqan_qald9['questions'].append(question)
 
-        question_linking = {'question': question_text, 'SerialNumber': question['id'], 'sparql_query': question['sparql'],
+        question_linking = {'question': question_text, 'SerialNumber': question['id'], 'sparql_query': question['query'],
                             'entity mapping': vertices, 'predicate mapping': predicates}
         kgqan_linking_qald9.append(question_linking)
 
