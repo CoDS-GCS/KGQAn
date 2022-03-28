@@ -135,7 +135,7 @@ if __name__ == '__main__':
         question_linking = {'question': question_text, 'SerialNumber': question['id'], 'sparql_query': question['query'],
                             'entity mapping': vertices, 'predicate mapping': predicates}
         # question_linking.toJSON()
-        json.dumps(question_linking, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        json.dumps(question_linking, sort_keys=True, indent=4)
         kgqan_linking_qald9.append(question_linking)
 
         et = time.time()
