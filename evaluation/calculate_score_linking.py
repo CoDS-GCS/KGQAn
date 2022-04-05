@@ -4,7 +4,6 @@ import json
 # file2_name = r"/home/ishika/try1.json"
 file1_name = r"/home/ishika/LCQuad_10ques.json"
 file2_name = r"/home/ishika/LCQuad_10ques_fake.json"
-file3_name = r"/home/ishika/LCQuad_10ques_fake2.json"
 
 if __name__ == '__main__':
     # Predicate scores
@@ -28,9 +27,6 @@ if __name__ == '__main__':
     with open(file2_name) as f2:
         produced = json.load(f2)
 
-    with open(file3_name) as f2:
-        produced2 = json.load(f2)
-
 
     def set_value(prec: float, rec: float, fscore: float):
         precision.append(prec)
@@ -42,7 +38,7 @@ if __name__ == '__main__':
         return real_dict['label'] == predicted_dict['label'] and real_dict['uri'] == predicted_dict['uri']
 
 
-    def evaluate_v2(real, predicted):
+    def evaluate(real, predicted):
         if (len(real) == 0) and (len(predicted) == 0):
             set_value(1.0, 1.0, 1.0)
         elif (len(real) == 0) and (len(predicted) != 0):
@@ -68,7 +64,7 @@ if __name__ == '__main__':
 
 
     def avg_score(r_value, p_value):
-        evaluate_v2(r_value, p_value)
+        evaluate(r_value, p_value)
         precision_value = sum(precision) / len(precision)
         recall_value = sum(recall) / len(recall)
         fmeasure_value = sum(f_measure) / len(f_measure)
@@ -94,10 +90,9 @@ if __name__ == '__main__':
         real_predicate = []
         pred_predicate = []
         if (ground_truth[question]['SerialNumber']) == (produced[question]['SerialNumber']):
-            # Fetch real predicate and entity mapping
-            real_predicate = (ground_truth[question]['predicate mapping'])
-            # Fetch predicted predicate mapping and entity mapping
-            pred_predicate = (produced[question]['predicate mapping'])
+            real_predicate = (ground_truth[question]['predicate mapping'])  # Fetch real predicate and entity mapping
+            pred_predicate = (produced[question]['predicate mapping'])  # Fetch predicted predicate mapping and entity
+            # mapping
             predicate_eval(real_predicate, pred_predicate)
         else:
             continue
