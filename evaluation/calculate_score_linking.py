@@ -2,8 +2,9 @@ import json
 
 file1_name = r"/home/ishika/Downloads/FullyAnnotated_LCQuAD5000.json"
 # file2_name = r"/home/ishika/try1.json"
-file2_name = r"/home/ishika/Downloads/Linking_lcquad.json"
+# file2_name = r"/home/ishika/Downloads/Linking_lcquad.json"
 # file2_name = r"/home/ishika/LCQuad_10ques_fake2.json"
+file2_name = r"/home/ishika/KGQAn/Linking_10_edges.json"
 
 if __name__ == '__main__':
     # Predicate scores
@@ -50,7 +51,6 @@ if __name__ == '__main__':
             set_value(0, 0, 0)
         else:
             hits = 0
-
             for r in range(len(real)):
                 for p in range(len(predicted)):
                     if len(real[r]) == 2 and len(predicted[p]) == 2:
@@ -172,9 +172,10 @@ if __name__ == '__main__':
     precision = list()
     recall = list()
     f_measure = list()
-
+    count =0
     # actual file evaluate
     for question1 in range(len(produced)):
+        count += 1
         for question2 in range(len(ground_truth)):
             if (produced[question1]['question']) == (ground_truth[question2]['question']):
                 real_entity = (ground_truth[question2]['entity mapping'])  # Fetch real entity
@@ -185,3 +186,4 @@ if __name__ == '__main__':
 
     print("Predicate eval P =", predicate_precision[-1], "R=", predicate_recall[-1], "F =", predicate_fmeasure[-1])
     print("entity eval P =", entity_precision[-1], "R=", entity_recall[-1], "F =", entity_fmeasure[-1])
+    print(count)
