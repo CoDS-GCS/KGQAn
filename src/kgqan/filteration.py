@@ -99,30 +99,35 @@ def test_filter_language(results, types):
     return {'bindings': filtered_bindings}
 
 
-def test_is_general(types, answer_type):
-    max_score = 0
-    for type in types:
-        name = extract_type_names(type)
-        score = w2v.n_similarity(answer_type, [name])
-        max_score = max(max_score, score)
+def test_is_general(types, answer_type, knowledge_graph):
+    if knowledge_graph == 'lc_quad':
+        max_score = 0
+        for type in types:
+            name = extract_type_names(type)
+            score = w2v.n_similarity(answer_type, [name])
+            max_score = max(max_score, score)
 
-    if max_score > 0.5:
-        return True
+        if max_score > 0.2:
+            return True
         # if '/' + answer_type[0] in type.lower():
         #     return True
-    return False
+        return False
+    else:
+        for type in types:
+            if '/' + answer_type[0] in type.lower():
+                return True
+        return False
 
-
-def test_filter_general(results, answer_type, types):
+def test_filter_general(results, answer_type, types, knowledge_graph):
     filtered_bindings = []
     for i in range(len(results['bindings'])):
-        if test_is_general(types[i], answer_type):
+        if test_is_general(types[i], answer_type, knowledge_graph):
             filtered_bindings.append(results['bindings'][i])
 
     return {'bindings': filtered_bindings}
 
 
-def update_results(results, answer_type, types):
+def update_results(results, answer_type, types, knowledge_graph):
     if 'person' in answer_type:
         return test_filter_person(results, types)
     elif 'place' in answer_type:
@@ -130,7 +135,7 @@ def update_results(results, answer_type, types):
     elif 'language' in answer_type:
         return test_filter_language(results, types)
     elif len(answer_type) > 0 and answer_type[0] not in ['boolean', 'date', 'count', 'other', 'string', 'price']:
-        return test_filter_general(results, answer_type, types)
+        return test_filter_general(results, answer_type, types, knowledge_graph)
     return results
 
 def filter_person(results):

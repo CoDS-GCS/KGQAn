@@ -80,6 +80,28 @@ def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=50
            f"select distinct ?uri  ?label " \
            f"where {{ ?uri rdf:label ?label. ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
 
+
+def make_Ms_academic_query(keywords_string: str, limit=500):
+    keywords_string = keywords_string.replace(',', '')
+    keywords_string = keywords_string.replace('.', '')
+    keywords_string = keywords_string.replace(':', '')
+    keywords_string = keywords_string.replace('&', '')
+    keywords_string = keywords_string.replace('\'s', '')
+    keywords_string = keywords_string.replace('\'', '')
+    # for cases such as "Angela Merkel ’s"
+    escape = ['’s', 'and']
+    kwlist = []
+    for w in keywords_string.strip().split():
+        if w not in escape:
+            if w.isnumeric():
+                w = '\\\'' + w + '\\\''
+                kwlist.append(w)
+            else:
+                kwlist.append(w)
+    kws = ' AND '.join(kwlist)
+    return f"select distinct ?uri  ?label " \
+           f"where {{ ?uri ?p ?label. ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
+
 # TODO its calling is removed for now till having a way of dealing with each KG with its compatible queries
 def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: str, limit=500):
     # for cases such as "Angela Merkel ’s"

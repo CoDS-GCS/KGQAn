@@ -33,6 +33,7 @@ from .nlp.utils import remove_duplicates
 from .nlp.models import cons_parser, WordNetLemmatizer
 from . import embeddings_client as w2v, utils
 
+import time
 import datetime
 from .filteration import *
 from termcolor import colored, cprint
@@ -64,7 +65,9 @@ knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
                           "microsoft_academic": "https://makg.org/sparql",
                           "open_citations": "https://opencitations.net/sparql",
                           "yago": "http://206.12.95.86:8892/sparql",
-                          "fact_forge": "http://factforge.net/sparql"}
+                          "fact_forge": "http://factforge.net/sparql",
+                          "bgee": "https://bgee.org/sparql",
+                          "dblp": "http://206.12.95.86:8893/sparql"}
 
 
 class KGQAn:
@@ -114,8 +117,9 @@ class KGQAn:
 
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
-
+        understanding_start = time.time()
         self.question = (question_text, question_id)
+        understanding_end = time.time()
         # self.question.id = question_id
         self.knowledge_graph = knowledge_graph
         if answer_type:
@@ -133,14 +137,18 @@ class KGQAn:
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
             logger.info("[NO Named-entity or NO Relation Detected]")
-            return [], [], []
+            return [], [], [], understanding_end - understanding_start, 0, 0
+        linking_start = time.time()
         self.extract_possible_V_and_E()
+        linking_end = time.time()
+        execution_start = time.time()
         self.generate_star_queries()
         self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
+        execution_end = time.time()
         logger.info(f"\n\n\n\n{'#' * 120}")
-        return answers, self.question.query_graph.nodes, self.question.query_graph.edges
+        return answers, self.question.query_graph.nodes, self.question.query_graph.edges, understanding_end - understanding_start, linking_end - linking_start, execution_end - execution_start
 
     def detect_question_and_answer_type(self):
         # question_text = question_text.lower()
@@ -231,15 +239,25 @@ class KGQAn:
             pass  # 11,13,75
 
         # Which Trial
-        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which ')\
-                or self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
-                or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
-                or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
+        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which '):
+                # or self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
+                # or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
+                # or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
             allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
             for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
                 if tag[0] in ['NN', 'NNS']:
                     self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
                     break
+        if self.knowledge_graph == "lc_quad":
+            if self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
+                or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
+                or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
+                allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
+                for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
+                    if tag[0] in ['NN', 'NNS']:
+                        self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
+                        break
+
     # TODO remove this if not needed
     def rephrase_question(self):
         if self.question.text.lower().startswith('who was'):
@@ -252,7 +270,11 @@ class KGQAn:
             if self.is_variable(entity):
                 # self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
-            entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            if self.knowledge_graph in ['microsoft_academic', 'bgee']:
+                entity_query = make_Ms_academic_query(entity, limit=self.n_limit_VQuery)
+            else:
+                entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            #entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
@@ -463,7 +485,7 @@ class KGQAn:
                     continue
                 # The else is for boolean questions
                 if 'results' in v_result:
-                    filtered_results = update_results(v_result['results'], self.question.answer_type, types)
+                    filtered_results = update_results(v_result['results'], self.question.answer_type, types, self.knowledge_graph)
                     possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
                 else:
                     possible_answer.update(results=[], boolean=v_result['boolean'])
