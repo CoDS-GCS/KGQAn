@@ -26,7 +26,7 @@ from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 
-file_name = r"yago/qald9_yago100.json"
+file_name = r"mag/qald9_ms100.json"
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -55,7 +55,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "qald9_yago100"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "qald9_ms100"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
         qc = next(qCount)
         for language_variant_question in question['question']:
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         try:
             answers, _, _, understanding_time, linking_time, execution_time\
                 = MyKGQAn.ask(question_text=question_text,
-                              question_id=question['id'], knowledge_graph='yago')
+                              question_id=question['id'], knowledge_graph='microsoft_academic')
         except Exception as e:
             traceback.print_exc()
             continue
@@ -106,12 +106,10 @@ if __name__ == '__main__':
     cprint(f"== QALD 9 Statistics : {qc} questions, Total Time == {text1}, Average Time == {text2} ")
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
-    cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
-
+    cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc}")
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
               f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
               encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
-

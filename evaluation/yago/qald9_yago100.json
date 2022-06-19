@@ -1,0 +1,5507 @@
+{
+  "dataset": {
+    "id": "yago100"
+  },
+  "questions": [
+    {
+      "id": 0,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Eagle Mountain situated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {<http://yago-knowledge.org/resource/Eagle_Mountain_(Minnesota)> rdfs:label \"Eagle Mountain (bukid sa Estados Unidos, Minnesota, Cook County, lat 47,90, long -90,56)\"@ceb ; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cook_County,_Minnesota"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Misquah_Hills"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are geo coordinates of Acuy Island?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Acuy Island\"@en. ?country schema:geo ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "uri",
+                  "value": "geo:-42.92141111114545,-73.42815000005875"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "question": [
+        {
+          "language": "en",
+          "string": "How does the logo of Federal Ministry of Agriculture, Regions and Tourism look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE { ?t rdfs:label \"Federal Ministry of Agriculture, Regions and Tourism\"@en; schema:logo ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/BMLRT%20Logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "question": [
+        {
+          "language": "en",
+          "string": "What all companies are sponsors of British Council?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE { ?t rdfs:label \"British Council\"@en ; schema:sponsor ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Foreign_and_Commonwealth_Office"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "question": [
+        {
+          "language": "en",
+          "string": "What banks are members of Mastercard?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?t rdfs:label \"Mastercard\"@en ; schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/FIDO_Alliance"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/World_Wide_Web_Consortium"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who is the founder of Bank of America?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?t rdfs:label \"Bank of America\"@en ; <http://schema.org/founder> ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Amadeo_Giannini"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "question": [
+        {
+          "language": "en",
+          "string": "Return the location where Tim hortons was found?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE { ?t rdfs:label \"Tim Hortons\"@en ; schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hamilton,_Ontario"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "question": [
+        {
+          "language": "en",
+          "string": "In which city can we find Davichi?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?d WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Seoul"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Acer Inc located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?d WHERE {?c rdfs:label \"Acer Inc.\"@en. ?c schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Taipei"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Davichi found?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "2008"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are the directions to Baypark Stadium?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {?t rdfs:label \"Baypark Stadium\"@en; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mount_Maunganui"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "question": [
+        {
+          "language": "en",
+          "string": "Return the Allianz Parque's geo coordinates."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?geo WHERE {?c rdfs:label \"Allianz Parque\"@en; schema:geo ?geo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "geo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "geo": {
+                  "type": "uri",
+                  "value": "geo:-23.5276,-46.6784"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the logo of Airlines of Tasmania."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"Airlines of Tasmania\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Airlines%20of%20Tasmania%20logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who are sponsors of Public Facilities Privacy & Security Act?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Public Facilities Privacy & Security Act\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Paul_Stam"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Julia_C._Howard"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bob_Steinburg"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Dan_Bishop"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who are the associates of Adelaide Club?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?t WHERE {  ?m rdfs:label \"Adelaide Club\"@en . ?t schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "t"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Blyth"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Hart_(South_Australian_colonist)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Randolph_Isham_Stow"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Bullock_Andrews"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alfred_Watts_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Stirling_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Ernest_Hamilton"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Hall_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Henry_Kent_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Matthew_Moorhouse"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Bowen_Colley"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Waters_Moore"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Littlejohn_O'Halloran"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wigley"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Hamilton_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alexander_Downer"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Rymill"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Frederick_Richards_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Herbert_Hudd"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/James_Wallace_Sandford"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Lavington_Bonython"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Norman_Jude"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Roland_Ellis_Jacobs"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Shirley_Jeffries"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Gordon_Duncan"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Harris_Browne"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Howard_Angas"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Everard_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Gosse_(surgeon)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_John_Peake"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Young_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Tuthill_Bagot"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_James_Browne"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Angas_Parsons"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Gordon_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Charles_Stirling"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Eric_Neal"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/G._C._Ligertwood"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/James_Hurtle_Fisher"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Morphett"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Lancelot_Stirling"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Hanson_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Lawson_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robin_Millhouse"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Sam_Jacobs_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Samuel_Davenport"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Elder"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Hardy_(businessman)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Beaumont_Arnold_Moulden"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Ben_Rounsevell"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Brookman_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Don_Laidlaw"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Hamilton_(Australian_police_officer)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Klewitz_Soward"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Joseph_Gilbert_(winemaker)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Martin_Haese"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_John_Peterswald"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_West-Erskine"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Goyder"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Milne_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_William_Hawker"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Cockburn_Henderson"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bradley_Selway"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bruce_Lander"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Angel_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Charles_Hawker"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_Brown_Fisher"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Baker_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Fife_Angas"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Henry_Ayers"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Baker_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Bakewell_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Waterhouse_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_George_Everard"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edmund_Mackenzie_(Edmond)_Young"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Philip_Levi"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Magarey"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Abraham_Scott"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_Mann_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Herbert_Bristow_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Anthony_Forster_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Mayo"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Barr_Smith"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Giles_(pastoralist)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Mair_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wadham"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Francis_William_Stokes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Duffield"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Boothby"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wyatt"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "question": [
+        {
+          "language": "en",
+          "string": "List the creators of Academy of Sciences of the Institute of Bologna."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?t WHERE {?m rdfs:label \"Academy of Sciences of the Institute of Bologna\"@en . ?t schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "t"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Nicolas-Louis_de_Lacaille"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Pafnuty_Chebyshev"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Luigi_Ferdinando_Marsili"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Sauveur_François_Morand"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Ralf_Trapp"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Gabriel_Cramer"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Antonio_Pacchioni"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "question": [
+        {
+          "language": "en",
+          "string": "How does a Samsung corby look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?i WHERE {?l rdfs:label \"Samsung Corby\"@en; schema:image ?i}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "i"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "i": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Samsung-corby.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was KC and the Sunshine Band originated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?l WHERE {?c rdfs:label \"KC and the Sunshine Band\"@en. ?c schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Miami"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "question": [
+        {
+          "language": "en",
+          "string": "Bullet for My Valentine belongs to which city?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?d WHERE {?c rdfs:label \"Bullet for My Valentine\"@en. ?c schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bridgend"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Battersea Dogs and Cats Home started?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Battersea Dogs and Cats Home\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "1860"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is 26 St James's Place located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?j WHERE {?t rdfs:label \"26 St James's Place\"@en;schema:containedInPlace ?j}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "j"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "j": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/St_James's"
+                }
+              },
+              {
+                "j": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/City_of_Westminster"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is the geographical position of Alanta?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?c rdfs:label \"Alanta\"@en; schema:geo ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "geo:55.3500000000011,25.28333333333384"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "question": [
+        {
+          "language": "en",
+          "string": "What does the logo of American Red Cross look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"American Red Cross\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/American%20Red%20Cross%20logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the sponsors of Sintel."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Sintel\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Netherlands_Film_Fund"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "question": [
+        {
+          "language": "en",
+          "string": "List the companies associated with FIDO Alliance."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?m schema:memberOf ?a . ?a rdfs:label \"FIDO Alliance\"@en}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bank_of_America"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alibaba_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NEC"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arm_Holdings"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/SK_Telecom"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Chunghwa_Telecom"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NTT_Docomo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Google"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/IBM"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Intel"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/KDDI"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Yahoo!_Japan"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mastercard"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Visa_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/LG_Electronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Samsung_Electronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/SoftBank_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Aetna"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Federal_Office_for_Information_Security"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cirrus_Logic"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/ThreatMetrix"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Qualcomm"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NortonLifeLock"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Wells_Fargo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Nok_Nok_Labs"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/BC_Card"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Groupement_des_Cartes_Bancaires_CB"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/American_Express"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fujitsu"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hitachi"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Huawei"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Lenovo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/National_Institute_of_Standards_and_Technology"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Royal_Bank_of_Canada"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Telstra"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Verizon_Wireless"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Dai_Nippon_Printing"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Line_Corporation"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NXP_Semiconductors"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thales_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/VMware"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mitsubishi_UFJ_Financial_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Goldman_Sachs"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Infineon_Technologies"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Giesecke+Devrient"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Intuit"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/JCB_Co.,_Ltd."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/PNC_Financial_Services"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Onfido"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Daon,_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Oberthur_Technologies"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/USAA"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Jumio"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/The_Vanguard_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cabinet_Office"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Facebook,_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fidelity_Investments"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/HID_Global"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/ING_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mitre_Corporation"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/OneSpan"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Plantronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/RSA_Security"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Synaptics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Discover_Financial"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Hillaire Kedigui born?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?l rdfs:label \"Hilaire Kédigui\"@en ; schema:birthPlace ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/N'Djamena"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the picture of Nokia Lumia."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?i WHERE {?l rdfs:label \"Lumia series\"@en; schema:image ?i}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "i"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "i": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Nokia%20%26%20Microsoft%20Lumia%20devices.png"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "question": [
+        {
+          "language": "en",
+          "string": "The entertainment firm of Alphabet Soup Children emanated from which city?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?l WHERE {?c rdfs:label \"Alphabet Soup Children's Entertainment\"@en. ?c schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Winnipeg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where did Justin Bieber grow up?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?l rdfs:label \"Justin Bieber\"@en; schema:birthPlace ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/London,_Ontario"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Carlo Giuliani shot?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?date WHERE {?c rdfs:label \"Carlo Giuliani\"@en; schema:deathDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "2001-07-20"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is the Fifth Avenue Plaza of Bank of America located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {?t rdfs:label \"Bank of America Fifth Avenue Plaza\"@en ; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Washington_(state)"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are the geo coordinates of Allied Arts Building?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?geo WHERE {?c rdfs:label \"Allied Arts Building\"@en; schema:geo ?geo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "geo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "geo": {
+                  "type": "uri",
+                  "value": "geo:37.4144,-79.1442"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is the logo of starbucks?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"Starbucks\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/SmilingMermaid.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "question": [
+        {
+          "language": "en",
+          "string": "Forma Urbis Romae is sponsored by whom?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Forma Urbis Romae\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Septimius_Severus"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the father organization of Manchester city."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?b WHERE {?m rdfs:label \"Manchester City F.C.\"@en; schema:parentOrganization ?b}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "b"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "b": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/City_Football_Group"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who produced the video game of Slayers?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?r WHERE {?m rdfs:label \"Slayers\"@en; schema:producer ?r}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "r"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "r": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hiroshi_Ogawa_(animator)"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "question": [
+        {
+          "language": "en",
+          "string": "Give the url for more information on 2010 Wimbledon Championships."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?u WHERE {?l rdfs:label \"2010 Wimbledon Championships\"@en; schema:url ?u}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "u"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "u": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+                  "value": "http://www.wimbledon.org/"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Atlas Genius founded?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?f WHERE {?c rdfs:label \"Atlas Genius\"@en. ?c schema:foundingLocation ?f}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "f"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "f": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Adelaide"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "question": [
+        {
+          "language": "en",
+          "string": "Queens belongs to which country?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?n WHERE {?m rdfs:label \"Queens\"@en; schema:countryOfOrigin ?n}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "n"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "n": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Spain"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Western University founded?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Western University\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "1991"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "question": [
+        {
+          "language": "en",
+          "string": "In which US state is Baltimore located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE {?r rdfs:label \"Baltimore\"@en; schema:location ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Maryland"
+                }
+              },
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Windsor_County,_Vermont"
+                }
+              },
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fairfield_County,_Ohio"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "question": [
+        {
+          "language": "en",
+          "string": "Give the geographical position of Alaska?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?a rdfs:label \"Alaska Range\"@en; schema:geo ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "geo:63.0694,-151.007"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "question": [
+        {
+          "language": "en",
+          "string": "What does the logo of Reebok look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE {?a rdfs:label \"Reebok\"@en; schema:logo ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Reebok%20logo19.png"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the members of Microsoft."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Microsoft\"@en; schema:memberOf ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alliance_for_Open_Media"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Wi-Fi_Alliance"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/World_Wide_Web_Consortium"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where did the UEFA Champions League Final take place?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"2018 UEFA Champions League Final\"@en; schema:location ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Olimpiyskiy_National_Sports_Complex"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the image of the car Puma"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE { ?l rdfs:label \"Puma\"@en ; schema:image ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%20500px.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%20band.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/SPz%20Puma%20Mobilit%C3%A4tsversuchfahrzeug%20VS2.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%206x6.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/CMM%20MountainLion.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 46,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is Ace in the Hole associated with?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?n WHERE {?h rdfs:label \"Ace in the Hole\"@en; schema:isPartOf ?n}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "n"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "n": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Beyond_the_Blue_Neon"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 47,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Bell railway station situated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE {?l rdfs:label \"Bell Busk railway station\"@en; schema:containedInPlace ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Craven"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 48,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Selena Gomez born?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?h WHERE {?l rdfs:label \"Selena Gomez\"@en ; schema:birthPlace ?h}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "h"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "h": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Grand_Prairie,_Texas"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 49,
+      "question": [
+        {
+          "language": "en",
+          "string": "When did Mahatma Gandhi die?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?h WHERE {?n rdfs:label \"Mohandas Karamchand Gandhi\"@en ; schema:deathDate ?h}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "h"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "h": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1948-01-30"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 50,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Eagle Mountain situated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {<http://yago-knowledge.org/resource/Eagle_Mountain_(Minnesota)> rdfs:label \"Eagle Mountain (bukid sa Estados Unidos, Minnesota, Cook County, lat 47,90, long -90,56)\"@ceb ; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cook_County,_Minnesota"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Misquah_Hills"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 51,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are geo coordinates of Acuy Island?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Acuy Island\"@en. ?country schema:geo ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "uri",
+                  "value": "geo:-42.92141111114545,-73.42815000005875"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 52,
+      "question": [
+        {
+          "language": "en",
+          "string": "How does the logo of Federal Ministry of Agriculture, Regions and Tourism look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE { ?t rdfs:label \"Federal Ministry of Agriculture, Regions and Tourism\"@en; schema:logo ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/BMLRT%20Logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 53,
+      "question": [
+        {
+          "language": "en",
+          "string": "What all companies are sponsors of British Council?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE { ?t rdfs:label \"British Council\"@en ; schema:sponsor ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Foreign_and_Commonwealth_Office"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 54,
+      "question": [
+        {
+          "language": "en",
+          "string": "What banks are members of Mastercard?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?t rdfs:label \"Mastercard\"@en ; schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/FIDO_Alliance"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/World_Wide_Web_Consortium"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 55,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who is the founder of Bank of America?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?t rdfs:label \"Bank of America\"@en ; <http://schema.org/founder> ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Amadeo_Giannini"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 56,
+      "question": [
+        {
+          "language": "en",
+          "string": "Return the location where Tim hortons was found?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE { ?t rdfs:label \"Tim Hortons\"@en ; schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hamilton,_Ontario"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 57,
+      "question": [
+        {
+          "language": "en",
+          "string": "In which city can we find Davichi?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?d WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Seoul"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 58,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Acer Inc located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?d WHERE {?c rdfs:label \"Acer Inc.\"@en. ?c schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Taipei"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 59,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Davichi found?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "2008"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 60,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are the directions to Baypark Stadium?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {?t rdfs:label \"Baypark Stadium\"@en; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mount_Maunganui"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 61,
+      "question": [
+        {
+          "language": "en",
+          "string": "Return the Allianz Parque's geo coordinates."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?geo WHERE {?c rdfs:label \"Allianz Parque\"@en; schema:geo ?geo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "geo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "geo": {
+                  "type": "uri",
+                  "value": "geo:-23.5276,-46.6784"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 62,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the logo of Airlines of Tasmania."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"Airlines of Tasmania\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Airlines%20of%20Tasmania%20logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 63,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who are sponsors of Public Facilities Privacy & Security Act?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Public Facilities Privacy & Security Act\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Paul_Stam"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Julia_C._Howard"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bob_Steinburg"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Dan_Bishop"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 64,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who are the associates of Adelaide Club?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?t WHERE {  ?m rdfs:label \"Adelaide Club\"@en . ?t schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "t"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Blyth"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Hart_(South_Australian_colonist)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Randolph_Isham_Stow"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Bullock_Andrews"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alfred_Watts_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Stirling_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Ernest_Hamilton"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Hall_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Henry_Kent_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Matthew_Moorhouse"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Bowen_Colley"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Waters_Moore"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Littlejohn_O'Halloran"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wigley"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Hamilton_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alexander_Downer"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Rymill"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Frederick_Richards_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Herbert_Hudd"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/James_Wallace_Sandford"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Lavington_Bonython"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Norman_Jude"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Roland_Ellis_Jacobs"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Shirley_Jeffries"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Gordon_Duncan"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Harris_Browne"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Howard_Angas"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Everard_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Gosse_(surgeon)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_John_Peake"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Young_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Tuthill_Bagot"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_James_Browne"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Angas_Parsons"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Gordon_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_Charles_Stirling"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Eric_Neal"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/G._C._Ligertwood"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/James_Hurtle_Fisher"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Morphett"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Lancelot_Stirling"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Hanson_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Lawson_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robin_Millhouse"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Sam_Jacobs_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Samuel_Davenport"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Elder"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arthur_Hardy_(businessman)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Beaumont_Arnold_Moulden"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Ben_Rounsevell"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Brookman_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Don_Laidlaw"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Hamilton_(Australian_police_officer)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Klewitz_Soward"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Joseph_Gilbert_(winemaker)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Martin_Haese"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_John_Peterswald"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_West-Erskine"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Goyder"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Milne_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edward_William_Hawker"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Cockburn_Henderson"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bradley_Selway"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bruce_Lander"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/David_Angel_(judge)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Charles_Hawker"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_Brown_Fisher"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Richard_Baker_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Fife_Angas"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Henry_Ayers"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/John_Baker_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Bakewell_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Waterhouse_(politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_George_Everard"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Edmund_Mackenzie_(Edmond)_Young"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Philip_Levi"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Magarey"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Abraham_Scott"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Charles_Mann_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Herbert_Bristow_Hughes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Anthony_Forster_(Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/George_Mayo"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Robert_Barr_Smith"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thomas_Giles_(pastoralist)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Mair_(South_Australian_politician)"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wadham"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Francis_William_Stokes"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Walter_Duffield"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Boothby"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/William_Wyatt"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 65,
+      "question": [
+        {
+          "language": "en",
+          "string": "List the creators of Academy of Sciences of the Institute of Bologna."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?t WHERE {?m rdfs:label \"Academy of Sciences of the Institute of Bologna\"@en . ?t schema:memberOf ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "t"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Nicolas-Louis_de_Lacaille"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Pafnuty_Chebyshev"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Luigi_Ferdinando_Marsili"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Sauveur_François_Morand"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Ralf_Trapp"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Gabriel_Cramer"
+                }
+              },
+              {
+                "t": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Antonio_Pacchioni"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 66,
+      "question": [
+        {
+          "language": "en",
+          "string": "How does a Samsung corby look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?i WHERE {?l rdfs:label \"Samsung Corby\"@en; schema:image ?i}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "i"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "i": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Samsung-corby.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 67,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was KC and the Sunshine Band originated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?l WHERE {?c rdfs:label \"KC and the Sunshine Band\"@en. ?c schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Miami"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 68,
+      "question": [
+        {
+          "language": "en",
+          "string": "Bullet for My Valentine belongs to which city?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?d WHERE {?c rdfs:label \"Bullet for My Valentine\"@en. ?c schema:foundingLocation ?d}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "d"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "d": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bridgend"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 69,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Battersea Dogs and Cats Home started?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Battersea Dogs and Cats Home\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "1860"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 70,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is 26 St James's Place located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?j WHERE {?t rdfs:label \"26 St James's Place\"@en;schema:containedInPlace ?j}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "j"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "j": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/St_James's"
+                }
+              },
+              {
+                "j": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/City_of_Westminster"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is the geographical position of Alanta?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?c rdfs:label \"Alanta\"@en; schema:geo ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "geo:55.3500000000011,25.28333333333384"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 72,
+      "question": [
+        {
+          "language": "en",
+          "string": "What does the logo of American Red Cross look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"American Red Cross\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/American%20Red%20Cross%20logo.svg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the sponsors of Sintel."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Sintel\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Netherlands_Film_Fund"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "question": [
+        {
+          "language": "en",
+          "string": "List the companies associated with FIDO Alliance."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE { ?m schema:memberOf ?a . ?a rdfs:label \"FIDO Alliance\"@en}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Bank_of_America"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alibaba_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NEC"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Arm_Holdings"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/SK_Telecom"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Chunghwa_Telecom"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NTT_Docomo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Google"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/IBM"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Intel"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/KDDI"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Yahoo!_Japan"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mastercard"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Visa_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/LG_Electronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Samsung_Electronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/SoftBank_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Aetna"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Federal_Office_for_Information_Security"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cirrus_Logic"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/ThreatMetrix"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Qualcomm"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NortonLifeLock"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Wells_Fargo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Nok_Nok_Labs"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/BC_Card"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Groupement_des_Cartes_Bancaires_CB"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/American_Express"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fujitsu"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hitachi"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Huawei"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Lenovo"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/National_Institute_of_Standards_and_Technology"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Royal_Bank_of_Canada"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Telstra"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Verizon_Wireless"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Dai_Nippon_Printing"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Line_Corporation"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/NXP_Semiconductors"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Thales_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/VMware"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mitsubishi_UFJ_Financial_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Goldman_Sachs"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Infineon_Technologies"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Giesecke+Devrient"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Intuit"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/JCB_Co.,_Ltd."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/PNC_Financial_Services"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Onfido"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Daon,_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Oberthur_Technologies"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/USAA"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Jumio"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/The_Vanguard_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Cabinet_Office"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Facebook,_Inc."
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fidelity_Investments"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/HID_Global"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/ING_Group"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Mitre_Corporation"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/OneSpan"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Plantronics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/RSA_Security"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Synaptics"
+                }
+              },
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Discover_Financial"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Hillaire Kedigui born?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?l rdfs:label \"Hilaire Kédigui\"@en ; schema:birthPlace ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/N'Djamena"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 76,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the picture of Nokia Lumia."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?i WHERE {?l rdfs:label \"Lumia series\"@en; schema:image ?i}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "i"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "i": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Nokia%20%26%20Microsoft%20Lumia%20devices.png"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 77,
+      "question": [
+        {
+          "language": "en",
+          "string": "The entertainment firm of Alphabet Soup Children emanated from which city?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?l WHERE {?c rdfs:label \"Alphabet Soup Children's Entertainment\"@en. ?c schema:foundingLocation ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Winnipeg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 78,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where did Justin Bieber grow up?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?l rdfs:label \"Justin Bieber\"@en; schema:birthPlace ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/London,_Ontario"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 79,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Carlo Giuliani shot?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?date WHERE {?c rdfs:label \"Carlo Giuliani\"@en; schema:deathDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "2001-07-20"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 80,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is the Fifth Avenue Plaza of Bank of America located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE {?t rdfs:label \"Bank of America Fifth Avenue Plaza\"@en ; schema:containedInPlace ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Washington_(state)"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 81,
+      "question": [
+        {
+          "language": "en",
+          "string": "What are the geo coordinates of Allied Arts Building?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?geo WHERE {?c rdfs:label \"Allied Arts Building\"@en; schema:geo ?geo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "geo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "geo": {
+                  "type": "uri",
+                  "value": "geo:37.4144,-79.1442"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 82,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is the logo of starbucks?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?logo WHERE { ?t rdfs:label \"Starbucks\"@en; schema:logo ?logo}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "logo"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "logo": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/SmilingMermaid.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 83,
+      "question": [
+        {
+          "language": "en",
+          "string": "Forma Urbis Romae is sponsored by whom?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Forma Urbis Romae\"@en; schema:sponsor ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Septimius_Severus"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 84,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the father organization of Manchester city."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?b WHERE {?m rdfs:label \"Manchester City F.C.\"@en; schema:parentOrganization ?b}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "b"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "b": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/City_Football_Group"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 85,
+      "question": [
+        {
+          "language": "en",
+          "string": "Who produced the video game of Slayers?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?r WHERE {?m rdfs:label \"Slayers\"@en; schema:producer ?r}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "r"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "r": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Hiroshi_Ogawa_(animator)"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 86,
+      "question": [
+        {
+          "language": "en",
+          "string": "Give the url for more information on 2010 Wimbledon Championships."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?u WHERE {?l rdfs:label \"2010 Wimbledon Championships\"@en; schema:url ?u}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "u"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "u": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+                  "value": "http://www.wimbledon.org/"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 87,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Atlas Genius founded?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?f WHERE {?c rdfs:label \"Atlas Genius\"@en. ?c schema:foundingLocation ?f}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "f"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "f": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Adelaide"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 88,
+      "question": [
+        {
+          "language": "en",
+          "string": "Queens belongs to which country?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?n WHERE {?m rdfs:label \"Queens\"@en; schema:countryOfOrigin ?n}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "n"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "n": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Spain"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 89,
+      "question": [
+        {
+          "language": "en",
+          "string": "When was Western University founded?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Western University\"@en. ?country schema:foundingDate ?date}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "date"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "date": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
+                  "value": "1991"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 90,
+      "question": [
+        {
+          "language": "en",
+          "string": "In which US state is Baltimore located?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE {?r rdfs:label \"Baltimore\"@en; schema:location ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Maryland"
+                }
+              },
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Windsor_County,_Vermont"
+                }
+              },
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Fairfield_County,_Ohio"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "question": [
+        {
+          "language": "en",
+          "string": "Give the geographical position of Alaska?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?g WHERE {?a rdfs:label \"Alaska Range\"@en; schema:geo ?g}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "g"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "g": {
+                  "type": "uri",
+                  "value": "geo:63.0694,-151.007"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 92,
+      "question": [
+        {
+          "language": "en",
+          "string": "What does the logo of Reebok look like?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?l WHERE {?a rdfs:label \"Reebok\"@en; schema:logo ?l}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "l"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "l": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Reebok%20logo19.png"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 93,
+      "question": [
+        {
+          "language": "en",
+          "string": "Name the members of Microsoft."
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"Microsoft\"@en; schema:memberOf ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Alliance_for_Open_Media"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Wi-Fi_Alliance"
+                }
+              },
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/World_Wide_Web_Consortium"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 94,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where did the UEFA Champions League Final take place?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?s WHERE { ?t rdfs:label \"2018 UEFA Champions League Final\"@en; schema:location ?s}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "s"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "s": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Olimpiyskiy_National_Sports_Complex"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 95,
+      "question": [
+        {
+          "language": "en",
+          "string": "Show the image of the car Puma"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?p WHERE { ?l rdfs:label \"Puma\"@en ; schema:image ?p}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "p"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%20500px.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%20band.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/SPz%20Puma%20Mobilit%C3%A4tsversuchfahrzeug%20VS2.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/Puma%206x6.jpg"
+                }
+              },
+              {
+                "p": {
+                  "type": "uri",
+                  "value": "http://commons.wikimedia.org/wiki/Special:FilePath/CMM%20MountainLion.jpg"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 96,
+      "question": [
+        {
+          "language": "en",
+          "string": "What is Ace in the Hole associated with?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?n WHERE {?h rdfs:label \"Ace in the Hole\"@en; schema:isPartOf ?n}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "n"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "n": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Beyond_the_Blue_Neon"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 97,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where is Bell railway station situated?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?m WHERE {?l rdfs:label \"Bell Busk railway station\"@en; schema:containedInPlace ?m}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "m"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "m": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Craven"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 98,
+      "question": [
+        {
+          "language": "en",
+          "string": "Where was Selena Gomez born?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?h WHERE {?l rdfs:label \"Selena Gomez\"@en ; schema:birthPlace ?h}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "h"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "h": {
+                  "type": "uri",
+                  "value": "http://yago-knowledge.org/resource/Grand_Prairie,_Texas"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "question": [
+        {
+          "language": "en",
+          "string": "When did Mahatma Gandhi die?"
+        }
+      ],
+      "query": {
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?h WHERE {?n rdfs:label \"Mohandas Karamchand Gandhi\"@en ; schema:deathDate ?h}"
+      },
+      "answers": [
+        {
+          "head": {
+            "link": [],
+            "vars": [
+              "h"
+            ]
+          },
+          "results": {
+            "distinct": false,
+            "ordered": true,
+            "bindings": [
+              {
+                "h": {
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1948-01-30"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

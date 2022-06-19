@@ -26,7 +26,7 @@ from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 
-file_name = r"dblp/dblpv2_benchmark.json"
+file_name = r"dblp/dblp100_benchmark.json"
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -45,8 +45,8 @@ if __name__ == '__main__':
     max_Vs = 1
     max_Es = 21
     max_answers = 41
-    limit_VQuery = 400
-    limit_EQuery = 25
+    limit_VQuery = 600
+    limit_EQuery = 300
 
     with open(file_name) as f:
         qald9_testset = json.load(f)
@@ -55,7 +55,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "dblpv2_benchmark"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "dblp100_benchmark"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
         qc = next(qCount)
         for language_variant_question in question['question']:
@@ -113,7 +113,3 @@ if __name__ == '__main__':
               encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
-
-
-
-
