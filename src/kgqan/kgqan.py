@@ -13,6 +13,7 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
+import json
 import os
 import re
 import operator
@@ -98,6 +99,7 @@ class KGQAn:
         self.knowledge_graph = ''
         self.sparql_end_point = None
         self.lemmatizer = WordNetLemmatizer()
+        self.connected_predicates = 0
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
@@ -266,6 +268,12 @@ class KGQAn:
 
         # logger.info(f'[Question Reformulation (Not Impl yet):] {self.question.text},\n')
 
+    def update_connected_predicate_count(self, uri):
+        count_response = self.sparql_end_point.evaluate_SPARQL_query(get_connected_predicate(uri))
+        response_json = json.loads(count_response)
+        count = response_json['results']['bindings'][0]["p_count"]["value"]
+        return count
+
     def extract_possible_V_and_E(self):
         for entity in self.question.query_graph:
             if self.is_variable(entity):
@@ -294,6 +302,7 @@ class KGQAn:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
             updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
             URIs_chosen = updated_vertex.get_vertex_uris()
+            self.connected_predicates = self.update_connected_predicate_count(URIs_chosen[0])
             # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             #if entity.lower() == 'boston tea party':
             #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
@@ -399,6 +408,7 @@ class KGQAn:
                     continue
 
                 if len(star_query[0]) == 2:
+
                     score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
                     # TODO update the calculation for mapping between different nodes and uris
                     query, node_uris, relation_uris = self.generate_sparql_query(star_query)

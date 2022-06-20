@@ -58,6 +58,27 @@ def make_keyword_unordered_search_query_with_type_simple_for_open_citations(keyw
     return f"PREFIX c4o: <http://purl.org/spar/c4o/> SELECT ?s ?o  " \
            f"where {{ ?s c4o:hasContent ?o  . filter regex(?o, '{kws}' ) .}}  LIMIT {limit}"
 
+def make_keyword_unordered_search_query_with_type_ms(keywords_string: str, limit=500):
+    keywords_string = keywords_string.replace(',', '')
+    keywords_string = keywords_string.replace('.', '')
+    keywords_string = keywords_string.replace(':', '')
+    keywords_string = keywords_string.replace('&', '')
+    keywords_string = keywords_string.replace('\'s', '')
+    keywords_string = keywords_string.replace('\'', '')
+    # for cases such as "Angela Merkel ’s"
+    escape = ['’s', 'and']
+    kwlist = []
+    for w in keywords_string.strip().split():
+        if w not in escape:
+            if w.isnumeric():
+                w = '\\\'' + w + '\\\''
+                kwlist.append(w)
+            else:
+                kwlist.append(w)
+    kws = ' AND '.join(kwlist)
+    return f"select distinct ?uri  ?label " \
+               f"where {{ ?uri ?p ?label. ?label  <bif:contains> '{kws}' . }}  LIMIT {limit}"
+
 def make_keyword_unordered_search_query_with_type(keywords_string: str, limit=500):
     keywords_string = keywords_string.replace(',', '')
     keywords_string = keywords_string.replace('.', '')
@@ -120,16 +141,20 @@ def make_keyword_unordered_search_query_with_type_fact_forge(keywords_string: st
 
 
 def make_top_predicates_sbj_query(uri, limit=1000):
-    return f"select distinct ?p where {{ <{uri}> ?p ?o . }}  LIMIT {limit}"
+    # return f"select distinct ?p where {{ <{uri}> ?p ?o . }}  LIMIT {limit}"
+    return f"select distinct ?p where {{ <{uri}> ?p ?o . }}"
 
+def get_connected_predicate(uri):
+    return f"select count(distinct ?p) as ?p_count where {{ <{uri}> ?p ?o . }}"
 
 def sparql_query_to_get_predicates_when_subj_and_obj_are_known(subj_uri, obj_uri, limit=1000):
-    return f"select distinct ?p where {{ <{subj_uri}> ?p <{obj_uri}> . }}  LIMIT {limit}"
-
+    # return f"select distinct ?p where {{ <{subj_uri}> ?p <{obj_uri}> . }}  LIMIT {limit}"
+    return f"select distinct ?p where {{ <{subj_uri}> ?p <{obj_uri}> . }}"
 
 def make_top_predicates_obj_query(uri, limit=1000):
     # return f"select ?p ?p2 where {{ ?s ?p <{uri}> . optional {{ ?s ?p2 ?o }} }} LIMIT {limit}"
-    return f"select distinct ?p where {{ ?s ?p <{uri}> . }} LIMIT {limit}"
+    #return f"select distinct ?p where {{ ?s ?p <{uri}> . }} LIMIT {limit}"
+    return f"select distinct ?p where {{ ?s ?p <{uri}> . }} "
 
 
 def construct_yesno_answers_query(sbj_uri, prd_uri, obj_uri):
