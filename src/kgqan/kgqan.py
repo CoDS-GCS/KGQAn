@@ -117,8 +117,9 @@ class KGQAn:
 
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
+        logger.info("Question: ", question_text)
         understanding_start = time.time()
-        self.question = (question_text, question_id)
+        self.question = (question_text, question_id, logger)
         understanding_end = time.time()
         # self.question.id = question_id
         self.knowledge_graph = knowledge_graph
@@ -517,7 +518,7 @@ class KGQAn:
 
     @question.setter
     def question(self, value: tuple):
-        self._current_question = Question(question_text=value[0], question_id=value[1])
+        self._current_question = Question(question_text=value[0], question_id=value[1], logger=value[2])
 
     @staticmethod
     def extract_resource_name_dbpedia(binding):

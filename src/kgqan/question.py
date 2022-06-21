@@ -44,7 +44,7 @@ class Question:
     types = ('person', 'price', 'count', 'date', 'place', 'other')  # it should be populated by the types of ontology
     datatypes = ('number', 'date', 'string', 'boolean', 'resource', 'list')
 
-    def __init__(self, question_text, question_id=None, answer_datatype=None):
+    def __init__(self, question_text, question_id=None, answer_datatype=None, logger=None):
         self.tokens = list()
         self._id = question_id
         self._question_text = question_text
@@ -54,6 +54,7 @@ class Question:
         self._parse_components = None
         self._possible_answers = list()
         self.triple_list = list()
+        self.logger = logger
 
         self.__process()
 
@@ -219,6 +220,7 @@ class Question:
         triples_str = triples_str.replace("<o] ", "<o>")
         triples_str = triples_str.replace("<p1 ", "<p>")
 
+        self.logger.info("Generated Triple: ", triples_str)
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:
