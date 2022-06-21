@@ -117,7 +117,7 @@ class KGQAn:
 
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
-        logger.info("Question: ", question_text)
+        logger.info(f"Question: {question_text}")
         understanding_start = time.time()
         self.question = (question_text, question_id, logger)
         understanding_end = time.time()

@@ -220,7 +220,7 @@ class Question:
         triples_str = triples_str.replace("<o] ", "<o>")
         triples_str = triples_str.replace("<p1 ", "<p>")
 
-        self.logger.info("Generated Triple: ", triples_str)
+        self.logger.info(f"Generated Triple: {triples_str}")
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:
