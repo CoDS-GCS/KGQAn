@@ -25,6 +25,7 @@ from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
+import numpy as np
 
 file_name = r"qald9/qald-9-test-multilingual.json"
 # file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"
@@ -47,8 +48,8 @@ if __name__ == '__main__':
     max_Vs = 1
     max_Es = 21
     max_answers = 41
-    limit_VQuery = 600
-    limit_EQuery = 300
+    limit_VQuery = 400
+    limit_EQuery = 25
 
     with open(file_name) as f:
         qald9_testset = json.load(f)
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     qCount = count(1)
 
     kgqan_qald9 = {"dataset": {"id": "qald-9-test-multilingual"}, "questions": []}
+    count_arr = []
     for i, question in enumerate(qald9_testset['questions']):
 
         # [27, 63, 86, 116, 160, 198]
