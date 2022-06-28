@@ -38,6 +38,7 @@ import time
 import datetime
 from .filteration import *
 from termcolor import colored, cprint
+from pyspark.sql import SparkSession
 
 formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
 
@@ -146,6 +147,7 @@ class KGQAn:
         linking_end = time.time()
         execution_start = time.time()
         self.generate_star_queries()
+        #Replace this with call to the parallel function
         self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
@@ -518,6 +520,42 @@ class KGQAn:
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
+
+    def execute(self, possible_answer):
+        logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
+        result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
+        logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
+        try:
+            result_compatible, v_result, get_answers, types = self.sparql_end_point.parse_result(result,
+                                                                                                 self.question.answer_datatype)
+            if not result_compatible:
+                return
+            # The else is for boolean questions
+            if 'results' in v_result:
+                filtered_results = update_results(v_result['results'], self.question.answer_type, types,
+                                                  self.knowledge_graph)
+                possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
+            else:
+                possible_answer.update(results=[], boolean=v_result['boolean'])
+            return possible_answer
+
+        except Exception as e:
+            # traceback.print_exc()
+            print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
+
+    def evaluate_sparql_query_parallel(self):
+        spark = SparkSession \
+            .builder \
+            .appName("Python Spark SQL basic example") \
+            .config("spark.some.config.option", "some-value") \
+            .getOrCreate()
+
+        self.question.possible_answers.sort(reverse=True)
+        qc = count(1)
+        sparqls = list()
+        possible_answers = spark.sparkContext.parallelize(self.question.possible_answers[:self._n_max_answers])
+        result = possible_answers.map(lambda x: self.execute(x))
+        self.question.possible_answers = result.collect()
 
     def is_variable(self, label):
         return 'var' in label

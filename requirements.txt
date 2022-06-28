@@ -6,3 +6,7 @@ gensim
 allennlp
 allennlp-models
 SPARQL-Burger
+chars2vec
+keras==2.7.0
+tensorflow==2.7.0
+pyspark
