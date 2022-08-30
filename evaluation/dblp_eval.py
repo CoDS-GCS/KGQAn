@@ -26,7 +26,7 @@ from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 
-file_name = r"dblp/dblp100_benchmark.json"
+file_name = r"dblp/qald9_dblp100.json"
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -55,7 +55,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "dblp100_benchmark"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "qald9_dblp100"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
         qc = next(qCount)
         for language_variant_question in question['question']:

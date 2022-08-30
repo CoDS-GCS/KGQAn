@@ -251,7 +251,7 @@ class KGQAn:
                 if tag[0] in ['NN', 'NNS']:
                     self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
                     break
-        if self.knowledge_graph == "lc_quad":
+        if self.knowledge_graph == "lc_quad" or self.knowledge_graph == "dblp" or self.knowledge_graph == "microsoft_academic":
             if self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
                 or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
                 or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
@@ -296,13 +296,15 @@ class KGQAn:
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
+            #print("Vertex with scores")
+            #print(URIs_with_scores)
             self.v_uri_scores.update(URIs_with_scores)
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
             updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
             URIs_chosen = updated_vertex.get_vertex_uris()
-            self.connected_predicates = self.update_connected_predicate_count(URIs_chosen[0])
+            #self.connected_predicates = self.update_connected_predicate_count(URIs_chosen[0])
             # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             #if entity.lower() == 'boston tea party':
             #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
@@ -383,6 +385,8 @@ class KGQAn:
         URIs_with_scores = list(zip(l1, l2, scores))
         URIs_with_scores.sort(key=operator.itemgetter(2), reverse=True)
         # self.uri_scores.update(URIs_with_scores)
+        #print("Edges with scores")
+        #print(remove_duplicates(URIs_with_scores))
         return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
     # TODO revise score calculation
@@ -457,7 +461,7 @@ class KGQAn:
     #TODO update with 2 variables
     def generate_sparql_query(self, star_query):
         select_query = SPARQLSelectQuery()
-        # select_query.add_variables(variables=["?uri"])
+        #select_query.add_variables(variables=["?uri"])
         select_query.add_variables(variables=["?uri", "?type"])
         where_pattern = SPARQLGraphPattern()
         node_uris = []
@@ -490,7 +494,7 @@ class KGQAn:
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                result_compatible, v_result, get_answers, types = self.sparql_end_point.parse_result(result,
+                result_compatible, v_result, get_answers, types= self.sparql_end_point.parse_result(result,
                                                                                               self.question.answer_datatype)
                 if not result_compatible:
                     continue
@@ -513,8 +517,9 @@ class KGQAn:
                                 logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     else:
                         answers.append(v_result['boolean'])
+                #print(possible_answer.sparql)
             except Exception as e:
-                # traceback.print_exc()
+                #traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls

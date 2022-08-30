@@ -11,9 +11,9 @@ from kgqan import KGQAn
 from kgqan.kgqan_server.server import max_answers, max_Vs, limit_EQuery, max_Es, limit_VQuery
 
 max_Vs = 1
-max_Es = 21
-max_answers = 41
-limit_VQuery = 600
+max_Es = 40
+max_answers = 40
+limit_VQuery = 400
 limit_EQuery = 300
 
 #file_name = r"qald9/qald-9-test-multilingual.json"
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         try:
             #answers, vertices, predicates, graph = MyKGQAn.ask(question_text=question_text,
                                                               # answer_type=question['answertype'], question_id=question['id'], knowledge_graph='dbpedia')
-            answers, vertices, predicates, graph = MyKGQAn.ask(question_text=question_text,
+            answers, vertices, predicates, _, _, _ = MyKGQAn.ask(question_text=question_text,
                                                                                 question_id=question['id'], knowledge_graph='lc_quad')
         except Exception as e:
             traceback.print_exc()
@@ -193,15 +193,15 @@ if __name__ == '__main__':
             for e in extracted_v:
                 predicate_mapping.add(e)
 
-            if keeping(answer):
-                keep_list.append(predicate_mapping)
-            else:
-                remove_list.append(predicate_mapping)
+            #if keeping(answer):
+            #    keep_list.append(predicate_mapping)
+            #else:
+            #    remove_list.append(predicate_mapping)
             
-        if predicate_mapping in remove_list and predicate_mapping not in keep_list:
-            filtered_predicate.append(predicate_mapping)
-        else:
-            unfiltered_predicates = predicate_mapping
+        #if predicate_mapping in remove_list and predicate_mapping not in keep_list:
+        #    filtered_predicate.append(predicate_mapping)
+        #else:
+        #    unfiltered_predicates = predicate_mapping
 
         ent_dict_list = list()
         for e in entity_mapping:
@@ -211,13 +211,13 @@ if __name__ == '__main__':
         for p in predicate_mapping:
             pred_dict_list.append({'uri': p})
 
-        filtered_dict_pred = list()
-        for p in unfiltered_predicates:
-            filtered_dict_pred.append(({'uri': p}))
+        #filtered_dict_pred = list()
+        #for p in unfiltered_predicates:
+        #    filtered_dict_pred.append(({'uri': p}))
 
         linking_filter = {"question": question_text, "SerialNumber": question['id'],
                               "sparql_query": question['query']['sparql'],
-                              "entity mapping": ent_dict_list, "predicate mapping": filtered_dict_pred}
+                              "entity mapping": ent_dict_list, "predicate mapping": pred_dict_list}
 
         # linking_filter = {"question": question_text, "SerialNumber": question['id'],
         #                           "sparql_query": question['query']['sparql'],
@@ -228,7 +228,7 @@ if __name__ == '__main__':
          #   break
     json_object = json.dumps(res, indent=4, ensure_ascii=False)
 
-    with open("FiteringLinkingquesBoolean.json", "w", encoding='utf-8') as outfile:
+    with open("FilteringLinkingquesBoolean.json", "w", encoding='utf-8') as outfile:
         outfile.write(json_object)
 
 # "SELECT ?uri WHERE { ?uri <http://dbpedia.org/ontology/country> <http://dbpedia.org/resource/United_States> .

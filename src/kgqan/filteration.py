@@ -1,4 +1,5 @@
 import os
+
 import re
 from urllib.parse import urlparse
 
@@ -100,14 +101,14 @@ def test_filter_language(results, types):
 
 
 def test_is_general(types, answer_type, knowledge_graph):
-    if knowledge_graph == 'lc_quad':
+    if knowledge_graph == 'lc_quad' or knowledge_graph=='dblp' or knowledge_graph == 'microsoft_academic':
         max_score = 0
         for type in types:
             name = extract_type_names(type)
             score = w2v.n_similarity(answer_type, [name])
             max_score = max(max_score, score)
 
-        if max_score > 0.2:
+        if max_score > 0.5:
             return True
         # if '/' + answer_type[0] in type.lower():
         #     return True
@@ -121,6 +122,8 @@ def test_is_general(types, answer_type, knowledge_graph):
 def test_filter_general(results, answer_type, types, knowledge_graph):
     filtered_bindings = []
     for i in range(len(results['bindings'])):
+        if results['bindings'][i]['uri']['type'] == 'bnode':
+            continue
         if test_is_general(types[i], answer_type, knowledge_graph):
             filtered_bindings.append(results['bindings'][i])
 
@@ -136,6 +139,11 @@ def update_results(results, answer_type, types, knowledge_graph):
         return test_filter_language(results, types)
     elif len(answer_type) > 0 and answer_type[0] not in ['boolean', 'date', 'count', 'other', 'string', 'price']:
         return test_filter_general(results, answer_type, types, knowledge_graph)
+    bindings = []
+    for i in range(len(results['bindings'])):
+        if results['bindings'][i]['uri']['type'] != 'bnode':
+            bindings.append(results['bindings'][i])
+    results['bindings'] = bindings
     return results
 
 def filter_person(results):
