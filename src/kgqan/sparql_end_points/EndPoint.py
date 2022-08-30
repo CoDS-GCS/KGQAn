@@ -41,14 +41,14 @@ class EndPoint:
     # 1) boolean indicating if the answer type is compatible with the answer)
     # 2) The result after being parsed
     # 3) boolean to indicate if we should gather the answers for logging or not, currently it is True for JSON and False for XML
-    def parse_result(self, result, answer_data_type):
+    def parse_result(self, result, answer_data_type, target_variable):
         v_result = json.loads(result)
-
+        v_result, types = self.extract_types(v_result, target_variable)
         result_compatiable = self.check_if_answers_type_compatible(v_result, answer_data_type)
         if not result_compatiable:
-            return False, [], True
+            return False, [], True, types
 
-        return True, v_result, True
+        return True, v_result, True, types
 
     def get_names_and_uris(self, entity_query):
         entity_result = json.loads(self.evaluate_SPARQL_query(entity_query))
@@ -173,5 +173,34 @@ class EndPoint:
             predicate_names.append(predicate_name)
             predicate_URIs.append(predicate_URI)
         return predicate_URIs, predicate_names
+
+    def extract_types(self, json_object, target_variable):
+        types = list()
+        answers = list()
+        current = -1
+        current_types = []
+        if not 'results' in json_object:
+            return json_object, types
+
+        for binding in json_object['results']['bindings']:
+            if not binding[target_variable] in answers:
+                current = current + 1
+                if current != 0:
+                    types.append(current_types)
+                    current_types = []
+                answers.append(binding[target_variable])
+            if 'type' in binding:
+                current_types.append(binding['type']['value'])
+                binding.pop('type')
+
+        types.append(current_types)
+        json_object['head']['vars'] = ['uri']
+        json_object['results'].pop('bindings')
+        final_binding = []
+        for answer in answers:
+            final_binding.append({'uri': answer})
+        json_object['results']['bindings'] = final_binding
+
+        return json_object, types
 
 

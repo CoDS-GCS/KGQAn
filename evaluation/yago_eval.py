@@ -25,11 +25,8 @@ from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
-import numpy as np
 
-file_name = r"qald9/qald-9-test-multilingual.json"
-# file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"
-
+file_name = r"yago/qald9_yago100.json"
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -42,14 +39,14 @@ if __name__ == '__main__':
     total_linking_time = 0
     total_execution_time = 0
 
-    # The main param: 
+    # The main param:
     # max no of vertices and edges to annotate the PGP
-    # max no of SPARQL queries to be generated from PGP 
+    # max no of SPARQL queries to be generated from PGP
     max_Vs = 1
     max_Es = 21
     max_answers = 41
-    limit_VQuery = 400
-    limit_EQuery = 25
+    limit_VQuery = 600
+    limit_EQuery = 300
 
     with open(file_name) as f:
         qald9_testset = json.load(f)
@@ -58,48 +55,9 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "qald-9-test-multilingual"}, "questions": []}
-    count_arr = []
+    kgqan_qald9 = {"dataset": {"id": "qald9_yago100"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
-
-        # [27, 63, 86, 116, 160, 198]
-        # 63- the correct V is Scarface_(rapper) and we get Scarface
-        # 116 - Who was called Rodzilla - use nick predicate
-        # if int(question['id']) not in [1, 14, 31, 88, 164, 177]:
-        #     continue
-
-        # hard to annotate/link with the KG
-        # if int(question['id']) in [167]:
-        #     continue
-
-        # Questions with no detected Relation or NE
-        # R [214, 199, 137, 136, 132, 124, 111, 10, 84, 213, 162]
-        # E [168, 166, 140, 123, 59, 39, 83, 209, 212]
-        # Questions with one NE
-        # if int(question['id']) not in [99, 98, 86, 64, 56, 44, 37, 31, 29, 23, 68, 22, 203, 197, 196, 188, 187, 62,
-        #                               173, 160, 158, 155, 150, 149, 25, 143, 139, 134, 128, 122, 117, 104, 1, 178,
-        #                               129, 183, 181, 7, 135, 50, 71, 105, 52, 102, 21, 34, 145, 154, 198]:
-        #     continue
-
-        # if int(question['id']) not in [81]:
-        #     continue
-
-        # if int(question['id'] <= 1097):
-        #     continue
-        # if int(question['id']) in [10, 45, 64, 69, 70, 100, 106, 114, 126, 132, 153, 165, 167, 182, 189, 194, 207,
-        #                            221, 248, 258, 268, 279, 289, 340, 359, 362, 366, 377, 394, 398, 427, 516, 520,
-        #                            524, 536, 547, 549, 553, 563, 584, 588, 594, 598, 622, 625, 641, 664, 669, 713,
-        #                            721, 729, 742, 743, 753, 756, 758, 760, 768, 769, 779, 801, 802, 815, 826, 838,
-        #                            844, 887, 896, 914, 929, 934, 938, 942, 1016, 1017, 1024, 1066, 1077, 1082, 1093,
-        #                            1097]:
-        #     continue
-
-        # long time queries 51
-        # if int(question['id']) in [27, 167]:
-        #     continue
-
         qc = next(qCount)
-        # question_text = ''
         for language_variant_question in question['question']:
             if language_variant_question['language'] == 'en':
                 question_text = language_variant_question['string'].strip()
@@ -114,8 +72,8 @@ if __name__ == '__main__':
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
         try:
             answers, _, _, understanding_time, linking_time, execution_time\
-                = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'],
-                              question_id=question['id'], knowledge_graph='dbpedia')
+                = MyKGQAn.ask(question_text=question_text,
+                              question_id=question['id'], knowledge_graph='yago')
         except Exception as e:
             traceback.print_exc()
             continue
@@ -149,6 +107,7 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
+
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
               f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',

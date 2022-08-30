@@ -32,6 +32,9 @@ if __name__ == '__main__':
     root_element.append(author_comment)
     timestr = time.strftime("%Y%m%d-%H%M%S")
     total_time = 0
+    total_understanding_time = 0
+    total_linking_time = 0
+    total_execution_time = 0
 
     # The main param:
     # max no of vertices and edges to annotate the PGP
@@ -54,7 +57,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "lcquad-qaldformat-test"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "lcquad-qaldformat-test2"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
 
         # if int(question['id']) not in [5]:
@@ -76,8 +79,12 @@ if __name__ == '__main__':
         st = time.time()
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
-        answers, _, _ = MyKGQAn.ask(question_text=question_text,
-                                 question_id=question['id'], knowledge_graph='lc_quad')
+        try:
+            answers, _, _, understanding_time, linking_time, execution_time\
+                = MyKGQAn.ask(question_text=question_text,
+                              question_id=question['id'], knowledge_graph='lc_quad')
+        except:
+            continue
 
         all_bindings = list()
         for answer in answers:
@@ -95,6 +102,9 @@ if __name__ == '__main__':
 
         et = time.time()
         total_time = total_time + (et - st)
+        total_understanding_time = total_understanding_time + understanding_time
+        total_linking_time = total_linking_time + linking_time
+        total_execution_time = total_execution_time + execution_time
         text = colored(f'[DONE!! in {et - st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
         cprint(f"== {text} ==")
 
@@ -102,6 +112,9 @@ if __name__ == '__main__':
     text1 = colored(f'total_time = [{total_time:.2f} sec]', 'yellow', attrs=['reverse', 'blink'])
     text2 = colored(f'avg time = [{total_time / qc:.2f} sec]', 'yellow', attrs=['reverse', 'blink'])
     cprint(f"== QALD 9 Statistics : {qc} questions, Total Time == {text1}, Average Time == {text2} ")
+    cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
+    cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
+    cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
               f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
