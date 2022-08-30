@@ -1,5 +1,8 @@
+import string
+
 import numpy as np
 import statistics
+import chars2vec
 
 class WordEmbeddings:
     def __init__(self, model_path):
@@ -8,6 +11,7 @@ class WordEmbeddings:
         self.vocab = None
         self.ivocab = None
         self.vector_feature_size = 0
+        self.char2vec = chars2vec.load_model('eng_300')
 
     def load_model(self):
         self.w, self.vocab, self.ivocab = self.load_vocab()
@@ -69,12 +73,13 @@ class WordEmbeddings:
                 if v2 is None:
                     sims.append(0.0)
                     continue
-                sim = np.dot(v1, v2.T)
+                sim = np.dot(v1, v2.T) / (np.linalg.norm(v1) * np.linalg.norm(v2))
                 sims.append(sim)
         else:
             return statistics.mean(sims)
 
     def get_embedding_for_mwe(self, mwe):
+        mwe = mwe.translate(str.maketrans('', '', string.punctuation))
         words = mwe.strip().split()
         mwe_vecs = list()
 
@@ -82,7 +87,9 @@ class WordEmbeddings:
             if w in self.vocab:
                 mwe_vecs.append(self.w[self.vocab[w], :])
             else:
-                mwe_vecs.append(None)
+                vec = self.char2vec.vectorize_words([w])
+                vec = vec.astype(float)
+                mwe_vecs.append(vec[0])
         else:
             return mwe_vecs
 

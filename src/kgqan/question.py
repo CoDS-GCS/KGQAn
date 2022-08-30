@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 lemmatizer = WordNetLemmatizer()
 # model_path = '/home/rehamomar/PycharmProjects/BARTInput/output_pred11/'
 # best 39.7
-model_path = '/mnt/KGQAn_Project/app_storage/output_pred18/'
+model_path = '/mnt/KGQAn_Project/app_storage/output_pred21_8_30/'
 model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained(model_path)
 
@@ -44,7 +44,7 @@ class Question:
     types = ('person', 'price', 'count', 'date', 'place', 'other')  # it should be populated by the types of ontology
     datatypes = ('number', 'date', 'string', 'boolean', 'resource', 'list')
 
-    def __init__(self, question_text, question_id=None, answer_datatype=None):
+    def __init__(self, question_text, question_id=None, answer_datatype=None, logger=None):
         self.tokens = list()
         self._id = question_id
         self._question_text = question_text
@@ -54,6 +54,7 @@ class Question:
         self._parse_components = None
         self._possible_answers = list()
         self.triple_list = list()
+        self.logger = logger
 
         self.__process()
 
@@ -101,6 +102,10 @@ class Question:
 
     def get_relations(self):
         pass
+
+    def set_answer_type(self, answer_type):
+        self._answer_type.clear()
+        self._answer_type.append(answer_type)
 
     def __process(self):
         self.__parse_sentence()
@@ -207,6 +212,15 @@ class Question:
         triples_str = triples_str.replace("<o|", "<o>")
         triples_str = triples_str.replace("<e> ", "<o>")
 
+        triples_str = triples_str.replace("<pp> ", "<p>")
+        triples_str = triples_str.replace("<oo> ", "<o>")
+        triples_str = triples_str.replace("<os> ", "<o>")
+        triples_str = triples_str.replace("<ol> ", "<o>")
+        triples_str = triples_str.replace("<o1 ", "<o>")
+        triples_str = triples_str.replace("<o] ", "<o>")
+        triples_str = triples_str.replace("<p1 ", "<p>")
+
+        self.logger.info(f"Generated Triple: {triples_str}")
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:
@@ -364,15 +378,32 @@ class Question:
         question_text = question_text.replace("oscar", "Oscar")
         question_text = question_text.replace("English", "english")
         question_text = question_text.replace("company", "Company")
+        question_text = question_text.replace("Whichlocation", "Which location")
         # question_text = question_text.replace("moon", "Moon")
         # For LCquad wrong questions
         # ID: 762, 848, 2265, 2449, 4516, 2730, 3019, 3242, 3330, 3461, 4659, 4706,
-        # question_text = question_text.replace("Whitney", "Whitey")
+        question_text = question_text.replace("Whitney", "Whitey")
         question_text = question_text.replace(" nad ", " and ")
         question_text = question_text.replace("Fuountain", "Fountain")
         question_text = question_text.replace("Hanses", "Hansen")
-        # question_text = question_text.replace("momoko", "momoko")
 
+        # Adjusted GT
+        question_text = question_text.replace("momoki", "momoko")
+        question_text = question_text.replace("Gombitov", "Gombitova")
+        question_text = question_text.replace("Demiville", "Demieville")
+        question_text = question_text.replace("prochzka", "prochazka")
+        question_text = question_text.replace("Tedd", "Teddy")
+        question_text = question_text.replace("Merendin", "Merendon")
+        question_text = question_text.replace("Institue", "Institute")
+        question_text = question_text.replace("Toru", "Torun")
+        question_text = question_text.replace("Piqu", "Pique")
+        question_text = question_text.replace("Ramerez", "Ramirez")
+        question_text = question_text.replace("Gdask", "Gdansk")
+        question_text = question_text.replace("Bhler", "Buhler")
+        question_text = question_text.replace("Uniamsi", "Uniamesi")
+        question_text = question_text.replace("Raa", "Rasa")
+        question_text = question_text.replace("Trn Vit Hng", "Tran Viet Huong")
+        question_text = question_text.replace("I'Isle", "l'Isle")
 
         return question_text
 

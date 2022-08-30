@@ -13,6 +13,7 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
+import json
 import os
 import re
 import operator
@@ -23,14 +24,17 @@ from itertools import count, product, zip_longest
 from urllib.parse import urlparse
 from SPARQLBurger.SPARQLQueryBuilder import *
 
+from kgqan.vertex import Vertex
 from .sparql_end_points.EndPoint import EndPoint
 from .sparql_end_points.XML_EndPoint import XML_EndPoint
 
 from .sparqls import *
 from .question import Question
 from .nlp.utils import remove_duplicates
+from .nlp.models import cons_parser, WordNetLemmatizer
 from . import embeddings_client as w2v, utils
 
+import time
 import datetime
 from .filteration import *
 from termcolor import colored, cprint
@@ -62,7 +66,9 @@ knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
                           "microsoft_academic": "https://makg.org/sparql",
                           "open_citations": "https://opencitations.net/sparql",
                           "yago": "http://206.12.95.86:8892/sparql",
-                          "fact_forge": "http://factforge.net/sparql"}
+                          "fact_forge": "http://factforge.net/sparql",
+                          "bgee": "https://bgee.org/sparql",
+                          "dblp": "http://206.12.95.86:8893/sparql"}
 
 
 class KGQAn:
@@ -92,6 +98,8 @@ class KGQAn:
         self.n_limit_EQuery = n_limit_EQuery
         self.knowledge_graph = ''
         self.sparql_end_point = None
+        self.lemmatizer = WordNetLemmatizer()
+        self.connected_predicates = 0
 
         cprint(f"== Execution settings : Max no. answers == {self._n_max_answers}, "
                f"Max no. Vertices == {self.n_max_Vs}, Max no. Edges == {self.n_max_Es} ")
@@ -111,8 +119,10 @@ class KGQAn:
 
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
-
-        self.question = (question_text, question_id)
+        logger.info(f"Question: {question_text}")
+        understanding_start = time.time()
+        self.question = (question_text, question_id, logger)
+        understanding_end = time.time()
         # self.question.id = question_id
         self.knowledge_graph = knowledge_graph
         if answer_type:
@@ -130,14 +140,18 @@ class KGQAn:
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
             logger.info("[NO Named-entity or NO Relation Detected]")
-            return [], [], []
+            return [], [], [], understanding_end - understanding_start, 0, 0
+        linking_start = time.time()
         self.extract_possible_V_and_E()
+        linking_end = time.time()
+        execution_start = time.time()
         self.generate_star_queries()
         self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
+        execution_end = time.time()
         logger.info(f"\n\n\n\n{'#' * 120}")
-        return answers, self.question.query_graph.nodes, self.question.query_graph.edges
+        return answers, self.question.query_graph.nodes, self.question.query_graph.edges, understanding_end - understanding_start, linking_end - linking_start, execution_end - execution_start
 
     def detect_question_and_answer_type(self):
         # question_text = question_text.lower()
@@ -196,9 +210,9 @@ class KGQAn:
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         # TODO Start workarouds
-        elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
-            self.question.answer_type = 'person'
-            self.question.answer_datatype = 'resource'  # of list
+        # elif 'birth name' in self.question.text.lower() or 'real name' in self.question.text.lower():
+        #     self.question.answer_type = 'person'
+        #     self.question.answer_datatype = 'resource'  # of list
         elif self.question.text.lower().startswith('which airports '):  # where do
             self.question.answer_type = 'place'
             self.question.answer_datatype = 'resource'  # of list
@@ -227,6 +241,26 @@ class KGQAn:
         else:
             pass  # 11,13,75
 
+        # Which Trial
+        if self.question.text.lower().startswith('which ') or self.question.text.lower().startswith(' in which '):
+                # or self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
+                # or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
+                # or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
+            allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
+            for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
+                if tag[0] in ['NN', 'NNS']:
+                    self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
+                    break
+        if self.knowledge_graph == "lc_quad" or self.knowledge_graph == "dblp" or self.knowledge_graph == "microsoft_academic":
+            if self.question.text.lower().startswith('to which ') or self.question.text.lower().startswith('under which ')\
+                or self.question.text.lower().startswith('what ') or self.question.text.lower().startswith('give ')\
+                or self.question.text.lower().startswith('name ') or self.question.text.lower().startswith('list '):
+                allennlp_dep_output = cons_parser.predict(sentence=self.question.text)
+                for tag in zip(allennlp_dep_output['pos_tags'], allennlp_dep_output['tokens']):
+                    if tag[0] in ['NN', 'NNS']:
+                        self.question.set_answer_type(self.lemmatizer.lemmatize(tag[1]))
+                        break
+
     # TODO remove this if not needed
     def rephrase_question(self):
         if self.question.text.lower().startswith('who was'):
@@ -234,12 +268,22 @@ class KGQAn:
 
         # logger.info(f'[Question Reformulation (Not Impl yet):] {self.question.text},\n')
 
+    def update_connected_predicate_count(self, uri):
+        count_response = self.sparql_end_point.evaluate_SPARQL_query(get_connected_predicate(uri))
+        response_json = json.loads(count_response)
+        count = response_json['results']['bindings'][0]["p_count"]["value"]
+        return count
+
     def extract_possible_V_and_E(self):
         for entity in self.question.query_graph:
             if self.is_variable(entity):
                 # self.question.query_graph.add_node(entity, uris=[], answers=[])
                 continue
-            entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            if self.knowledge_graph in ['microsoft_academic', 'bgee']:
+                entity_query = make_Ms_academic_query(entity, limit=self.n_limit_VQuery)
+            else:
+                entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
+            #entity_query = make_keyword_unordered_search_query_with_type(entity, limit=self.n_limit_VQuery)
             cprint(f"== SPARQL Q Find V: {entity_query}")
 
             try:
@@ -252,14 +296,20 @@ class KGQAn:
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
+            #print("Vertex with scores")
+            #print(URIs_with_scores)
             self.v_uri_scores.update(URIs_with_scores)
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
                 URIs_sorted = list(zip(*URIs_with_scores))[0]
-            URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
+            updated_vertex = Vertex(self.n_max_Vs, URIs_sorted, self.sparql_end_point, self.n_limit_EQuery)
+            URIs_chosen = updated_vertex.get_vertex_uris()
+            #self.connected_predicates = self.update_connected_predicate_count(URIs_chosen[0])
+            # URIs_chosen = remove_duplicates(URIs_sorted)[:self.n_max_Vs]
             #if entity.lower() == 'boston tea party':
             #    URIs_chosen = ['http://dbpedia.org/resource/Boston_Tea_Party']
             self.question.query_graph.nodes[entity]['uris'].extend(URIs_chosen)
+            self.question.query_graph.nodes[entity]['vertex'] = updated_vertex
 
         # Find E for all relations
         for (source, destination, key, relation) in self.question.query_graph.edges(data='relation', keys=True):
@@ -272,12 +322,16 @@ class KGQAn:
             uris, names = list(), list()
             for comb in combinations:
                 if self.is_variable(source) or self.is_variable(destination):
-                    URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
-                                                                                                   nlimit=self.n_limit_EQuery)
-                    if 'leadfigures' in names_false:
-                        idx = names_false.index('leadfigures')
-                        names_false[idx] = 'lead figures'
-                    URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
+                    if self.is_variable(source):
+                        uris, names = self.question.query_graph.nodes[destination]['vertex'].get_predicates()
+                    else:
+                        uris, names = self.question.query_graph.nodes[source]['vertex'].get_predicates()
+                    # URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
+                    #                                                                                nlimit=self.n_limit_EQuery)
+                    # if 'leadfigures' in names_false:
+                    #     idx = names_false.index('leadfigures')
+                    #     names_false[idx] = 'lead figures'
+                    # URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
                 else:
                     URIs_false, names_false, URIs_true, names_true = [], [], [], []
                     if len(source_URIs) > 0 and len(destination_URIs) > 0:
@@ -286,26 +340,26 @@ class KGQAn:
                                                                                                        nlimit=self.n_limit_EQuery)
                         URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
                                                                                                      nlimit=self.n_limit_EQuery)
-                if len(URIs_false) > 0 and len(URIs_true) > 0:
-                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                    uris.extend(URIs_false + URIs_true)
-                    names.extend(names_false + names_true)
-                elif(len(URIs_false) > 0):
-                    URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                    uris.extend(URIs_false)
-                    names.extend(names_false)
-                else:
-                    URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                    uris.extend(URIs_true)
-                    names.extend(names_true)
-
+                    if len(URIs_false) > 0 and len(URIs_true) > 0:
+                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                        uris.extend(URIs_false + URIs_true)
+                        names.extend(names_false + names_true)
+                    elif(len(URIs_false) > 0):
+                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+                        uris.extend(URIs_false)
+                        names.extend(names_false)
+                    elif(len(URIs_true) > 0):
+                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+                        uris.extend(URIs_true)
+                        names.extend(names_true)
             else:
                 URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
                 self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
+
 
     @staticmethod
     def __compute_semantic_similarity_between_single_word_and_word_list(word, word_list):
@@ -331,6 +385,8 @@ class KGQAn:
         URIs_with_scores = list(zip(l1, l2, scores))
         URIs_with_scores.sort(key=operator.itemgetter(2), reverse=True)
         # self.uri_scores.update(URIs_with_scores)
+        #print("Edges with scores")
+        #print(remove_duplicates(URIs_with_scores))
         return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
     # TODO revise score calculation
@@ -356,6 +412,7 @@ class KGQAn:
                     continue
 
                 if len(star_query[0]) == 2:
+
                     score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
                     # TODO update the calculation for mapping between different nodes and uris
                     query, node_uris, relation_uris = self.generate_sparql_query(star_query)
@@ -401,9 +458,11 @@ class KGQAn:
         # ask_query = query.replace("\n", " ")
         return query, node1_uris, node2_uris, relation_uris
 
+    #TODO update with 2 variables
     def generate_sparql_query(self, star_query):
         select_query = SPARQLSelectQuery()
-        select_query.add_variables(variables=["?uri"])
+        #select_query.add_variables(variables=["?uri"])
+        select_query.add_variables(variables=["?uri", "?type"])
         where_pattern = SPARQLGraphPattern()
         node_uris = []
         relation_uris = []
@@ -416,6 +475,13 @@ class KGQAn:
             node_uris.append(v_uri)
             relation_uris.append(predicate[0])
 
+        optional_pattern = SPARQLGraphPattern(optional=True)
+        optional_pattern.add_triples(
+            triples=[
+                Triple(subject='?uri', predicate='<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>', object='?type')
+            ]
+        )
+        where_pattern.add_nested_graph_pattern(optional_pattern)
         select_query.set_where_pattern(graph_pattern=where_pattern)
         return select_query.get_text(), node_uris, relation_uris
 
@@ -428,13 +494,13 @@ class KGQAn:
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                result_compatible, v_result, get_answers = self.sparql_end_point.parse_result(result,
+                result_compatible, v_result, get_answers, types= self.sparql_end_point.parse_result(result,
                                                                                               self.question.answer_datatype)
                 if not result_compatible:
                     continue
                 # The else is for boolean questions
                 if 'results' in v_result:
-                    filtered_results = update_results(v_result['results'], self.question.answer_type)
+                    filtered_results = update_results(v_result['results'], self.question.answer_type, types, self.knowledge_graph)
                     possible_answer.update(results=filtered_results, vars=v_result['head']['vars'])
                 else:
                     possible_answer.update(results=[], boolean=v_result['boolean'])
@@ -451,8 +517,9 @@ class KGQAn:
                                 logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     else:
                         answers.append(v_result['boolean'])
+                #print(possible_answer.sparql)
             except Exception as e:
-                # traceback.print_exc()
+                #traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")
         else:
             self.question.sparqls = sparqls
@@ -466,7 +533,7 @@ class KGQAn:
 
     @question.setter
     def question(self, value: tuple):
-        self._current_question = Question(question_text=value[0], question_id=value[1])
+        self._current_question = Question(question_text=value[0], question_id=value[1], logger=value[2])
 
     @staticmethod
     def extract_resource_name_dbpedia(binding):
