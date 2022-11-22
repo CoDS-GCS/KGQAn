@@ -404,13 +404,14 @@ class KGQAn:
             if len(possible_triples) > 0:
                 possible_triples_for_all_relations.append(possible_triples)
 
-            if not self.check_validity(possible_triples_for_all_relations):
-                return
+
             # print(source)
             # print(source_URIs)
             # print(destination)
             # print(destination_URIs)
             # print(edge_info)
+        if not self.check_validity(possible_triples_for_all_relations):
+            return
         for star_query in product(*possible_triples_for_all_relations):
             score = self.calculate_score(star_query)
             if len(star_query) == 0:
@@ -548,8 +549,8 @@ class KGQAn:
         # This means that we have a triple of this structure (var1 ?p var2)
         if len(edge) == 0 and len(first_uris) > 0 and len(second_uris) and self.is_variable(first_uris[0]) and\
                 self.is_variable(second_uris[0]):
-            possible_triples.append((first_uris[0], '?p', second_uris[0]))
-            possible_triples.append((second_uris[0], '?p', first_uris[0]))
+            possible_triples.append((first_uris[0], ('?p', 0), second_uris[0]))
+            possible_triples.append((second_uris[0], ('?p', 0), first_uris[0]))
 
         return possible_triples
 
@@ -610,9 +611,11 @@ class KGQAn:
                     candidate_targets.append(uri2)
                 else:
                     uri2 = f'<{n2_uri}>'
+
+                p = predicate[0] if predicate[0] == '?p' else f'<{predicate[0]}>'
                 # uri2 = n2_uri if self.is_variable(n2_uri) else f'<{n2_uri}>'
                 where_pattern.add_triples(
-                    triples=[Triple(subject=uri1, predicate=f'<{predicate[0]}>', object=uri2)])
+                    triples=[Triple(subject=uri1, predicate=p, object=uri2)])
 
             candidate_targets.sort()
             self.target_variable = candidate_targets[0] if len(candidate_targets) > 0 else "?var1"
