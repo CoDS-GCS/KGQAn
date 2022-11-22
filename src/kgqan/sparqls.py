@@ -178,57 +178,17 @@ def evaluate_SPARQL_query(query: str, fmt='application/json', knowledge_graph='h
         fmt = 'application/rdf+xml'
 
     payload = {
-        # 'default-graph-uri': '',
         'query': query,
         'format': fmt,  # application/rdf+xml
-        # 'CXML_redir_for_subjs': '121',
-        # 'CXML_redir_for_hrefs': '',
-        # 'timeout': '30000',
-        # 'debug': 'on',
-        # 'run': '+Run+Query+',
     }
     query_response = requests.get(knowledge_graph, params=payload)
-    # print("query_response for ", knowledge_graph)
-    # print(query_response)
     if query_response.status_code in [414]:
         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
     return query_response.text
-
-    # if knowledge_graph == 'Dbpedia':
-    #     # From public https://dbpedia.org/sparql
-    #     # query_response = requests.get(f'https://dbpedia.org/sparql', params=payload)
-    #
-    #     # From local http://localhost:8890/sparql
-    #     # query_response = requests.get(f'http://localhost:8890/sparql', params=payload)
-    #
-    #     # Moh Saleem'recommened DBpedia dataset: http://206.12.92.210:8890/sparql/
-    #     query_response = requests.get(f'http://206.12.92.210:8890/sparql', params=payload)
-    #     # logger2.debug(f"[STATUS CODE FOR SPARQL EVAL:] {query_response.status_code}")
-    #     if query_response.status_code in [414]:
-    #         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-    #     return query_response.text
-    # elif knowledge_graph == 'MS':
-    #     query_response = requests.get(f'https://makg.org/sparql', params=payload)
-    #     if query_response.status_code in [414]:
-    #         return '{"head":{"vars":[]}, "results":{"bindings": []}, "status":414 }'
-    #     return query_response.text
 
 def process_SPARQL_query_result(query_response: requests.models.Response):
     pass
 
 
 if __name__ == '__main__':
-    # payload = {
-    #     'default-graph-uri': '',
-    #     'query': make_top_predicates_obj_query(resource_URI),
-    #     'format': 'application/rdf',  # application/rdf+xml
-    #     'CXML_redir_for_subjs': '121',
-    #     'CXML_redir_for_hrefs': '',
-    #     'timeout': '30000',
-    #     'debug': 'on',
-    #     'run': '+Run+Query+',
-    # }
-    #
-    # x = requests.get(f'https://dbpedia.org/sparql', params=payload)
-    # print(x.text)
     pass

@@ -68,7 +68,7 @@ knowledge_graph_to_uri = {"dbpedia": "http://206.12.95.86:8890/sparql",
                           "yago": "http://206.12.95.86:8892/sparql",
                           "fact_forge": "http://factforge.net/sparql",
                           "bgee": "https://bgee.org/sparql",
-                          "dblp": "http://206.12.95.86:8893/sparql"}
+                          "dblp": "http://206.12.95.86:8894/sparql"}
 
 
 class KGQAn:
@@ -89,6 +89,7 @@ class KGQAn:
     def __init__(self, semantic_affinity_server=None,
                  n_max_answers: int = 10, n_max_Vs: int = 1, n_max_Es: int = 10, n_limit_VQuery=400,
                  n_limit_EQuery=400):
+        self.target_variable = None
         self._ss_server = semantic_affinity_server
         self._n_max_answers = n_max_answers  # this should affect the number of star queries to be executed against TS
         self._current_question = None
@@ -145,7 +146,8 @@ class KGQAn:
         self.extract_possible_V_and_E()
         linking_end = time.time()
         execution_start = time.time()
-        self.generate_star_queries()
+        self.generate_queries_new()
+        # self.generate_star_queries()
         self.evaluate_star_queries()
 
         answers = [answer.json() for answer in self.question.possible_answers[:n_max_answers]]
@@ -173,19 +175,19 @@ class KGQAn:
         elif self.question.text.lower().startswith('who is '):
             self.question.answer_type = 'person'
             self.question.answer_datatype = 'resource'
-        elif self.question.text.lower().startswith('are'):
+        elif self.question.text.lower().startswith('are '):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
-        elif self.question.text.lower().startswith('is'):
+        elif self.question.text.lower().startswith('is '):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
-        elif self.question.text.lower().startswith('did'):
+        elif self.question.text.lower().startswith('did '):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
-        elif self.question.text.lower().startswith('do'):
+        elif self.question.text.lower().startswith('do '):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
-        elif self.question.text.lower().startswith('does'):
+        elif self.question.text.lower().startswith('does '):
             self.question.answer_type = 'boolean'
             self.question.answer_datatype = 'boolean'
         elif self.question.text.lower().startswith('who are '):
@@ -206,7 +208,7 @@ class KGQAn:
         elif self.question.text.lower().startswith('when did ') or self.question.text.lower().startswith('when was '):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
-        elif self.question.text.lower().startswith('when'):
+        elif self.question.text.lower().startswith('when '):
             self.question.answer_type = 'date'
             self.question.answer_datatype = 'date'
         # TODO Start workarouds
@@ -296,8 +298,8 @@ class KGQAn:
 
             URIs_with_scores = list(zip(uris, scores))
             URIs_with_scores.sort(key=operator.itemgetter(1), reverse=True)
-            #print("Vertex with scores")
-            #print(URIs_with_scores)
+            # print("Vertex with scores")
+            # print(URIs_with_scores)
             self.v_uri_scores.update(URIs_with_scores)
             URIs_sorted = []
             if len(list(zip(*URIs_with_scores))) > 0:
@@ -317,45 +319,42 @@ class KGQAn:
                 continue
             source_URIs = self.question.query_graph.nodes[source]['uris']
             destination_URIs = self.question.query_graph.nodes[destination]['uris']
-            combinations = utils.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
+            # combinations = utils.get_combination_of_two_lists(source_URIs, destination_URIs, with_reversed=False)
 
             uris, names = list(), list()
-            for comb in combinations:
-                if self.is_variable(source) or self.is_variable(destination):
-                    if self.is_variable(source):
-                        uris, names = self.question.query_graph.nodes[destination]['vertex'].get_predicates()
-                    else:
-                        uris, names = self.question.query_graph.nodes[source]['vertex'].get_predicates()
-                    # URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names(subj=comb,
-                    #                                                                                nlimit=self.n_limit_EQuery)
-                    # if 'leadfigures' in names_false:
-                    #     idx = names_false.index('leadfigures')
-                    #     names_false[idx] = 'lead figures'
-                    # URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(obj=comb, nlimit=self.n_limit_EQuery)
-                else:
-                    URIs_false, names_false, URIs_true, names_true = [], [], [], []
-                    if len(source_URIs) > 0 and len(destination_URIs) > 0:
-                        v_uri_1, v_uri_2 = comb
-                        URIs_false, names_false = self.sparql_end_point.get_predicates_and_their_names( v_uri_1, v_uri_2,
-                                                                                                       nlimit=self.n_limit_EQuery)
-                        URIs_true, names_true = self.sparql_end_point.get_predicates_and_their_names(v_uri_2, v_uri_1,
-                                                                                                     nlimit=self.n_limit_EQuery)
-                    if len(URIs_false) > 0 and len(URIs_true) > 0:
-                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                        uris.extend(URIs_false + URIs_true)
-                        names.extend(names_false + names_true)
-                    elif(len(URIs_false) > 0):
-                        URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-                        uris.extend(URIs_false)
-                        names.extend(names_false)
-                    elif(len(URIs_true) > 0):
-                        URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
-                        uris.extend(URIs_true)
-                        names.extend(names_true)
-            else:
-                URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
-                self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
+            if not self.is_variable(source):
+                for source_uri in source_URIs:
+                    #TODO what if source is associated with multiple vertices
+                    uris_source, names_source = self.question.query_graph.nodes[source]['vertex'].get_predicates()
+                    uris.extend(uris_source)
+                    names.extend(names_source)
+
+            if not self.is_variable(destination):
+                for destination_uri in destination_URIs:
+                    #TODO what if source is associated with multiple vertices
+                    uris_destination, names_destination = self.question.query_graph.nodes[destination]['vertex']\
+                        .get_predicates()
+                    uris.extend(uris_destination)
+                    names.extend(names_destination)
+
+            # for comb in combinations:
+            #     if self.is_variable(source) or self.is_variable(destination):
+            #         if self.is_variable(source):
+            #             uris, names = self.question.query_graph.nodes[destination]['vertex'].get_predicates()
+            #         else:
+            #             uris, names = self.question.query_graph.nodes[source]['vertex'].get_predicates()
+            #     else:
+            #         uris, names = list(), list()
+            #         uris_source, names_source = self.question.query_graph.nodes[source]['vertex'].get_predicates()
+            #         uris_destination, names_destination = self.question.query_graph.nodes[destination]['vertex']\
+            #             .get_predicates()
+            #         uris.extend(uris_source+uris_destination)
+            #         names.extend(names_source+names_destination)
+            # else:
+            URIs_chosen = self.__get_chosen_URIs_for_relation(relation, uris, names)
+            # print("Edges CHosen")
+            # print(URIs_chosen)
+            self.question.query_graph[source][destination][key]['uris'].extend(URIs_chosen)
         else:
             logger.info(f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}")
             logger.info(f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}")
@@ -381,15 +380,55 @@ class KGQAn:
 
         scores = self.__class__.__compute_semantic_similarity_between_single_word_and_word_list(relation, names)
         # (uri, True) ===>  (uri, True, score)
-        l1, l2 = list(zip(*uris))
-        URIs_with_scores = list(zip(l1, l2, scores))
-        URIs_with_scores.sort(key=operator.itemgetter(2), reverse=True)
+        l1, l2, l3 = list(zip(*uris))
+        URIs_with_scores = list(zip(l1, l2, l3, scores))
+        URIs_with_scores.sort(key=operator.itemgetter(3), reverse=True)
         # self.uri_scores.update(URIs_with_scores)
-        #print("Edges with scores")
-        #print(remove_duplicates(URIs_with_scores))
+        # print("Edges with scores")
+        # print(remove_duplicates(URIs_with_scores))
         return remove_duplicates(URIs_with_scores)[:self.n_max_Es]
 
-    # TODO revise score calculation
+    def generate_queries_new(self):
+        possible_triples_for_all_relations = list()
+        for source, destination, key, edge_info in self.question.query_graph.edges(data="uris", keys=True):
+            source_URIs = self.question.query_graph.nodes[source]['uris']
+            destination_URIs = self.question.query_graph.nodes[destination]['uris']
+            node1_uris = ["?" + source] if self.is_variable(source) else source_URIs
+            node2_uris = ["?" + destination] if self.is_variable(destination) else destination_URIs
+            # if self.is_variable(source):
+            #     source_URIs.append("?" + source)
+            # if self.is_variable(destination):
+            #     destination_URIs.append("?" + destination)
+            possible_triples = self.get_all_possible_triples_for_edge(edge_info, node1_uris, node2_uris)
+            self.question.query_graph[source][destination][key]['possible_triples'] = possible_triples
+            if len(possible_triples) > 0:
+                possible_triples_for_all_relations.append(possible_triples)
+            # print(source)
+            # print(source_URIs)
+            # print(destination)
+            # print(destination_URIs)
+            # print(edge_info)
+        for star_query in product(*possible_triples_for_all_relations):
+            score = self.calculate_score(star_query)
+            if len(star_query) == 0:
+                continue
+
+            # if len(star_query[0]) == 2:
+            #     query, node_uris, relation_uris = self.generate_sparql_query(star_query)
+            #     query = query.replace("\n", " ")
+            #     self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
+            #                                       nodes=node_uris, edges=relation_uris)
+            elif len(star_query[0]) == 3:
+                query, _, _ = self.generate_sparql_query_new(star_query)
+                # query, node1_uris, node2_uris, relation_uris = self.generate_ask_sparql_query(star_query)
+                query = query.replace("\n", " ")
+                # print(query)
+                # self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
+                #                                   node1=node1_uris, node2=node2_uris, edges=relation_uris)
+                self.question.add_possible_answer(question=self.question.text, sparql=query, score=score)
+            else:
+                print("Error dealing with query, ", star_query)
+
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
@@ -400,6 +439,7 @@ class KGQAn:
                 if len(node_uris) == 0 or len(relation_uris) == 0:
                     continue
                 possible_triples_for_single_relation = utils.get_combination_of_two_lists(node_uris, relation_uris)
+                # print(possible_triples_for_single_relation)
                 possible_triples_for_all_relations.append(possible_triples_for_single_relation)
             elif len(source_URIs) > 0 and len(destination_URIs) > 0:
                 possible_triples_for_ask_query = utils.get_combination_of_three_lists(source_URIs, destination_URIs, relation_uris)
@@ -408,12 +448,15 @@ class KGQAn:
                 #     query = self.generate_ask_sparql_query(star_query)
         else:
             for star_query in product(*possible_triples_for_all_relations):
+                score = self.calculate_score(star_query)
                 if len(star_query) == 0:
                     continue
 
                 if len(star_query[0]) == 2:
 
-                    score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
+                    # score = sum([self.v_uri_scores[subj] + predicate[2] for subj, predicate in star_query])
+                    # score = self.calculate_score(star_query)
+                    # print("current score = ", score, " new score = ", self.calculate_score(star_query))
                     # TODO update the calculation for mapping between different nodes and uris
                     query, node_uris, relation_uris = self.generate_sparql_query(star_query)
                     query = query.replace("\n", " ")
@@ -433,12 +476,66 @@ class KGQAn:
                     self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
                                                       nodes=node_uris, edges=relation_uris)
                 elif len(star_query[0]) == 3:
+                    # score = self.calculate_score(star_query)
                     query, node1_uris, node2_uris, relation_uris = self.generate_ask_sparql_query(star_query)
                     query = query.replace("\n", " ")
-                    self.question.add_possible_answer(question=self.question.text, sparql=query, score=1,
+                    self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
                                                       node1=node1_uris, node2=node2_uris, edges=relation_uris)
                 else:
                     print("Error dealing with query, ", star_query)
+
+    def calculate_score(self, star_query):
+        score = 0.0
+        score_count = 0
+        for q in star_query:
+            if len(q) == 2:
+                score += self.v_uri_scores[q[0]]
+                score += q[1][2]
+                score_count += 2
+            elif len(q) == 3:
+                if not self.is_variable(q[0]):
+                    score += self.v_uri_scores[q[0]]
+                    score_count += 1
+                score += q[1][1]
+                score_count += 1
+                if not self.is_variable(q[2]):
+                    score += self.v_uri_scores[q[2]]
+                    score_count += 1
+        return score / score_count if score_count > 0 else score
+
+    # Edge is an array of (predicate, vertex, orientation, score), orientation = false -> vertex is subject,
+    # True-> vertex is object
+    # first_uris are the nodes of the first connected vertex to the edge
+    # second_uris are the nodes of the second connected vertex to the edge
+    # They should be in a format of (uri, score)
+    # Assumptions:
+    # 1) edges are sent in the required format
+    # 2) for variables nodes, the uris will contain var1, or any information should be sent to add this information to
+    # this method so the triples are ready and complete
+    # Points to consider
+    # 1) What if any of the node_uris or the edge uris are empty.
+    # 2) What If the edge is between two variables, then it won't be annotated with any relation
+    def get_all_possible_triples_for_edge(self, edge, first_uris, second_uris):
+        possible_triples = list()
+        for predicate, vertex, orientation, score in edge:
+            if orientation:
+                # vertex is object
+                object_uris = [vertex]
+                if vertex in first_uris:
+                    subject_uris = second_uris
+                elif vertex in second_uris:
+                    subject_uris = first_uris
+            else:
+                # vertex is subject
+                subject_uris = [vertex]
+                if vertex in first_uris:
+                    object_uris = second_uris
+                elif vertex in second_uris:
+                    object_uris = first_uris
+            triples = list(product(subject_uris, [(predicate, score)], object_uris))
+            possible_triples.extend(triples)
+            # print(possible_triples)
+        return possible_triples
 
     def generate_ask_sparql_query(self, triple):
         ask_triple = []
@@ -458,6 +555,64 @@ class KGQAn:
         # ask_query = query.replace("\n", " ")
         return query, node1_uris, node2_uris, relation_uris
 
+    # TODO add node and vertices uris for the website, update boolean part in a better way
+
+    def generate_sparql_query_new(self, star_query):
+        if self.question.answer_datatype == 'boolean':
+            ask_triple = []
+            node1_uris = []
+            node2_uris = []
+            relation_uris = []
+            for n1_uri, predicate, n2_uri in star_query:
+                if predicate[1]:
+                    ask_triple.append(f'<{n2_uri}> <{predicate[0]}> <{n1_uri}>')
+                else:
+                    ask_triple.append(f'<{n1_uri}> <{predicate[0]}> <{n2_uri}>')
+                node1_uris.append(n1_uri)
+                node2_uris.append(n2_uri)
+                relation_uris.append(predicate[0])
+            query = f"ASK {{ {' . '.join(ask_triple)} }}"
+            # ask_query, node1_uris,node2_uris, relation_uris = self.generate_sparql_query(query)
+            # ask_query = query.replace("\n", " ")
+            # return query, node1_uris, node2_uris, relation_uris
+            return query, node1_uris, node2_uris
+        else:
+            select_query = SPARQLSelectQuery()
+            where_pattern = SPARQLGraphPattern()
+            node_uris = []
+            relation_uris = []
+            candidate_targets = []
+            for n1_uri, predicate, n2_uri in star_query:
+                if self.is_variable(n1_uri):
+                    uri1 = n1_uri
+                    candidate_targets.append(uri1)
+                else:
+                    uri1 = f'<{n1_uri}>'
+
+                if self.is_variable(n2_uri):
+                    uri2 = n2_uri
+                    candidate_targets.append(uri2)
+                else:
+                    uri2 = f'<{n2_uri}>'
+                # uri2 = n2_uri if self.is_variable(n2_uri) else f'<{n2_uri}>'
+                where_pattern.add_triples(
+                    triples=[Triple(subject=uri1, predicate=f'<{predicate[0]}>', object=uri2)])
+
+            candidate_targets.sort()
+            self.target_variable = candidate_targets[0] if len(candidate_targets) > 0 else "?var1"
+            select_query.add_variables(variables=[self.target_variable, "?type"])
+            # remove the question mark for further use
+            self.target_variable = self.target_variable[1:]
+            optional_pattern = SPARQLGraphPattern(optional=True)
+            optional_pattern.add_triples(
+                triples=[
+                    Triple(subject='?var1', predicate='<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>',
+                           object='?type')
+                ]
+            )
+            where_pattern.add_nested_graph_pattern(optional_pattern)
+            select_query.set_where_pattern(graph_pattern=where_pattern)
+            return select_query.get_text(), node_uris, relation_uris
     #TODO update with 2 variables
     def generate_sparql_query(self, star_query):
         select_query = SPARQLSelectQuery()
@@ -494,8 +649,8 @@ class KGQAn:
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
             logger.info(f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}")
             try:
-                result_compatible, v_result, get_answers, types= self.sparql_end_point.parse_result(result,
-                                                                                              self.question.answer_datatype)
+                result_compatible, v_result, get_answers, types= self.sparql_end_point.parse_result\
+                    (result, self.question.answer_datatype, self.target_variable)
                 if not result_compatible:
                     continue
                 # The else is for boolean questions
@@ -517,7 +672,7 @@ class KGQAn:
                                 logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     else:
                         answers.append(v_result['boolean'])
-                #print(possible_answer.sparql)
+                # print(possible_answer.sparql)
             except Exception as e:
                 #traceback.print_exc()
                 print(f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<")

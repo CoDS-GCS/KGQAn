@@ -43,10 +43,10 @@ if __name__ == '__main__':
     # max no of vertices and edges to annotate the PGP
     # max no of SPARQL queries to be generated from PGP
     max_Vs = 1
-    max_Es = 21
-    max_answers = 41
-    limit_VQuery = 600
-    limit_EQuery = 300
+    max_Es = 20
+    max_answers = 40
+    limit_VQuery = 400
+    limit_EQuery = 200
 
     with open(file_name) as f:
         qald9_testset = json.load(f)

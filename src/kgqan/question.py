@@ -127,7 +127,6 @@ class Question:
         pos_tags = allannlp_dep_output['pos']
         dependencies = allannlp_dep_output['predicted_dependencies']
         heads = allannlp_dep_output['predicted_heads']
-        # d = reformat_allennlp_ner_output(ner_tags, words)
 
         positions = traverse_tree(allannlp_dep_output['hierplane_tree']['root'])
         positions.sort()
@@ -218,6 +217,7 @@ class Question:
         triples_str = triples_str.replace("<ol> ", "<o>")
         triples_str = triples_str.replace("<o1 ", "<o>")
         triples_str = triples_str.replace("<o] ", "<o>")
+        triples_str = triples_str.replace("<o></ ", "<o>")
         triples_str = triples_str.replace("<p1 ", "<p>")
 
         self.logger.info(f"Generated Triple: {triples_str}")
@@ -250,8 +250,6 @@ class Question:
         relations_ignored = ['has', 'have', 'had', 'be', 'is', 'are', 'was', 'were', 'do', 'did', 'does',
                              'much', 'many', 'give', 'show', '', 'be on']
         relation_labeling = RelationLabeling()
-        # positions = [token['position'] for token in self.question.tokens]
-        #  i = word index, w = word_text, h = Dep_head, d
         question_type = ""
         for token in self.tokens:
             if token['token'].lower() in ['how', 'who', 'when', 'what', 'which', 'where']:

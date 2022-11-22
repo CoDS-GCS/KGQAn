@@ -54,16 +54,20 @@ class Vertex:
             (obj=uri, nlimit=self.n_limit_EQuery)
 
         if len(URIs_false) > 0 and len(URIs_true) > 0:
-            URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
-            URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+            URIs_false = [(x, uri, False) for x in URIs_false]
+            # URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+            URIs_true = [(x, uri, True) for x in URIs_true]
+            # URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
             uris.extend(URIs_false + URIs_true)
             names.extend(names_false + names_true)
         elif (len(URIs_false) > 0):
-            URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
+            URIs_false = [(x, uri, False) for x in URIs_false]
+            # URIs_false = list(zip_longest(URIs_false, [False], fillvalue=False))
             uris.extend(URIs_false)
             names.extend(names_false)
         elif (len(URIs_true) > 0):
-            URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+            # URIs_true = list(zip_longest(URIs_true, [True], fillvalue=True))
+            URIs_true = [(x, uri, True) for x in URIs_true]
             uris.extend(URIs_true)
             names.extend(names_true)
 
