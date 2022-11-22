@@ -403,6 +403,9 @@ class KGQAn:
             self.question.query_graph[source][destination][key]['possible_triples'] = possible_triples
             if len(possible_triples) > 0:
                 possible_triples_for_all_relations.append(possible_triples)
+
+            if not self.check_validity(possible_triples_for_all_relations):
+                return
             # print(source)
             # print(source_URIs)
             # print(destination)
@@ -429,6 +432,13 @@ class KGQAn:
             else:
                 print("Error dealing with query, ", star_query)
 
+    def check_validity(self, triples):
+        if len(triples) == 1 and len(triples[0]) == 2 and self.is_variable(triples[0][0][0]) and \
+                self.is_variable(triples[0][0][2]) and self.is_variable(triples[0][1][0]) and\
+                self.is_variable(triples[0][1][2]):
+            print("In condition")
+            return False
+        return True
     def generate_star_queries(self):
         possible_triples_for_all_relations = list()
         for source, destination, key, relation_uris in self.question.query_graph.edges(data='uris', keys=True):
@@ -534,7 +544,13 @@ class KGQAn:
                     object_uris = first_uris
             triples = list(product(subject_uris, [(predicate, score)], object_uris))
             possible_triples.extend(triples)
-            # print(possible_triples)
+
+        # This means that we have a triple of this structure (var1 ?p var2)
+        if len(edge) == 0 and len(first_uris) > 0 and len(second_uris) and self.is_variable(first_uris[0]) and\
+                self.is_variable(second_uris[0]):
+            possible_triples.append((first_uris[0], '?p', second_uris[0]))
+            possible_triples.append((second_uris[0], '?p', first_uris[0]))
+
         return possible_triples
 
     def generate_ask_sparql_query(self, triple):
