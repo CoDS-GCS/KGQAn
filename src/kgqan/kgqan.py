@@ -390,15 +390,20 @@ class KGQAn:
     def get_possible_combinations(self):
         edges = list(nx.dfs_edges(self.question.query_graph))
         bgps = []
-        if len(edges) == 1:
-            bgps = list(product(self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']))
-        elif len(edges) > 0:
+        handled_edges = 0
+        # if len(edges) == 1:
+        #     bgps = list(product(self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']))
+        # elif len(edges) > 0:
+        if len(edges) > 0:
             bgps = self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']
+            handled_edges += 1
         for i in range(1, len(edges)):
             connected_node = set(edges[i]).intersection(set(edges[i-1]))
+            if len(connected_node) == 0:
+                continue
             connected_node = next(iter(connected_node))
             current_triples = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
-            print(connected_node)
+            # print(connected_node)
             if self.is_variable(connected_node):
                 bgps = product(bgps, current_triples)
             else:
@@ -414,6 +419,11 @@ class KGQAn:
                             temp = bgp.append(triple)
                             updated_bgps.append(temp)
                 bgps = updated_bgps
+            handled_edges += 1
+
+        if handled_edges == 1:
+            bgps = list(product(bgps))
+        # print(len(bgps))
         return bgps
 
     def check_validity(self, triples):
