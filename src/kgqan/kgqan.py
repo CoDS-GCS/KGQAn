@@ -396,16 +396,17 @@ class KGQAn:
         # elif len(edges) > 0:
         if len(edges) > 0:
             bgps = self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']
-            handled_edges += 1
+            handled_edges = 1 if len(bgps) != 0 else 0
         for i in range(1, len(edges)):
             connected_node = set(edges[i]).intersection(set(edges[i-1]))
-            if len(connected_node) == 0:
+            current_triples = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
+            if len(connected_node) == 0 or len(current_triples) == 0:
+            # if (handled_edges == 1 and len(connected_node) == 0) or len(current_triples) == 0:
                 continue
             connected_node = next(iter(connected_node))
-            current_triples = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
             # print(connected_node)
             if self.is_variable(connected_node):
-                bgps = product(bgps, current_triples)
+                bgps = product(bgps, current_triples) if len(bgps) != 0 else current_triples
             else:
                 connected_node_vertices = self.question.query_graph.nodes[connected_node]['uris']
                 updated_bgps = []
