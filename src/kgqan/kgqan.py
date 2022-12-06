@@ -400,8 +400,15 @@ class KGQAn:
         for i in range(1, len(edges)):
             connected_node = set(edges[i]).intersection(set(edges[i-1]))
             current_triples = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
-            if len(connected_node) == 0 or len(current_triples) == 0:
-            # if (handled_edges == 1 and len(connected_node) == 0) or len(current_triples) == 0:
+            if len(current_triples) == 0:
+                continue
+
+            if handled_edges == 0:
+                bgps = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
+                handled_edges += 1
+                continue
+
+            if len(connected_node) == 0:
                 continue
             connected_node = next(iter(connected_node))
             # print(connected_node)
