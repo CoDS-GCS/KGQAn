@@ -355,23 +355,16 @@ class KGQAn:
             self.question.query_graph[source][destination][key]['possible_triples'] = possible_triples
             if len(possible_triples) > 0:
                 possible_triples_for_all_relations.append(possible_triples)
-            # print(source)
-            # print(source_URIs)
-            # print(destination)
-            # print(destination_URIs)
-            # print(edge_info)
         if not self.check_validity(possible_triples_for_all_relations):
             return
         possible_bgps = self.get_possible_combinations()
         for bgp in possible_bgps:
-            # print(bgp)
             score = self.calculate_score(bgp)
             if len(bgp) == 0:
                 continue
 
             query, _, _ = self.generate_sparql_query_new(bgp)
             query = query.replace("\n", " ")
-            # print(query)
             # self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
             #                                   node1=node1_uris, node2=node2_uris, edges=relation_uris)
             self.question.add_possible_answer(question=self.question.text, sparql=query, score=score)
@@ -394,11 +387,10 @@ class KGQAn:
         # if len(edges) == 1:
         #     bgps = list(product(self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']))
         # elif len(edges) > 0:
-        if len(edges) > 0:
-            bgps = self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']
-            handled_edges = 1 if len(bgps) != 0 else 0
-        for i in range(1, len(edges)):
-            connected_node = set(edges[i]).intersection(set(edges[i-1]))
+        # if len(edges) > 0:
+        #     bgps = self.question.query_graph[edges[0][0]][edges[0][1]][0]['possible_triples']
+        #     handled_edges = 1 if len(bgps) != 0 else 0
+        for i in range(0, len(edges)):
             current_triples = self.question.query_graph[edges[i][0]][edges[i][1]][0]['possible_triples']
             if len(current_triples) == 0:
                 continue
@@ -408,10 +400,11 @@ class KGQAn:
                 handled_edges += 1
                 continue
 
+            connected_node = set(edges[i]).intersection(set(edges[i - 1]))
             if len(connected_node) == 0:
                 continue
             connected_node = next(iter(connected_node))
-            # print(connected_node)
+
             if self.is_variable(connected_node):
                 bgps = product(bgps, current_triples) if len(bgps) != 0 else current_triples
             else:
@@ -431,7 +424,6 @@ class KGQAn:
 
         if handled_edges == 1:
             bgps = list(product(bgps))
-        # print(len(bgps))
         return bgps
 
     def check_validity(self, triples):
