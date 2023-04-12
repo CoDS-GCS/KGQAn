@@ -117,4 +117,4 @@ Citing Our Work
 Contact:
 -
 - - - -
-For any queries, feel free to send an e-mail to `reham.omar@condordia.ca` or `essam.mansour@concordia.ca`. We look forward to receiving your feedback.
+For any queries, feel free to send an e-mail to `reham.omar@mail.concordia.ca` or `essam.mansour@concordia.ca`. We look forward to receiving your feedback.
