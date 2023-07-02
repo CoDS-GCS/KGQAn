@@ -165,3 +165,10 @@ cython_debug/
 media
 static
 
+
+
+# wiki/ in word_embedding will contain word-embedding *.txt 
+word_embedding/wiki/*
+
+
+data/*

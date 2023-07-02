@@ -1,0 +1,10 @@
+version: '3.9'
+services:
+  word_embd_server:
+    build: ./word_embedding
+    ports:
+      - '9600:9600'
+    command: ["--data_dir", "data", "--word_embed_file", "wiki-news-300d-1M.txt"]
+    volumes:
+      - ./data:/app/data
+

@@ -1,8 +1,12 @@
 import string
-
+import os
+import sys
 import numpy as np
 import statistics
 import chars2vec
+
+wiki_model = None
+
 
 class WordEmbeddings:
     def __init__(self, model_path):
@@ -11,18 +15,18 @@ class WordEmbeddings:
         self.vocab = None
         self.ivocab = None
         self.vector_feature_size = 0
-        self.char2vec = chars2vec.load_model('eng_300')
+        self.char2vec = chars2vec.load_model("eng_300")
 
     def load_model(self):
         self.w, self.vocab, self.ivocab = self.load_vocab()
 
     def load_vocab(self):
-        with open(self.model_path, 'r') as f:
-            words = [x.rstrip().split(' ')[0] for x in f.readlines()]
-        with open(self.model_path, 'r') as f:
+        with open(self.model_path, "r") as f:
+            words = [x.rstrip().split(" ")[0] for x in f.readlines()]
+        with open(self.model_path, "r") as f:
             vectors = {}
             for line in f:
-                vals = line.rstrip().split(' ')
+                vals = line.rstrip().split(" ")
                 vectors[vals[0]] = [float(x) for x in vals[1:]]
 
         vocab_size = len(words)
@@ -34,13 +38,13 @@ class WordEmbeddings:
         vector_feature_size = vector_dim
         W = np.zeros((vocab_size, vector_dim))
         for word, v in vectors.items():
-            if word == '<unk>':
+            if word == "<unk>":
                 continue
             W[vocab[word], :] = v
 
         # normalize each word vector to unit variance
         W_norm = np.zeros(W.shape)
-        d = (np.sum(W ** 2, 1) ** (0.5))
+        d = np.sum(W**2, 1) ** (0.5)
         W_norm = (W.T / d).T
         return (W_norm, vocab, ivocab)
 
@@ -67,7 +71,7 @@ class WordEmbeddings:
             for v2 in vs2:
                 cmp_count += 1
                 if v1 is None:
-                    #TODO: use minimum edit distance
+                    # TODO: use minimum edit distance
                     sims.append(0.0)
                     continue
                 if v2 is None:
@@ -79,7 +83,7 @@ class WordEmbeddings:
             return statistics.mean(sims)
 
     def get_embedding_for_mwe(self, mwe):
-        mwe = mwe.translate(str.maketrans('', '', string.punctuation))
+        mwe = mwe.translate(str.maketrans("", "", string.punctuation))
         words = mwe.strip().split()
         mwe_vecs = list()
 
@@ -94,9 +98,36 @@ class WordEmbeddings:
             return mwe_vecs
 
 
-if __name__ == '__main__':
-    wiki_model = WordEmbeddings(r'/home/disooqi/projects/wise/word_embedding/wiki-news-300d-1M.txt')
+def request_semantic_affinity(word_1, word_2):
+    return wiki_model.mwe_semantic_distance(
+        wiki_model.get_embedding_for_mwe(word_1),
+        wiki_model.get_embedding_for_mwe(word_2),
+    )
+
+
+def wiki_model_from_path(model_path):
+    global wiki_model
+    if os.path.exists(model_path):
+        wiki_model = WordEmbeddings(model_path)
+        wiki_model.load_model()
+        print("Done loading")
+    else:
+        print("Invalid word_embedding file path!!!")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    wiki_model = WordEmbeddings(
+        r"/home/disooqi/projects/wise/word_embedding/wiki-news-300d-1M.txt"
+    )
     wiki_model.load_model()
-    print('Done loading')
-    print("ss: " + str(wiki_model.semantic_distance(wiki_model.get_embedding_for_word("wife"),
-                                                    wiki_model.get_embedding_for_word("spouse"))))
+    print("Done loading")
+    print(
+        "ss: "
+        + str(
+            wiki_model.semantic_distance(
+                wiki_model.get_embedding_for_word("wife"),
+                wiki_model.get_embedding_for_word("spouse"),
+            )
+        )
+    )

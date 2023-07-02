@@ -3,18 +3,7 @@ import selectors
 import json
 import io
 import struct
-from wordembeddings import WordEmbeddings
-
-
-wiki_model = WordEmbeddings(r'/mnt/KGQAn_Project/app_storage/wiki-news-300d-1M.txt')
-
-wiki_model.load_model()
-print('Done loading')
-
-
-def request_semantic_affinity(word_1, word_2):
-    return wiki_model.mwe_semantic_distance(wiki_model.get_embedding_for_mwe(word_1),
-                                wiki_model.get_embedding_for_mwe(word_2))
+from wordembeddings import request_semantic_affinity
 
 
 class Message:
@@ -151,7 +140,7 @@ class Message:
             self.selector.unregister(self.sock)
         except Exception as e:
             print(
-                f"error: selector.unregister() exception for",
+                "error: selector.unregister() exception for",
                 f"{self.addr}: {repr(e)}",
             )
 
@@ -159,7 +148,7 @@ class Message:
             self.sock.close()
         except OSError as e:
             print(
-                f"error: socket.close() exception for",
+                "error: socket.close() exception for",
                 f"{self.addr}: {repr(e)}",
             )
         finally:

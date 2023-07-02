@@ -1,0 +1,3 @@
+chars2vec
+keras
+tensorflow
