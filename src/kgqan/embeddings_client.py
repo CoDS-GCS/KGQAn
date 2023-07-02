@@ -1,10 +1,7 @@
-import sys
 import socket
 import selectors
 import traceback
-from . import libclient
-
-
+import libclient as libclient
 
 
 def create_request(word1, word2):
@@ -24,6 +21,7 @@ def start_connection(host, port, sel, request):
     events = selectors.EVENT_READ | selectors.EVENT_WRITE
     message = libclient.Message(sel, sock, addr, request)
     sel.register(sock, events, data=message)
+
 
 def drop_common_word(wlist1, wlist2):
     output1 = []

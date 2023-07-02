@@ -1,9 +1,8 @@
 import json
-from itertools import zip_longest
 
 import requests
 
-from kgqan.sparql_end_points import EndPoint
+from sparql_end_points import EndPoint
 
 
 class Vertex:
@@ -26,7 +25,7 @@ class Vertex:
             uris, names = self.process_vertex(current_uri)
             if len(uris) == 0:
                 redirected_uri = self.get_redirected_uri(current_uri)
-                if redirected_uri == None:
+                if redirected_uri is None:
                     self.vertices.append(current_uri)
                     self.predicates_names.append(names)
                     self.predicates_uris.append(uris)
@@ -99,9 +98,3 @@ class Vertex:
     # TODO Update when dealing with multiple vertices not just 1
     def get_predicates(self):
         return self.predicates_uris[0], self.predicates_names[0]
-
-
-
-
-
-

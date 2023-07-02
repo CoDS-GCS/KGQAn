@@ -1,0 +1,12 @@
+graphviz
+transitions
+networkx
+termcolor
+gensim
+allennlp
+allennlp-models
+SPARQL-Burger
+chars2vec
+keras
+tensorflow
+spacy

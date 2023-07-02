@@ -1,7 +1,7 @@
 #!./venv python
 # -*- coding: utf-8 -*-
 """
-KGQAn: A Natural Language Platform 
+KGQAn: A Natural Language Platform
 """
 ___lab__ = "CoDS Lab"
 __copyright__ = "Copyright 2020-29, GINA CODY SCHOOL OF ENGINEERING AND COMPUTER SCIENCE, CONCORDIA UNIVERSITY"
@@ -14,20 +14,31 @@ __status__ = "debug"
 __created__ = "2020-02-07"
 
 import logging
+import os
 import networkx as nx
-from .nlp.models import  WordNetLemmatizer
 from termcolor import cprint
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
 logger = logging.getLogger(__name__)
-lemmatizer = WordNetLemmatizer()
-model_path = '/mnt/KGQAn_Project/app_storage/output_pred21_8_30/'
-model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
-tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+model = None
+tokenizer = None
+
+
+def load_model(model_path):
+    global model
+    global tokenizer
+    if os.path.exists(model_path):
+        model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        print("Seq2Seq model loaded...")
+    else:
+        print("Invalid Seq2Seq model path")
+
 
 if not logger.handlers:
-    file_handler = logging.FileHandler('kgqan.log')
-    formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
+    file_handler = logging.FileHandler("kgqan.log")
+    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
     file_handler.setFormatter(formatter)
     file_handler.setLevel(logging.INFO)
     logger.addHandler(file_handler)
@@ -35,10 +46,19 @@ if not logger.handlers:
 
 
 class Question:
-    types = ('person', 'price', 'count', 'date', 'place', 'other')  # it should be populated by the types of ontology
-    datatypes = ('number', 'date', 'string', 'boolean', 'resource', 'list')
+    types = (
+        "person",
+        "price",
+        "count",
+        "date",
+        "place",
+        "other",
+    )  # it should be populated by the types of ontology
+    datatypes = ("number", "date", "string", "boolean", "resource", "list")
 
-    def __init__(self, question_text, question_id=None, answer_datatype=None, logger=None):
+    def __init__(
+        self, question_text, question_id=None, answer_datatype=None, logger=None
+    ):
         self.tokens = list()
         self._id = question_id
         self._question_text = question_text
@@ -80,7 +100,9 @@ class Question:
     @answer_datatype.setter
     def answer_datatype(self, value):
         if value not in Question.datatypes:
-            raise ValueError(f"Question should has one of the following types {Question.datatypes}")
+            raise ValueError(
+                f"Question should has one of the following types {Question.datatypes}"
+            )
         self._answer_datatype = value
 
     @property
@@ -115,7 +137,7 @@ class Question:
     # Parses the triple strings given to create the graph
     # In case there is a missing part of the triple, the triple is bypassed
     def __parse_triple(self, triples_str):
-        triples_str = triples_str.replace("\"", "")
+        triples_str = triples_str.replace('"', "")
         triples_str = triples_str.replace("_", " ")
         triples_str = triples_str.replace("<s>", "")
         triples_str = triples_str.replace("<P>", "<p>")
@@ -138,36 +160,48 @@ class Question:
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:
-            if '</s>' in triple_str:
-                subj_start = triple_str.index('</s>')
+            if "</s>" in triple_str:
+                subj_start = triple_str.index("</s>")
             else:
                 print("Triple ", triple_str, "has no subject")
                 continue
-            if '<p>' in triple_str:
-                pred_start = triple_str.index('<p>')
+            if "<p>" in triple_str:
+                pred_start = triple_str.index("<p>")
             else:
                 print("Triple ", triple_str, "has no predicate")
                 continue
-            if '<o>' in triple_str:
-                obj_start = triple_str.index('<o>')
+            if "<o>" in triple_str:
+                obj_start = triple_str.index("<o>")
             else:
                 print("Triple ", triple_str, "has no Object")
                 continue
 
-            subject = triple_str[subj_start + 4: pred_start].strip() if triple_str.startswith("</s>") else triple_str[: pred_start].strip()
-            predicate = triple_str[pred_start + 3: obj_start].strip()
-            object = triple_str[obj_start + 3: -4].strip() if triple_str.endswith("</s>") else triple_str[obj_start + 3:].strip()
-            self.triple_list.append({"subject": subject, "predicate": predicate, "object": object})
+            subject = (
+                triple_str[subj_start + 4 : pred_start].strip()
+                if triple_str.startswith("</s>")
+                else triple_str[:pred_start].strip()
+            )
+            predicate = triple_str[pred_start + 3 : obj_start].strip()
+            object = (
+                triple_str[obj_start + 3 : -4].strip()
+                if triple_str.endswith("</s>")
+                else triple_str[obj_start + 3 :].strip()
+            )
+            self.triple_list.append(
+                {"subject": subject, "predicate": predicate, "object": object}
+            )
 
     def __build_graph_from_triples(self):
         for triple in self.triple_list:
-            subject = triple['subject']
-            predicate = triple['predicate']
-            object = triple['object']
+            subject = triple["subject"]
+            predicate = triple["predicate"]
+            object = triple["object"]
 
             subject_node = self.__add_node_or_retrieve_existing_node(subject)
             object_node = self.__add_node_or_retrieve_existing_node(object)
-            self.query_graph.add_edge(subject_node, object_node, relation=predicate, uris=[])
+            self.query_graph.add_edge(
+                subject_node, object_node, relation=predicate, uris=[]
+            )
         else:
             cprint(f"[GRAPH NODES WITH URIs:] {self.query_graph.nodes(data=True)}")
             cprint(f"[GRAPH EDGES WITH URIs:] {self.query_graph.edges(data=True)}")
@@ -176,7 +210,7 @@ class Question:
         for node in self.query_graph.nodes():
             if node == node_label:
                 return node
-        if 'var' in node_label:
+        if "var" in node_label:
             self.query_graph.add_node(node_label, uris=[], answers=[], type="variable")
         else:
             self.query_graph.add_node(node_label, uris=[], answers=[], type="entity")
@@ -186,18 +220,21 @@ class Question:
             if node == node_label:
                 return node
 
+
 class Answer:
     def __init__(self, **kwargs):
-        self._answer = dict({
-            "id": id(self),
-            "question": None,
-            # "question_id": kwargs['question_id'],  # question_id
-            "results": None,  # here are the bindings returned from the triple store
-            "status": None,  # same as the http request status, and actually it does not make sense and I might remove
-            "vars": None,
-            "sparql": None,
-            "boolean": False
-        })
+        self._answer = dict(
+            {
+                "id": id(self),
+                "question": None,
+                # "question_id": kwargs['question_id'],  # question_id
+                "results": None,  # here are the bindings returned from the triple store
+                "status": None,  # same as the http request status, and actually it does not make sense and I might remove
+                "vars": None,
+                "sparql": None,
+                "boolean": False,
+            }
+        )
         for key, value in kwargs.items():
             self._answer[key] = value
 
@@ -213,20 +250,20 @@ class Answer:
 
     @property
     def sparql(self):
-        return self._answer['sparql']
+        return self._answer["sparql"]
 
     @property
     def score(self):
-        return self._answer['score']
+        return self._answer["score"]
 
     @property
     def boolean(self):
-        return self._answer['boolean']
+        return self._answer["boolean"]
 
     @sparql.setter
     def sparql(self, value):
-        self._answer['sparql'] = value
+        self._answer["sparql"] = value
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
