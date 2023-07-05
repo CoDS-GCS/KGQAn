@@ -2,8 +2,7 @@ import os
 import socket
 import selectors
 import traceback
-from libserver import Message
-from wordembeddings import wiki_model_from_path
+from libserver import Message, wiki_model_from_path
 import argparse
 
 sel = selectors.DefaultSelector()
@@ -18,20 +17,21 @@ def accept_wrapper(sock):
 
 
 def main():
-    args_parser = argparse.ArgumentParser()
-    args_parser.add_argument(
-        "--data_dir",
-        help='data directory path',
-        required=True,
-    )
-    args_parser.add_argument(
-        "--word_embed_file",
-        help='wiki embeddings filename inside data_dir path',
-        required=True,
-    )
-
-    args = args_parser.parse_args()
-    wiki_word_embed_path = os.path.join(args.data_dir, args.word_embed_file)
+#    args_parser = argparse.ArgumentParser()
+#    args_parser.add_argument(
+#        "--data_dir",
+#        help='data directory path',
+#        required=True,
+#    )
+#    args_parser.add_argument(
+#        "--word_embed_file",
+#        help='wiki embeddings filename inside data_dir path',
+#        required=True,
+#    )
+#
+#    args = args_parser.parse_args()
+    # wiki_word_embed_path = os.path.join(args.data_dir, args.word_embed_file)
+    wiki_word_embed_path = os.path.join("data", "wiki-news-300d-1M.txt")
     print(wiki_word_embed_path)
     wiki_model_from_path(wiki_word_embed_path)
 
@@ -70,4 +70,5 @@ def main():
 
 
 if __name__ == "__main__":
+    print("in main word embedding....")
     main()

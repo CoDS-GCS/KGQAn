@@ -3,7 +3,7 @@ import os
 import re
 from urllib.parse import urlparse
 
-from nlp.models import ner
+#from nlp.models import ner
 import embeddings_client as w2v
 
 

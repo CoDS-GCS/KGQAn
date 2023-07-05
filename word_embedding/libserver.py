@@ -1,9 +1,30 @@
+import os
 import sys
 import selectors
 import json
 import io
 import struct
-from wordembeddings import request_semantic_affinity
+from wordembeddings import WordEmbeddings
+
+
+wiki_model = None
+def request_semantic_affinity(word_1, word_2):
+    return wiki_model.mwe_semantic_distance(
+        wiki_model.get_embedding_for_mwe(word_1),
+        wiki_model.get_embedding_for_mwe(word_2),
+    )
+
+
+def wiki_model_from_path(model_path):
+    global wiki_model
+    if os.path.exists(model_path):
+        print(f"Model loading from {model_path}")
+        wiki_model = WordEmbeddings(model_path)
+        wiki_model.load_model()
+        print("Done loading")
+    else:
+        print("Invalid word_embedding file path!!!")
+        sys.exit(1)
 
 
 class Message:

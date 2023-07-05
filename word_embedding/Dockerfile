@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.7
 
 ADD requirements.txt ./app/requirements.txt
 RUN pip3 install --upgrade pip 
@@ -10,4 +10,4 @@ WORKDIR app
 RUN useradd appuser && chown -R appuser /app
 USER appuser
 
-ENTRYPOINT ["python", "server.py"]
+CMD ["python", "server.py"]

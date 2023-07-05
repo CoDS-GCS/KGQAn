@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.7
 
 ADD requirements.txt ./app/requirements.txt
 RUN pip3 install --upgrade pip 
@@ -13,4 +13,4 @@ USER appuser
 ENV ALLENNLP_CACHE_ROOT="."
 
 RUN python nltk_setup.py
-ENTRYPOINT ["python", "server.py"]
+CMD ["python", "server.py"]

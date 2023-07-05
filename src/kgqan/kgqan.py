@@ -32,7 +32,8 @@ import sparqls as sparqls
 # from .sparqls import *
 from question import Question
 from nlp.utils import remove_duplicates
-from nlp.models import cons_parser, WordNetLemmatizer
+from nlp.models import cons_parser
+from nltk.stem import WordNetLemmatizer
 import logging
 
 import time

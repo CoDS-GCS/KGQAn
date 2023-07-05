@@ -4,7 +4,7 @@ services:
     build: ./word_embedding
     ports:
       - '9600:9600'
-    command: ["--data_dir", "data", "--word_embed_file", "wiki-news-300d-1M.txt"]
+        #command: ["--data_dir", "data", "--word_embed_file", "wiki-news-300d-1M.txt"]
     volumes:
       - ./data:/app/data
 
@@ -14,7 +14,7 @@ services:
       - '8899:8899'
     depends_on:
       - word_embd_server
-    command: ["--data_dir", "cache", "--model_name", "output_pred21_8_30"]
-    volumes:
-      - ./data/cache:/app/cache
+        #command: ["--data_dir", "cache", "--model_name", "output_pred21_8_30"]
+    # volumes:
+    # - ./data/cache:/app/cache
 

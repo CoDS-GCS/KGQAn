@@ -172,3 +172,4 @@ word_embedding/wiki/*
 
 
 data/*
+src/kgqan/nltk_cache/

@@ -5,7 +5,6 @@ import numpy as np
 import statistics
 import chars2vec
 
-wiki_model = None
 
 
 class WordEmbeddings:
@@ -98,22 +97,6 @@ class WordEmbeddings:
             return mwe_vecs
 
 
-def request_semantic_affinity(word_1, word_2):
-    return wiki_model.mwe_semantic_distance(
-        wiki_model.get_embedding_for_mwe(word_1),
-        wiki_model.get_embedding_for_mwe(word_2),
-    )
-
-
-def wiki_model_from_path(model_path):
-    global wiki_model
-    if os.path.exists(model_path):
-        wiki_model = WordEmbeddings(model_path)
-        wiki_model.load_model()
-        print("Done loading")
-    else:
-        print("Invalid word_embedding file path!!!")
-        sys.exit(1)
 
 
 if __name__ == "__main__":
