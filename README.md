@@ -28,6 +28,12 @@ pip install -r requirements.txt
 * Unzip the downloaded directory and put it under `models` directory
 * Update the path of `model_path` in `src/kgqan/question.py` to point to the unzipped file
 
+Running KGQAn | Docker
+------------
+- - - - 
+[Run KGQAn in Dockerized Environment](docker_run.md)
+
+
 Running KGQAn
 ------------
 - - - - 
