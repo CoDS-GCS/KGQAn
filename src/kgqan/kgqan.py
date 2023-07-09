@@ -35,11 +35,13 @@ from nlp.utils import remove_duplicates
 from nlp.models import cons_parser
 from nltk.stem import WordNetLemmatizer
 import logging
+from logger import LoggingSingleton
 
 import time
 import filteration as filteration
 from termcolor import cprint
 import networkx as nx
+from logger import LoggingSingleton
 
 
 formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
@@ -52,6 +54,8 @@ file_handler.setLevel(logging.INFO)
 logger.addHandler(file_handler)
 logger.setLevel(logging.INFO)
 logger.propagate = False
+# LoggingSingleton.get_instance()
+
 
 # LOGGER 2 for DEBUGGING
 logger2 = logging.getLogger("Dos logger")
@@ -61,6 +65,7 @@ sh.setFormatter(formatter)
 logger2.addHandler(sh)
 logger2.setLevel(logging.DEBUG)
 logger2.propagate = False
+
 
 # TODO check best place to have these updates and send either uri or key according to usecase
 
@@ -138,7 +143,6 @@ class KGQAn:
 
 
         """
-
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
         logger.info(f"Question: {question_text}")
@@ -463,13 +467,13 @@ class KGQAn:
             if len(bgp) == 0:
                 continue
 
-            query, _, _ = self.generate_sparql_query_new(bgp)
+            query, node_uris, relation_uris = self.generate_sparql_query_new(bgp)
             query = query.replace("\n", " ")
             # self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
             #                                   node1=node1_uris, node2=node2_uris, edges=relation_uris)
             self.question.add_possible_answer(
-                question=self.question.text, sparql=query, score=score
-            )
+                question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris
+                )
         # for star_query in product(*possible_triples_for_all_relations):
         #     score = self.calculate_score(star_query)
         #     if len(star_query) == 0:
@@ -756,14 +760,21 @@ class KGQAn:
                     candidate_targets.append(uri1)
                 else:
                     uri1 = f"<{n1_uri}>"
+                    node_uris.append(n1_uri)
 
                 if self.is_variable(n2_uri):
                     uri2 = n2_uri
                     candidate_targets.append(uri2)
                 else:
                     uri2 = f"<{n2_uri}>"
+                    node_uris.append(n2_uri)
 
-                p = predicate[0] if predicate[0] == "?p" else f"<{predicate[0]}>"
+                if predicate[0] == '?p':
+                    p = predicate[0]
+                else:
+                    p =  f'<{predicate[0]}>'
+                    relation_uris.append(predicate[0])
+                #p = predicate[0] if predicate[0] == '?p' else f'<{predicate[0]}>'
                 # uri2 = n2_uri if self.is_variable(n2_uri) else f'<{n2_uri}>'
                 where_pattern.add_triples(
                     triples=[SparqlQB.Triple(subject=uri1, predicate=p, object=uri2)]

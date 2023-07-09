@@ -7,14 +7,33 @@ services:
         #command: ["--data_dir", "data", "--word_embed_file", "wiki-news-300d-1M.txt"]
     volumes:
       - ./data:/app/data
+    networks:
+      - kgqan_network
+    # dependent services will run this command before getting started
+#    healthcheck:
+#      test: ["CMD", "curl", "--fail", "http://word_embed_server:9600/health"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 3
 
   kgqan_server:
     build: ./src/kgqan
     ports:
       - '8899:8899'
+    volumes:
+      - ./data/output_pred21_8_30:/app/model
+    environment:
+      - WORD_EMBEDDING_HOST=word_embd_server
+      - WORD_EMBEDDING_PORT=9600
     depends_on:
       - word_embd_server
+#      word_embd_server:
+#        condition: service_healthy
+    networks:
+      - kgqan_network
         #command: ["--data_dir", "cache", "--model_name", "output_pred21_8_30"]
     # volumes:
     # - ./data/cache:/app/cache
 
+networks:
+  kgqan_network:

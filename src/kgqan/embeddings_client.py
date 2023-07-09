@@ -2,6 +2,8 @@ import socket
 import selectors
 import traceback
 import libclient as libclient
+import time
+import os
 
 
 def create_request(word1, word2):
@@ -59,7 +61,8 @@ def n_similarity(mwe1, mwe2):
     mwe2 = ' '.join(mwe2)
 
     sel = selectors.DefaultSelector()
-    host, port = '127.0.0.1', 9600
+    host = os.getenv("WORD_EMBEDDING_HOST", "0.0.0.0")
+    port = int(os.getenv("WORD_EMBEDDING_PORT", '9600'))
     request = create_request(mwe1, mwe2)
 
     start_connection(host, port, sel, request)
@@ -89,6 +92,10 @@ def n_similarity(mwe1, mwe2):
 
 
 if __name__ == '__main__':
-    sim = n_similarity(['satellites'], ['moon'])
-    # sim = n_similarity(['mohamed'], ['ahmed'])
-    print(sim)
+    start_time = time.time()
+    for i in range(1000):
+        sim = n_similarity(['intel'], ['intel', '80486dx'])
+        # sim = n_similarity(['mohamed'], ['ahmed'])
+        # print(sim)
+    end_time = time.time()
+    print(end_time-start_time)

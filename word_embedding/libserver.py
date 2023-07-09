@@ -22,6 +22,9 @@ def wiki_model_from_path(model_path):
         wiki_model = WordEmbeddings(model_path)
         wiki_model.load_model()
         print("Done loading")
+        print("testing word-embedding functionality")
+        score = request_semantic_affinity("world", "fire")
+        print(f"{score}")
     else:
         print("Invalid word_embedding file path!!!")
         sys.exit(1)

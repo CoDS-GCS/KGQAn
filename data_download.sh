@@ -1,13 +1,17 @@
 #!/bin/bash
 
+if [ $# -ne 1 ]; then
+    echo "Usage: ./data_download.sh [local|docker]"
+    exit 1
+fi
+
+mode=$1
+
+
 # add required file's url to list
 urls=(
     "http://206.12.94.177/CodsData/KGQAN/KGQAN_Models/seq2seq_model.zip"
     "http://206.12.94.177/CodsData/KGQAN/KGQAN_Models/wiki-news-300d-1M.txt.zip"
-    # "https://storage.googleapis.com/allennlp-public-models/fine-grained-ner.2021-02-11.tar.gz"
-    # "https://storage.googleapis.com/allennlp-public-models/ner-elmo.2021-02-12.tar.gz"
-    # "https://storage.googleapis.com/allennlp-public-models/biaffine-dependency-parser-ptb-2020.04.06.tar.gz"
-    # "https://storage.googleapis.com/allennlp-public-models/elmo-constituency-parser-2020.02.10.tar.gz"
 )
 
 # files will be stored in data directory
@@ -31,3 +35,16 @@ do
         rm "$data_dir/$file_name" # remove the tar
     fi
 done
+
+if [ "$mode" = "local" ]; then
+    echo "Running Copy commands to run locally"
+    # copy the file to the respective target path
+    word_embedding_path="word_embedding/data"
+    mkdir -p "$word_embedding_path"
+    cp "./data/wiki-news-300d-1M.txt" "$word_embedding_path"
+
+    kgqan_model_path="src/kgqan/model/"
+    mkdir -p "$kgqan_model_path"
+    cp -r ./data/output_pred21_8_30/* "$kgqan_model_path"
+fi
+
