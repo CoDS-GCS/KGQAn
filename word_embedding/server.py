@@ -15,6 +15,18 @@ def accept_wrapper(sock):
     message = Message(sel, conn, addr)
     sel.register(conn, selectors.EVENT_READ, data=message)
 
+# for later use
+def health_check(client_socket, request):
+    # Parse the request and check if it is a health endpoint request
+    if request.startswith("GET /health"):
+        # Respond with a success status for the health endpoint
+        response = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n"
+    else:
+        # Handle other API requests as usual
+        # ...
+
+    # Send the response back to the client
+    client_socket.sendall(response.encode())
 
 def main():
 #    args_parser = argparse.ArgumentParser()

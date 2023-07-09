@@ -10,7 +10,7 @@ WORKDIR app
 
 RUN useradd appuser && chown -R appuser /app
 USER appuser
-ENV ALLENNLP_CACHE_ROOT="."
+ENV ALLENNLP_CACHE_ROOT="./allen"
 
 RUN python nltk_setup.py
 CMD ["python", "server.py"]

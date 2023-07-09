@@ -166,10 +166,13 @@ media
 static
 
 
+.vscode
 
 # wiki/ in word_embedding will contain word-embedding *.txt 
-word_embedding/wiki/*
+word_embedding/data/*
 
 
 data/*
 src/kgqan/nltk_cache/
+src/kgqan/model/*
+src/kgqan/allen/*

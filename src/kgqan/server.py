@@ -7,7 +7,9 @@ import io
 import os
 from kgqan import KGQAn
 from question import load_model
-import logging
+from logger import LoggingSingleton
+
+logger = LoggingSingleton.get_instance()
 
 hostName = "0.0.0.0"
 serverPort = 8899
@@ -18,11 +20,6 @@ max_answers = 41
 limit_VQuery = 600
 limit_EQuery = 300
 
-logging.basicConfig(
-    level=logging.INFO,  # Set the logging level (e.g., DEBUG, INFO, WARNING, ERROR)
-    format="%(asctime)s [%(levelname)s] %(message)s",  # Set the log message format
-    datefmt="%Y-%m-%d %H:%M:%S"  # Set the date and time format for log messages
-)
 
 class MyServer(BaseHTTPRequestHandler):
 
@@ -121,9 +118,10 @@ class MyServer(BaseHTTPRequestHandler):
             self.send_error(500, "Failed to get the answer to the question")
 
 def main():
+    print(hostName, serverPort)
     webServer = HTTPServer((hostName, serverPort), MyServer)
     print("Server started http://%s:%s" % (hostName, serverPort))
-    logging.info("Server started http://%s:%s" % (hostName, serverPort))
+    logger.log("Server started http://%s:%s" % (hostName, serverPort))
 
 #    args_parser = argparse.ArgumentParser()
 #    args_parser.add_argument(
@@ -139,7 +137,7 @@ def main():
 #    )
 #    args = args_parser.parse_args()
 #    seq2seq_model_path = os.path.join(args.data_dir, args.model_name)
-    seq2seq_model_path = os.path.join("cache", "output_pred21_8_30")
+    seq2seq_model_path = os.path.join("model")
     print(seq2seq_model_path)
     load_model(seq2seq_model_path)
 
