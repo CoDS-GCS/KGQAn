@@ -23,7 +23,7 @@ def wiki_model_from_path(model_path):
         wiki_model.load_model()
         print("Done loading")
         print("testing word-embedding functionality")
-        score = request_semantic_affinity("world", "fire")
+        score = request_semantic_affinity("world", "sfda34rfafsd")
         print(f"{score}")
     else:
         print("Invalid word_embedding file path!!!")

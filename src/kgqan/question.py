@@ -18,8 +18,8 @@ import os
 import networkx as nx
 from termcolor import cprint
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-
-logger = logging.getLogger(__name__)
+from kgqan.seq2seq import seq2seq_model 
+from kgqan.logger import logger
 
 model = None
 tokenizer = None
@@ -36,13 +36,13 @@ def load_model(model_path):
         print("Invalid Seq2Seq model path")
 
 
-if not logger.handlers:
-    file_handler = logging.FileHandler("kgqan.log")
-    formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-    file_handler.setFormatter(formatter)
-    file_handler.setLevel(logging.INFO)
-    logger.addHandler(file_handler)
-    logger.setLevel(logging.INFO)
+# if not logger.handlers:
+#     file_handler = logging.FileHandler("kgqan.log")
+#     formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
+#     file_handler.setFormatter(formatter)
+#     file_handler.setLevel(logging.INFO)
+#     logger.addHandler(file_handler)
+#     logger.setLevel(logging.INFO)
 
 
 class Question:
@@ -128,9 +128,9 @@ class Question:
         self.__build_graph_from_triples()
 
     def __find_possible_relations(self):
-        inputs = tokenizer.encode(self._question_text, return_tensors="pt")
-        outputs = model.generate(inputs, max_length=300)
-        outputs = tokenizer.batch_decode(outputs)
+        inputs = seq2seq_model.tokenizer.encode(self._question_text, return_tensors="pt")
+        outputs = seq2seq_model.model.generate(inputs, max_length=300)
+        outputs = seq2seq_model.tokenizer.batch_decode(outputs)
         for output in outputs:
             self.__parse_triple(output)
 
@@ -156,7 +156,7 @@ class Question:
         triples_str = triples_str.replace("<o></ ", "<o>")
         triples_str = triples_str.replace("<p1 ", "<p>")
 
-        self.logger.info(f"Generated Triple: {triples_str}")
+        self.logger.log_info(f"Generated Triple: {triples_str}")
         print("Generated Triple ", triples_str)
         triples = triples_str.split("|")
         for triple_str in triples:

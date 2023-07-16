@@ -13,20 +13,20 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
-import sys
-
-sys.path.append('../src/')
-
 import json
+import os
 import time
-import traceback
-
-from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
+from kgqan.kgqan import KGQAn
 
-file_name = r"dblp/qald9_dblp100.json"
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+the_39_question_ids = (1, 3, 8, 9, 11, 13, 14, 15, 16, 17, 21, 23, 24, 26, 27, 28, 30, 31, 33, 35, 37, 39, 40, 41, 43,
+                       47, 54, 56, 61, 62, 64, 68, 75, 83, 85, 92, 93, 96, 99)
+file_name = os.path.join(file_dir, "qald6/qald-6-test-multilingual.json")
+
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -34,30 +34,26 @@ if __name__ == '__main__':
     author_comment = Et.Comment(f'created by CoDS Lab')
     root_element.append(author_comment)
     timestr = time.strftime("%Y%m%d-%H%M%S")
+    the_39_questions = list()
     total_time = 0
-    total_understanding_time = 0
-    total_linking_time = 0
-    total_execution_time = 0
 
-    # The main param:
-    # max no of vertices and edges to annotate the PGP
-    # max no of SPARQL queries to be generated from PGP
     max_Vs = 1
     max_Es = 21
     max_answers = 41
-    limit_VQuery = 600
-    limit_EQuery = 300
 
     with open(file_name) as f:
-        qald9_testset = json.load(f)
-    dataset_id = qald9_testset['dataset']['id']
-    MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
-                    n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
-    qCount = count(1)
+        qald6_testset = json.load(f)
+    dataset_id = qald6_testset['dataset']['id']
+    MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es)
+    count39 = count(1)
+    kgqan_qald6 = {"dataset": {"id": "qald-6-test-multilingual"}, "questions": []}
+    for i, question in enumerate(qald6_testset['questions']):
+        # if question['id'] not in the_39_question_ids:
+        #     continue
+        qc = next(count39)
 
-    kgqan_qald9 = {"dataset": {"id": "qald9_dblp100"}, "questions": []}
-    for i, question in enumerate(qald9_testset['questions']):
-        qc = next(qCount)
+
+        # question_text = ''
         for language_variant_question in question['question']:
             if language_variant_question['language'] == 'en':
                 question_text = language_variant_question['string'].strip()
@@ -70,13 +66,7 @@ if __name__ == '__main__':
         st = time.time()
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
-        try:
-            answers, _, _, understanding_time, linking_time, execution_time\
-                = MyKGQAn.ask(question_text=question_text,
-                              question_id=question['id'], knowledge_graph='dblp')
-        except Exception as e:
-            traceback.print_exc()
-            continue
+        answers = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'])
 
         all_bindings = list()
         for answer in answers:
@@ -86,30 +76,24 @@ if __name__ == '__main__':
         try:
             if 'results' in question['answers'][0]:
                 question['answers'][0]['results']['bindings'] = all_bindings.copy()
+                kgqan_qald6['questions'].append(question)
                 all_bindings.clear()
         except:
             question['answers'] = []
 
-        kgqan_qald9['questions'].append(question)
-
         et = time.time()
         total_time = total_time + (et - st)
-        total_understanding_time = total_understanding_time + understanding_time
-        total_linking_time = total_linking_time + linking_time
-        total_execution_time = total_execution_time + execution_time
-        text = colored(f'[DONE!! in {et - st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
+        text = colored(f'[DONE!! in {et-st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
         cprint(f"== {text} ==")
 
         # break
     text1 = colored(f'total_time = [{total_time:.2f} sec]', 'yellow', attrs=['reverse', 'blink'])
     text2 = colored(f'avg time = [{total_time / qc:.2f} sec]', 'yellow', attrs=['reverse', 'blink'])
     cprint(f"== QALD 9 Statistics : {qc} questions, Total Time == {text1}, Average Time == {text2} ")
-    cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
-    cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
-    cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc}")
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
-              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
+              f'_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
               encoding='utf-8', mode='w') as rfobj:
-        json.dump(kgqan_qald9, rfobj)
+        json.dump(kgqan_qald6, rfobj)
         rfobj.write('\n')
+

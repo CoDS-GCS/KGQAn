@@ -14,19 +14,18 @@ __status__ = "debug"
 __created__ = "2020-02-07"
 
 import sys
-
-sys.path.append('../src/')
-
+import os
 import json
 import time
 import traceback
-
-from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
+from kgqan.kgqan import KGQAn
 
-file_name = r"mag/qald9_ms100.json"
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+file_name = os.path.join(file_dir, "dblp/dblp100_benchmark.json")
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -43,10 +42,10 @@ if __name__ == '__main__':
     # max no of vertices and edges to annotate the PGP
     # max no of SPARQL queries to be generated from PGP
     max_Vs = 1
-    max_Es = 20
-    max_answers = 40
-    limit_VQuery = 400
-    limit_EQuery = 200
+    max_Es = 21
+    max_answers = 41
+    limit_VQuery = 600
+    limit_EQuery = 300
 
     with open(file_name) as f:
         qald9_testset = json.load(f)
@@ -55,7 +54,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "qald9_ms100"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "qald9_dblp100"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
         qc = next(qCount)
         for language_variant_question in question['question']:
@@ -73,7 +72,7 @@ if __name__ == '__main__':
         try:
             answers, _, _, understanding_time, linking_time, execution_time\
                 = MyKGQAn.ask(question_text=question_text,
-                              question_id=question['id'], knowledge_graph='microsoft_academic')
+                              question_id=question['id'], knowledge_graph='dblp')
         except Exception as e:
             traceback.print_exc()
             continue

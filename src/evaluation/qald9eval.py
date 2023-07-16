@@ -14,21 +14,22 @@ __status__ = "debug"
 __created__ = "2020-02-07"
 
 import sys
-
-sys.path.append('../src/')
-
+# sys.path.append('.')
+import os
 import json
 import time
 import traceback
 
-from kgqan import KGQAn
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 import numpy as np
 
-file_name = r"qald9/qald-9-test-multilingual.json"
-# file_name = r"/home/rehamomar/Downloads/lcquad_qaldformat.json"
+from kgqan.kgqan import KGQAn
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+file_name = os.path.join(file_dir, "qald9/qald-9-test-multilingual.json")
 
 
 if __name__ == '__main__':
@@ -150,8 +151,8 @@ if __name__ == '__main__':
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
 
-    with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
-              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
+    with open(os.path.join(file_dir, f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
+              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json'),
               encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')

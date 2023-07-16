@@ -1,29 +1,51 @@
 import logging
 
-class LoggingSingleton:
-    __instance = None
+class LoggerSingleton:
+    _instance = None
 
-    @staticmethod
-    def get_instance():
-        """Static access method to get the singleton instance."""
-        if LoggingSingleton.__instance is None:
-            LoggingSingleton()
-        return LoggingSingleton.__instance
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+            cls._instance._configure_logger()
+        return cls._instance
 
-    def __init__(self):
-        """Private constructor that initializes the logger."""
-        if LoggingSingleton.__instance is not None:
-            raise Exception("This class is a singleton!")
-        else:
-            LoggingSingleton.__instance = self
-            logging.basicConfig(level=logging.DEBUG)  # Set desired logging level here
-            self.logger = logging.getLogger()
+    def _configure_logger(self):
+        # Create a logger instance
+        self.logger = logging.getLogger("Logger")
+        self.logger.setLevel(logging.DEBUG)
 
-    def log(self, message):
-        """Logs the given message using the logger."""
+        # Create a console handler for CLI logs
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.INFO)
+        console_formatter = logging.Formatter("%(levelname)s - %(message)s")
+        console_handler.setFormatter(console_formatter)
+
+        # Create a file handler for file logs
+        file_handler = logging.FileHandler("logs.log")
+        file_handler.setLevel(logging.DEBUG)
+        file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(file_formatter)
+
+        error_handler = logging.StreamHandler()
+        error_handler.setLevel(logging.ERROR)
+        error_handler.setFormatter(console_formatter)
+
+        # Add handlers to the logger
+        self.logger.addHandler(console_handler)
+        self.logger.addHandler(file_handler)
+        self.logger.addHandler(error_handler)
+
+    def log_info(self, message):
+        self.logger.info(message)
+
+    def log_debug(self, message):
         self.logger.debug(message)
-        # You can use other logging methods like .info(), .warning(), etc.
+    
+    def log_error(self, message):
+        self.logger.error(message)
 
-# Usage example:
-# logger = LoggingSingleton.get_instance()
+# Usage:
+logger = LoggerSingleton()
+# logger.log_info("This is an info log message")
+# logger.log_debug("This is a debug log message")
 

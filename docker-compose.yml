@@ -17,7 +17,7 @@ services:
 #      retries: 3
 
   kgqan_server:
-    build: ./src/kgqan
+    build: ./src
     ports:
       - '8899:8899'
     volumes:
@@ -32,8 +32,8 @@ services:
     networks:
       - kgqan_network
         #command: ["--data_dir", "cache", "--model_name", "output_pred21_8_30"]
-    # volumes:
-    # - ./data/cache:/app/cache
+    volumes:
+    - ./src:/app
 
 networks:
   kgqan_network:

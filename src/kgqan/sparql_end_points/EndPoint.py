@@ -5,7 +5,7 @@ import os
 import re
 from urllib.parse import urlparse
 from termcolor import cprint
-import sparqls as sparqls
+import kgqan.sparqls as sparqls
 
 
 class EndPoint:

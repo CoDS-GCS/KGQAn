@@ -8,9 +8,12 @@ RUN python -m spacy download en_core_web_sm
 ADD . ./app
 WORKDIR app
 
-RUN useradd appuser && chown -R appuser /app
-USER appuser
+RUN python -m nltk.downloader punkt wordnet
+
+# RUN useradd appuser && chown -R appuser /app
+# USER appuser
 ENV ALLENNLP_CACHE_ROOT="./allen"
 
-RUN python nltk_setup.py
-CMD ["python", "server.py"]
+# RUN python nltk_setup.py
+# CMD ["python", "server.py"]
+CMD ["tail", "-f", "/dev/null"]

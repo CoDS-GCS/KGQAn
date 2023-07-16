@@ -12,18 +12,23 @@ __maintainer__ = "CODS Lab"
 __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
-import sys
-sys.path.append('../src/')
 
+import sys
+
+# sys.path.append('../src/')
+import os
 import json
 import time
-from kgqan import KGQAn
+import traceback
+
 from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
+from kgqan.kgqan import KGQAn
 
-file_name = r"/mnt/KGQAn_Project/KGQAn/evaluation/lcquad1/lcquad_qaldformat.json"
-indices_file_test = r"/mnt/KGQAn_Project/KGQAn/evaluation/lcquad1/TestingIDs_LCQuAD1.txt"
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+file_name = os.path.join(file_dir, "yago/qald9_yago100.json")
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -45,11 +50,6 @@ if __name__ == '__main__':
     limit_VQuery = 600
     limit_EQuery = 300
 
-    indices = []
-    with open(indices_file_test) as(f):
-        for line in f:
-            indices.append(int(line))
-
     with open(file_name) as f:
         qald9_testset = json.load(f)
     dataset_id = qald9_testset['dataset']['id']
@@ -57,16 +57,9 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "lcquad-qaldformat-test2"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": "qald9_yago100"}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
-
-        # if int(question['id']) not in [5]:
-        #     continue
-        if int(question['id']) not in indices:
-            continue
-
         qc = next(qCount)
-        # question_text = ''
         for language_variant_question in question['question']:
             if language_variant_question['language'] == 'en':
                 question_text = language_variant_question['string'].strip()
@@ -82,8 +75,9 @@ if __name__ == '__main__':
         try:
             answers, _, _, understanding_time, linking_time, execution_time\
                 = MyKGQAn.ask(question_text=question_text,
-                              question_id=question['id'], knowledge_graph='lc_quad')
-        except:
+                              question_id=question['id'], knowledge_graph='yago')
+        except Exception as e:
+            traceback.print_exc()
             continue
 
         all_bindings = list()
@@ -115,6 +109,7 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
+
 
     with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
               f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',

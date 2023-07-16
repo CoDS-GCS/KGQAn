@@ -1,15 +1,13 @@
-import nltk_setup
+import kgqan.nltk_setup
 import traceback
 import argparse
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import io
 import os
-from kgqan import KGQAn
-from question import load_model
-from logger import LoggingSingleton
-
-logger = LoggingSingleton.get_instance()
+from kgqan.kgqan import KGQAn
+from kgqan.question import load_model
+from kgqan.logger import logger
 
 hostName = "0.0.0.0"
 serverPort = 8899
@@ -118,28 +116,8 @@ class MyServer(BaseHTTPRequestHandler):
             self.send_error(500, "Failed to get the answer to the question")
 
 def main():
-    print(hostName, serverPort)
     webServer = HTTPServer((hostName, serverPort), MyServer)
-    print("Server started http://%s:%s" % (hostName, serverPort))
-    logger.log("Server started http://%s:%s" % (hostName, serverPort))
-
-#    args_parser = argparse.ArgumentParser()
-#    args_parser.add_argument(
-#        "--data_dir",
-#        help='data directory path',
-#        required=True,
-#    )
-#
-#    args_parser.add_argument(
-#        "--model_name",
-#        help='model directory name',
-#        required=True,
-#    )
-#    args = args_parser.parse_args()
-#    seq2seq_model_path = os.path.join(args.data_dir, args.model_name)
-    seq2seq_model_path = os.path.join("model")
-    print(seq2seq_model_path)
-    load_model(seq2seq_model_path)
+    logger.log_info("Server started http://%s:%s" % (hostName, serverPort))
 
     try:
         webServer.serve_forever()
@@ -150,5 +128,4 @@ def main():
     print("Server stopped.")
 
 if __name__ == "__main__":
-    print("in maiin")
     main()
