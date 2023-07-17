@@ -15,15 +15,6 @@ __status__ = "debug"
 __created__ = "2020-02-07"
 
 import requests
-import logging
-
-
-formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-logger2 = logging.getLogger("SPARQL logger")
-sh = logging.StreamHandler()
-sh.setFormatter(formatter)
-logger2.addHandler(sh)
-logger2.setLevel(logging.DEBUG)
 
 KEYWORD_SEARCH_QUERY_VAR_URI = "uri"
 KEYWORD_SEARCH_QUERY_VAR_PRED = "pred"

@@ -4,7 +4,7 @@ import re
 from urllib.parse import urlparse
 
 #from nlp.models import ner
-import embeddings_client as w2v
+import kgqan.embeddings_client as w2v
 
 
 def is_person(output):

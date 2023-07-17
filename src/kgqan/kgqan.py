@@ -13,6 +13,10 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
+import sys
+
+# sys.path.append('.')
+
 import os
 from urllib.parse import urlparse
 import re
@@ -22,49 +26,24 @@ from collections import defaultdict
 from itertools import count, product
 import SPARQLBurger.SPARQLQueryBuilder as SparqlQB
 
-from vertex import Vertex
-from sparql_end_points.EndPoint import EndPoint
-from sparql_end_points.XML_EndPoint import XML_EndPoint
-import utils as utils
-import embeddings_client as w2v
-import sparqls as sparqls
+from kgqan.vertex import Vertex
+from kgqan.sparql_end_points.EndPoint import EndPoint
+from kgqan.sparql_end_points.XML_EndPoint import XML_EndPoint
+import kgqan.utils as utils
+import kgqan.embeddings_client as w2v
+import kgqan.sparqls as sparqls
 
-# from .sparqls import *
-from question import Question
-from nlp.utils import remove_duplicates
-from nlp.models import cons_parser
+from kgqan.question import Question
+from kgqan.nlp.utils import remove_duplicates
+from kgqan.nlp.models import cons_parser
 from nltk.stem import WordNetLemmatizer
 import logging
-from logger import LoggingSingleton
+from kgqan.logger import logger
 
 import time
-import filteration as filteration
+import kgqan.filteration as filteration
 from termcolor import cprint
 import networkx as nx
-from logger import LoggingSingleton
-
-
-formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
-
-# LOGGER 1 for Info, Warning and Errors
-logger = logging.getLogger(__name__)
-file_handler = logging.FileHandler("kgqan.log")
-file_handler.setFormatter(formatter)
-file_handler.setLevel(logging.INFO)
-logger.addHandler(file_handler)
-logger.setLevel(logging.INFO)
-logger.propagate = False
-# LoggingSingleton.get_instance()
-
-
-# LOGGER 2 for DEBUGGING
-logger2 = logging.getLogger("Dos logger")
-# if not logger.handlers:
-sh = logging.StreamHandler()
-sh.setFormatter(formatter)
-logger2.addHandler(sh)
-logger2.setLevel(logging.DEBUG)
-logger2.propagate = False
 
 
 # TODO check best place to have these updates and send either uri or key according to usecase
@@ -145,7 +124,7 @@ class KGQAn:
         """
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
-        logger.info(f"Question: {question_text}")
+        logger.log_info(f"Question: {question_text}")
         understanding_start = time.time()
         self.question = (question_text, question_id, logger)
         understanding_end = time.time()
@@ -168,7 +147,7 @@ class KGQAn:
         self.detect_question_and_answer_type()
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
-            logger.info("[NO Named-entity or NO Relation Detected]")
+            logger.log_info("[NO Named-entity or NO Relation Detected]")
             return [], [], [], understanding_end - understanding_start, 0, 0
         linking_start = time.time()
         self.extract_possible_V_and_E()
@@ -182,7 +161,7 @@ class KGQAn:
             answer.json() for answer in self.question.possible_answers[:n_max_answers]
         ]
         execution_end = time.time()
-        logger.info(f"\n\n\n\n{'#' * 120}")
+        logger.log_info(f"\n\n\n\n{'#' * 120}")
         return (
             answers,
             self.question.query_graph.nodes,
@@ -337,7 +316,7 @@ class KGQAn:
             try:
                 uris, names = self.sparql_end_point.get_names_and_uris(entity_query)
             except:
-                logger.error(
+                logger.log_error(
                     f"Error at 'extract_possible_V_and_E' method with v_query value of {entity_query} "
                 )
                 continue
@@ -401,10 +380,10 @@ class KGQAn:
                 URIs_chosen
             )
         else:
-            logger.info(
+            logger.log_info(
                 f"[GRAPH NODES WITH URIs:] {self.question.query_graph.nodes(data=True)}"
             )
-            logger.info(
+            logger.log_info(
                 f"[GRAPH EDGES WITH URIs:] {self.question.query_graph.edges(data=True)}"
             )
 
@@ -855,9 +834,9 @@ class KGQAn:
         for i, possible_answer in enumerate(
             self.question.possible_answers[: self._n_max_answers]
         ):
-            logger.info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
+            logger.log_info(f"[EVALUATING SPARQL:] {possible_answer.sparql}")
             result = self.sparql_end_point.evaluate_SPARQL_query(possible_answer.sparql)
-            logger.info(
+            logger.log_info(
                 f"[POSSIBLE SPARQLs WITH ANSWER (SORTED):] {possible_answer.sparql}"
             )
             try:
@@ -896,7 +875,7 @@ class KGQAn:
                             answers.append(answer)
                         else:
                             if v_result["results"]["bindings"]:
-                                logger.info(f"[POSSIBLE ANSWER {i}:] {answers}")
+                                logger.log_info(f"[POSSIBLE ANSWER {i}:] {answers}")
                     else:
                         answers.append(v_result["boolean"])
                 # print(possible_answer.sparql)

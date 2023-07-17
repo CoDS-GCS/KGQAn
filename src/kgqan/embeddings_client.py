@@ -1,7 +1,7 @@
 import socket
 import selectors
 import traceback
-import libclient as libclient
+import kgqan.libclient as libclient
 import time
 import os
 

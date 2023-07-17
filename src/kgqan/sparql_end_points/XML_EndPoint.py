@@ -1,6 +1,6 @@
 import traceback
 
-from .EndPoint import EndPoint
+from kgqan.sparql_end_points.EndPoint import EndPoint
 import requests
 import xml.etree.ElementTree as ET
 from termcolor import cprint

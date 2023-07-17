@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from sparql_end_points import EndPoint
+from kgqan.sparql_end_points import EndPoint
 
 
 class Vertex:
