@@ -25,7 +25,7 @@ from kgqan.kgqan import KGQAn
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
 
-file_name = os.path.join(file_dir, "dblp/dblp100_benchmark.json")
+file_name = os.path.join(file_dir, "dblp/qald9_dblp100.json")
 
 if __name__ == '__main__':
     root_element = Et.Element('dataset')
@@ -54,7 +54,7 @@ if __name__ == '__main__':
                     n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
     qCount = count(1)
 
-    kgqan_qald9 = {"dataset": {"id": "qald9_dblp100"}, "questions": []}
+    kgqan_qald9 = {"dataset": {"id": dataset_id}, "questions": []}
     for i, question in enumerate(qald9_testset['questions']):
         qc = next(qCount)
         for language_variant_question in question['question']:
@@ -106,9 +106,13 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc}")
-
-    with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
-              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
-              encoding='utf-8', mode='w') as rfobj:
+    
+    with open(os.path.join(file_dir, f'output/dblp.json'), encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
+
+    # with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
+    #           f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
+    #           encoding='utf-8', mode='w') as rfobj:
+    #     json.dump(kgqan_qald9, rfobj)
+    #     rfobj.write('\n')
