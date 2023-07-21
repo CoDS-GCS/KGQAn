@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  word_embd_server:
+    build: ./word_embedding
+    ports:
+      - '9600:9600'
+    volumes:
+      - ./data:/app/data
+    networks:
+      - kgqan_network
+
+  kgqan_server:
+    build: 
+      context: ./src
+      dockerfile: Dockerfile.server
+    ports:
+      - '8899:8899'
+    volumes:
+      - ./data/output_pred21_8_30:/app/model
+    environment:
+      - WORD_EMBEDDING_HOST=word_embd_server
+      - WORD_EMBEDDING_PORT=9600
+    depends_on:
+      - word_embd_server
+    networks:
+      - kgqan_network
+    volumes:
+    - ./src:/app
+
+networks:
+  kgqan_network:

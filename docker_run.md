@@ -30,13 +30,28 @@ cd KGQAn
 ./data_download.sh docker
 ```
 
+## *Note* : KGQAn server depends on Word Embedding Server, Word Embedding server takes arround ~3.5 minute time to load w2v file. So there is 300 seconds delay in docker run.
+
 ## Build and run the services using Docker Compose:
 - Make sure you are in the root directory of the project.
+- To start KGQAn in server mode use docker-compose-server.yml
 ```shell
-docker-compose up --build
+docker-compose -f docker-compose-server.yml up --build
 ```
 
-## Access the services:
+- To start KGQAn in evaluation mode use docker-compose-evaluation.yml
+```shell
+docker-compose -f docker-compose-evaluation.yml up --build
+```
+- The evaluation results for benchmarks [QALD, DBLP, LCQUAD, YAGO, MAG] will be stored in src/evaluation/output/evaluation_results.csv
+- It will be in below format
+```csv
+Benchmark Name
+P, R, F1
+xx, xx, xx
+```
+
+## Access the services (Start in server mode):
 - Once the Docker containers are up and running, you can access the services using the specified URLs or ports.
 ```shell
 curl -X POST -H "Content-Type: application/json" -d '{"question": "Who founded Intel?", "knowledge_graph":"dbpedia", "max_answers": 3}' localhost:8899

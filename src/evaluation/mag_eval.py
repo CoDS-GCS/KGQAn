@@ -108,8 +108,12 @@ if __name__ == '__main__':
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc}")
 
-    with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
-              f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
-              encoding='utf-8', mode='w') as rfobj:
+    with open(os.path.join(file_dir, f'output/mag.json'), encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
+    
+    # with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
+    #           f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json',
+    #           encoding='utf-8', mode='w') as rfobj:
+    #     json.dump(kgqan_qald9, rfobj)
+    #     rfobj.write('\n')
