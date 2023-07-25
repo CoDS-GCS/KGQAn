@@ -21,6 +21,10 @@ case "$1" in
         echo "Waiting for word_embedding_server to load model"
         waittime=300
         sleep $waittime && echo "waited for 300 sec, till word_embd_server loaded model"
+
+        output_path="evaluation/output"
+        mkdir -p "$output_path"
+
         python -m evaluation.qald9_eval
         ruby evaluation/evaluation.rb evaluation/output/qald.json QALD
 
@@ -35,6 +39,8 @@ case "$1" in
 
         python -m evaluation.mag_eval
         ruby evaluation/evaluation.rb evaluation/output/mag.json MAG
+
+        python evaluation/merge_files.py
 
         echo "Evaluation Completed!, results can be found at src/evaluation/output/evaluation_results.csv"
         python -m kgqan.server

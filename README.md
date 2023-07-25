@@ -10,10 +10,24 @@ a phrase graph pattern (PGP). 2) JIT linking phase to link the nodes and edges o
 the KG without using any pre-created index. 3) Execution and post-filtering phase to create the SPARQL query from the linked
 PGP, execute it and filters the list of answers returned then the answers are sent to the user.
 
-
-Installation
------------
+Running KGQAn
+-------------
 - - - - 
+- KGQAn can run in two modes:
+  1. Docker Setup
+  2. Local Setup
+
+Running KGQAn in Docker mode 
+------------
+- - - - 
+[Run KGQAn in Dockerized Environment](docker_run.md)
+
+Running KGQAn in Local mode 
+------------
+- - - - 
+
+### Installation
+ 
 * Clone the repo
 * Create `kgqan` Conda environment (Python 3.7) and install pip requirements.
 ```
@@ -21,22 +35,16 @@ conda create --name kgqan python=3.7
 conda activate kgqan
 pip install -r requirements.txt
 ```
-* Download the word embeddings file: `wiki-news-300d-1M.txt.zip`: **Link will be provided upon acceptance**
-* Unzip the downloaded file and put it under `word_embedding` directory
-* Update the path of `wiki_model` in `word_embedding/libserver.py` to point to the unzipped file
-* Download the trained question understanding model: **Link will be provided upon acceptance**
-* Unzip the downloaded directory and put it under `models` directory
-* Update the path of `model_path` in `src/kgqan/question.py` to point to the unzipped file
 
-Running KGQAn | Docker
-------------
-- - - - 
-[Run KGQAn in Dockerized Environment](docker_run.md)
+### Download the required data/models:
+- Run the following command to execute the data download script:
+- This script will download the trained models and any necessary data for the services.
+```shell
+# run in docker environment
+./data_download.sh local
+```
 
-
-Running KGQAn
-------------
-- - - - 
+### Running KGQAn
 
 KGQAn uses a semantic similarity model in two of its phases, a pre-requisite step is to run the server of the
 word-embedding based similarity service using the following command
@@ -100,14 +108,14 @@ Benchmarks:
 -
 - - - -
 1. QALD-9:
-   1. https://github.com/ag-sc/QALD/blob/master/9/data/qald-9-test-multilingual.json
-   2. Put the downloaded benchmark in `qald` directory
+   1. `src/evaluation/data/qald-9-test-multilingual.json`
+   2. https://github.com/ag-sc/QALD/blob/master/9/data/qald-9-test-multilingual.json
 2. LCQUAD:
-   1. https://figshare.com/articles/dataset/LC-QuAD_QALDformat/5818452
-   2. Put the downloaded benchmark in `lcquad` directory
-3. YAGO: Will be released soon
-4. DBLP: Will be released soon
-5. MAG: Will be released soon
+   1. `src/evaluation/data/lcquad-qaldformat-test2.json `
+   2. https://figshare.com/articles/dataset/LC-QuAD_QALDformat/5818452 
+3. YAGO: `src/evaluation/data/qald9_yago100.json ` 
+4. DBLP: `src/evaluation/data/qald9_dblp100.json ` 
+5. MAG: `src/evaluation/data/qald9_ms100.json` 
 
 Citing Our Work
 -

@@ -6,7 +6,6 @@ import json
 import io
 import os
 from kgqan.kgqan import KGQAn
-from kgqan.question import load_model
 from kgqan.logger import logger
 
 hostName = "0.0.0.0"

@@ -20,6 +20,7 @@ from termcolor import colored, cprint
 from itertools import count
 import xml.etree.ElementTree as Et
 from kgqan.kgqan import KGQAn
+import csv
 
 file_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -116,10 +117,19 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
+    response_time = [{"Question Understanding": total_understanding_time / qc,
+                      "Linking": total_linking_time / qc,
+                      "Execution": total_execution_time / qc}]
 
     with open(os.path.join(file_dir, f'output/lcquad.json'), encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
+
+    field_names = response_time[0].keys()
+    with open(os.path.join(file_dir, f'output/lcquad_response_time.csv'), mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerows(response_time)
 
 
     # with open(f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'

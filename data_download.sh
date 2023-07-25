@@ -36,7 +36,7 @@ do
     fi
 done
 
-if [ "$mode" = "local" ]; then
+if [ "$mode" = "local" ] | [ "$mode" = "docker" ]; then
     echo "Running Copy commands to run locally"
     # copy the file to the respective target path
     word_embedding_path="word_embedding/data"

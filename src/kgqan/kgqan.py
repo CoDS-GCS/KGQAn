@@ -51,7 +51,7 @@ import networkx as nx
 knowledge_graph_to_uri = {
     "dbpedia": "http://206.12.95.86:8890/sparql",
     "lc_quad": "http://206.12.95.86:8891/sparql",
-    "microsoft_academic": "https://makg.org/sparql",
+    "microsoft_academic": "http://206.12.97.159:8890/sparql",
     "open_citations": "https://opencitations.net/sparql",
     "yago": "http://206.12.95.86:8892/sparql",
     "fact_forge": "http://factforge.net/sparql",
