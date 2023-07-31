@@ -43,6 +43,7 @@ docker-compose -f docker-compose-server.yml up --build
 ```shell
 docker-compose -f docker-compose-evaluation.yml up --build
 ```
+- If you faced any error running the previous docker-compose commands due to a versioning error, adjust the version paramater in the `.yml` file according to your version of docker-compose: https://docs.docker.com/compose/compose-file/compose-versioning/ 
 - The evaluation results for benchmarks [QALD, DBLP, LCQUAD, YAGO, MAG] will be stored in src/evaluation/output/evaluation_results.csv
 - It will be in below format
 ```csv

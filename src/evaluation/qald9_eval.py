@@ -13,12 +13,12 @@ __email__ = "essam.mansour@concordia.ca"
 __status__ = "debug"
 __created__ = "2020-02-07"
 
-import sys
-# sys.path.append('.')
 import os
 import json
 import time
 import traceback
+import csv
+import argparse
 
 from termcolor import colored, cprint
 from itertools import count
@@ -43,6 +43,11 @@ if __name__ == '__main__':
     total_linking_time = 0
     total_execution_time = 0
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--filter", type=str, default="True", help="argument to enable filtration")
+    args = parser.parse_args()
+    filter = args.filter.lower() == 'true'
+
     # The main param: 
     # max no of vertices and edges to annotate the PGP
     # max no of SPARQL queries to be generated from PGP 
@@ -56,7 +61,7 @@ if __name__ == '__main__':
         qald9_testset = json.load(f)
     dataset_id = qald9_testset['dataset']['id']
     MyKGQAn = KGQAn(n_max_answers=max_answers, n_max_Vs=max_Vs, n_max_Es=max_Es,
-                    n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery)
+                    n_limit_VQuery=limit_VQuery, n_limit_EQuery=limit_EQuery, filtration_enabled=filter)
     qCount = count(1)
 
     kgqan_qald9 = {"dataset": {"id": dataset_id}, "questions": []}
@@ -150,11 +155,19 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc} ")
+    response_time = [{"Question Understanding": total_understanding_time / qc,
+                      "Linking": total_linking_time / qc,
+                      "Execution": total_execution_time / qc}]
 
     with open(os.path.join(file_dir, f'output/qald.json'), encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
 
+    field_names = response_time[0].keys()
+    with open(os.path.join(file_dir, f'output/qald_response_time.csv'), mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=field_names)
+        writer.writeheader()
+        writer.writerows(response_time)
 
     # with open(os.path.join(file_dir, f'output/MyKGQAn_result_{timestr}_MaxAns{max_answers}_MaxVs{max_Vs}_MaxEs{max_Es}'
     #           f'_limit_VQuery{limit_VQuery}_limit_VQuery{limit_EQuery}_TTime{total_time:.2f}Sec_Avgtime{total_time / qc:.2f}Sec.json'),

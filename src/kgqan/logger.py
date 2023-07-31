@@ -15,10 +15,10 @@ class LoggerSingleton:
         self.logger.setLevel(logging.DEBUG)
 
         # Create a console handler for CLI logs
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.INFO)
-        console_formatter = logging.Formatter("%(levelname)s - %(message)s")
-        console_handler.setFormatter(console_formatter)
+        # console_handler = logging.StreamHandler()
+        # console_handler.setLevel(logging.INFO)
+        # console_formatter = logging.Formatter("%(levelname)s - %(message)s")
+        # console_handler.setFormatter(console_formatter)
 
         # Create a file handler for file logs
         file_handler = logging.FileHandler("logs.log")
@@ -28,10 +28,10 @@ class LoggerSingleton:
 
         error_handler = logging.StreamHandler()
         error_handler.setLevel(logging.ERROR)
-        error_handler.setFormatter(console_formatter)
+        # error_handler.setFormatter(console_formatter)
 
         # Add handlers to the logger
-        self.logger.addHandler(console_handler)
+        # self.logger.addHandler(console_handlxer)
         self.logger.addHandler(file_handler)
         self.logger.addHandler(error_handler)
 

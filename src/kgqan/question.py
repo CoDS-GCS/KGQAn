@@ -24,18 +24,6 @@ from kgqan.logger import logger
 model = None
 tokenizer = None
 
-
-def load_model(model_path):
-    global model
-    global tokenizer
-    if os.path.exists(model_path):
-        model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
-        print("Seq2Seq model loaded...")
-    else:
-        print("Invalid Seq2Seq model path")
-
-
 # if not logger.handlers:
 #     file_handler = logging.FileHandler("kgqan.log")
 #     formatter = logging.Formatter("%(asctime)s:%(name)s:%(levelname)s:%(message)s")
