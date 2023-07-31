@@ -10,8 +10,8 @@ mode=$1
 
 # add required file's url to list
 urls=(
-    "http://206.12.94.177/CodsData/KGQAN/KGQAN_Models/seq2seq_model.zip"
-    "http://206.12.94.177/CodsData/KGQAN/KGQAN_Models/wiki-news-300d-1M.txt.zip"
+    "http://206.12.89.16/CodsData/KGQAN/KGQAN_Models/seq2seq_model.zip"
+    "http://206.12.89.16/CodsData/KGQAN/KGQAN_Models/wiki-news-300d-1M.txt.zip"
 )
 
 # files will be stored in data directory
