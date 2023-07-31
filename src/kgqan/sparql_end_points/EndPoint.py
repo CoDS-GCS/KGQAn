@@ -9,9 +9,10 @@ import kgqan.sparqls as sparqls
 
 
 class EndPoint:
-    def __init__(self, knowledge_graph: str, link: str):
+    def __init__(self, knowledge_graph: str, link: str, filtration_enabled: bool):
         self.link = link
         self.knowledge_graph = knowledge_graph
+        self.filtration_enabled = filtration_enabled
 
     def evaluate_SPARQL_query(self, query: str):
         payload = {
@@ -45,11 +46,12 @@ class EndPoint:
     def parse_result(self, result, answer_data_type, target_variable):
         v_result = json.loads(result)
         v_result, types = self.extract_types(v_result, target_variable)
-        result_compatiable = self.check_if_answers_type_compatible(
-            v_result, answer_data_type
-        )
-        if not result_compatiable:
-            return False, [], True, types
+        if self.filtration_enabled:
+            result_compatiable = self.check_if_answers_type_compatible(
+                v_result, answer_data_type
+            )
+            if not result_compatiable:
+                return False, [], True, types
 
         return True, v_result, True, types
 

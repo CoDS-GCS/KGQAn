@@ -83,6 +83,7 @@ class KGQAn:
         n_max_Es: int = 10,
         n_limit_VQuery=400,
         n_limit_EQuery=400,
+        filtration_enabled: bool = True
     ):
         self.target_variable = None
         self._ss_server = semantic_affinity_server
@@ -96,6 +97,7 @@ class KGQAn:
         self.sparql_end_point = None
         self.lemmatizer = WordNetLemmatizer()
         self.connected_predicates = 0
+        self.filteration_enabled = filtration_enabled
 
         cprint(
             f"== Execution settings : Max no. answers == {self._n_max_answers}, "
@@ -137,11 +139,11 @@ class KGQAn:
         self.n_max_Es = n_max_Es if n_max_Es else self.n_max_Es
         if knowledge_graph in ["open_citations"]:
             self.sparql_end_point = XML_EndPoint(
-                knowledge_graph, knowledge_graph_to_uri[knowledge_graph]
+                knowledge_graph, knowledge_graph_to_uri[knowledge_graph], self.filteration_enabled
             )
         else:
             self.sparql_end_point = EndPoint(
-                knowledge_graph, knowledge_graph_to_uri[knowledge_graph]
+                knowledge_graph, knowledge_graph_to_uri[knowledge_graph], self.filteration_enabled
             )
 
         self.detect_question_and_answer_type()
@@ -852,15 +854,20 @@ class KGQAn:
                     continue
                 # The else is for boolean questions
                 if "results" in v_result:
-                    filtered_results = filteration.update_results(
-                        v_result["results"],
-                        self.question.answer_type,
-                        types,
-                        self.knowledge_graph,
-                    )
-                    possible_answer.update(
-                        results=filtered_results, vars=v_result["head"]["vars"]
-                    )
+                    if self.filteration_enabled:
+                        filtered_results = filteration.update_results(
+                            v_result["results"],
+                            self.question.answer_type,
+                            types,
+                            self.knowledge_graph,
+                        )
+                        possible_answer.update(
+                            results=filtered_results, vars=v_result["head"]["vars"]
+                        )
+                    else:
+                        possible_answer.update(
+                            results=v_result["results"], vars=v_result["head"]["vars"]
+                        )
                 else:
                     possible_answer.update(results=[], boolean=v_result["boolean"])
                 sparqls.append(possible_answer.sparql)

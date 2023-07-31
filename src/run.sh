@@ -42,8 +42,16 @@ case "$1" in
 
         python evaluation/merge_files.py
 
+        python -m evaluation.qald9_eval --filter False
+        ruby evaluation/evaluation.rb evaluation/output/qald.json QALD-NO-Filtration
+
+        python -m evaluation.lcquad_eval --filter False
+        ruby evaluation/evaluation.rb evaluation/output/qald.json LCQUAD-NO-Filtration
+
+        python -m evaluation.filtering_ques
+        python evaluation/calculate_score_linking.py
+
         echo "Evaluation Completed!, results can be found at src/evaluation/output/evaluation_results.csv"
-        python -m kgqan.server
         ;;
     *)
         echo "Invalid argument. Usage: $0 [server|evaluation]"

@@ -1,14 +1,13 @@
 import sys
 
-sys.path.append('../src/')
-
+import os
 import json
 import traceback
 from itertools import count
 from termcolor import colored, cprint
 
-from kgqan import KGQAn
-from kgqan.kgqan_server.server import max_answers, max_Vs, limit_EQuery, max_Es, limit_VQuery
+from kgqan.kgqan import KGQAn
+
 
 max_Vs = 1
 max_Es = 40
@@ -16,10 +15,9 @@ max_answers = 40
 limit_VQuery = 400
 limit_EQuery = 300
 
-#file_name = r"qald9/qald-9-test-multilingual.json"
-file_name = r"/mnt/KGQAn_Project/KGQAn/evaluation/lcquad1/lcquad_qaldformat.json"
-indices_file_test = r"/mnt/KGQAn_Project/KGQAn/evaluation/lcquad1/TestingIDs_LCQuAD1.txt"
-
+file_dir = os.path.dirname(os.path.abspath(__file__))
+file_name = os.path.join(file_dir, "lcquad1/lcquad-qaldformat-test2.json")
+indices_file_test = os.path.join(file_dir, "lcquad1/TestingIDs_LCQuAD1.txt")
 
 def extracting_e(text_sparql):
     entity_list = list()
@@ -228,7 +226,7 @@ if __name__ == '__main__':
          #   break
     json_object = json.dumps(res, indent=4, ensure_ascii=False)
 
-    with open("FilteringLinkingquesBoolean.json", "w", encoding='utf-8') as outfile:
+    with open(os.path.join(file_dir, f'output/FilteringLinkingquesBoolean.json'), "w", encoding='utf-8') as outfile:
         outfile.write(json_object)
 
 # "SELECT ?uri WHERE { ?uri <http://dbpedia.org/ontology/country> <http://dbpedia.org/resource/United_States> .
