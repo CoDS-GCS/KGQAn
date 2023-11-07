@@ -18,6 +18,7 @@ import sys
 # sys.path.append('.')
 
 import os
+import traceback
 from urllib.parse import urlparse
 import re
 import json
@@ -41,9 +42,13 @@ import logging
 from kgqan.logger import logger
 
 import time
+from kgqan.langchain_filtration import choose_question_from_keywords
 import kgqan.filteration as filteration
 from termcolor import cprint
 import networkx as nx
+import datetime
+
+import logging
 
 
 # TODO check best place to have these updates and send either uri or key according to usecase
@@ -98,6 +103,8 @@ class KGQAn:
         self.lemmatizer = WordNetLemmatizer()
         self.connected_predicates = 0
         self.filteration_enabled = filtration_enabled
+        self.query_selection_end = 0
+        self.num_queries_executed = 0
 
         cprint(
             f"== Execution settings : Max no. answers == {self._n_max_answers}, "
@@ -150,14 +157,16 @@ class KGQAn:
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
             logger.log_info("[NO Named-entity or NO Relation Detected]")
-            return [], [], [], understanding_end - understanding_start, 0, 0
+            return [], [], [], understanding_end - understanding_start, 0, 0, 0, 0
         linking_start = time.time()
         self.extract_possible_V_and_E()
         linking_end = time.time()
         execution_start = time.time()
+        query_selection_start = time.time()
         self.generate_queries_new()
         # self.generate_star_queries()
-        self.evaluate_star_queries()
+        # self.evaluate_star_queries()
+        self.evaluate_star_queries_predicate_based()
 
         answers = [
             answer.json() for answer in self.question.possible_answers[:n_max_answers]
@@ -171,6 +180,8 @@ class KGQAn:
             understanding_end - understanding_start,
             linking_end - linking_start,
             execution_end - execution_start,
+            self.query_selection_end - query_selection_start,
+            self.num_queries_executed
         )
 
     def detect_question_and_answer_type(self):
@@ -448,12 +459,13 @@ class KGQAn:
             if len(bgp) == 0:
                 continue
 
-            query, node_uris, relation_uris = self.generate_sparql_query_new(bgp)
+            query, node_uris, relation_uris, triples = self.generate_sparql_query_new(bgp)
             query = query.replace("\n", " ")
             # self.question.add_possible_answer(question=self.question.text, sparql=query, score=score,
             #                                   node1=node1_uris, node2=node2_uris, edges=relation_uris)
             self.question.add_possible_answer(
-                question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris
+                question=self.question.text, sparql=query, score=score, nodes=node_uris, edges=relation_uris,
+                triples=triples
                 )
         # for star_query in product(*possible_triples_for_all_relations):
         #     score = self.calculate_score(star_query)
@@ -711,24 +723,29 @@ class KGQAn:
     # TODO add node and vertices uris for the website, update boolean part in a better way
 
     def generate_sparql_query_new(self, star_query):
+        triples = list()
         if self.question.answer_datatype == "boolean":
             ask_triple = []
             node1_uris = []
             node2_uris = []
             relation_uris = []
             for n1_uri, predicate, n2_uri in star_query:
-                if predicate[1]:
-                    ask_triple.append(f"<{n2_uri}> <{predicate[0]}> <{n1_uri}>")
-                else:
-                    ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
+                # direction was decided in generation of BGP step
+                print(predicate)
+                ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
+                # if predicate[1]:
+                #     ask_triple.append(f"<{n2_uri}> <{predicate[0]}> <{n1_uri}>")
+                # else:
+                #     ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
                 node1_uris.append(n1_uri)
                 node2_uris.append(n2_uri)
                 relation_uris.append(predicate[0])
+                triples.append([n1_uri, predicate, n2_uri])
             query = f"ASK {{ {' . '.join(ask_triple)} }}"
             # ask_query, node1_uris,node2_uris, relation_uris = self.generate_sparql_query(query)
             # ask_query = query.replace("\n", " ")
             # return query, node1_uris, node2_uris, relation_uris
-            return query, node1_uris, node2_uris
+            return query, node1_uris, node2_uris, triples
         else:
             select_query = SparqlQB.SPARQLSelectQuery()
             where_pattern = SparqlQB.SPARQLGraphPattern()
@@ -736,6 +753,7 @@ class KGQAn:
             relation_uris = []
             candidate_targets = []
             for n1_uri, predicate, n2_uri in star_query:
+                triples.append([n1_uri, predicate, n2_uri])
                 if self.is_variable(n1_uri):
                     uri1 = n1_uri
                     candidate_targets.append(uri1)
@@ -765,7 +783,7 @@ class KGQAn:
             self.target_variable = (
                 candidate_targets[0] if len(candidate_targets) > 0 else "?var1"
             )
-            select_query.add_variables(variables=[self.target_variable, "?type"])
+            select_query.add_variables(variables=[self.target_variable])
             # remove the question mark for further use
             self.target_variable = self.target_variable[1:]
             optional_pattern = SparqlQB.SPARQLGraphPattern(optional=True)
@@ -778,9 +796,8 @@ class KGQAn:
                     )
                 ]
             )
-            where_pattern.add_nested_graph_pattern(optional_pattern)
             select_query.set_where_pattern(graph_pattern=where_pattern)
-            return select_query.get_text(), node_uris, relation_uris
+            return select_query.get_text(), node_uris, relation_uris, triples
 
     # TODO update with 2 variables
     def generate_sparql_query(self, star_query):
@@ -829,6 +846,42 @@ class KGQAn:
         select_query.set_where_pattern(graph_pattern=where_pattern)
         return select_query.get_text(), node_uris, relation_uris
 
+    def evaluate_star_queries_predicate_based(self):
+        sparqls = list()
+        sparqls_triples = list()
+        for i, possible_answer in enumerate(
+                self.question.possible_answers[: self._n_max_answers]
+        ):
+            sparqls.append(possible_answer.sparql)
+            sparqls_triples.append(possible_answer.triples)
+        if len(sparqls) == 0:
+            return
+        queries_indices = choose_question_from_keywords(self.question.text, sparqls, sparqls_triples)
+        self.query_selection_end = time.time()
+        self.num_queries_executed = len(queries_indices)
+        for index in queries_indices:
+            result = self.sparql_end_point.evaluate_SPARQL_query(sparqls[index])
+            v_result = json.loads(result)
+            if "results" in v_result:
+                v_result = self.postprocess_answer_if_needed(v_result)
+                self.question.possible_answers[index].update(
+                    results=v_result["results"], vars=v_result["head"]["vars"]
+                )
+            else:
+                self.question.possible_answers[index].update(results=[], boolean=v_result["boolean"])
+            answers = list()
+            if "results" in v_result:
+                for binding in v_result["results"]["bindings"]:
+                    answer = self.__class__.extract_resource_name_from_uri(
+                        binding[self.target_variable]["value"]
+                    )[0]
+                    answers.append(answer)
+                else:
+                    if v_result["results"]["bindings"]:
+                        logger.log_info(f"[POSSIBLE ANSWER {i}:] {answers}")
+            else:
+                answers.append(v_result["boolean"])
+
     def evaluate_star_queries(self):
         self.question.possible_answers.sort(reverse=True)
         # qc = count(1)
@@ -848,7 +901,7 @@ class KGQAn:
                     get_answers,
                     types,
                 ) = self.sparql_end_point.parse_result(
-                    result, self.question.answer_datatype, self.target_variable
+                    result, self.question.answer_datatype, self.target_variable, possible_answer.triples
                 )
                 if not result_compatible:
                     continue
@@ -887,7 +940,7 @@ class KGQAn:
                         answers.append(v_result["boolean"])
                 # print(possible_answer.sparql)
             except Exception as e:
-                # traceback.print_exc()
+                traceback.print_exc()
                 print(
                     f" >>>>>>>>>>>>>>>>>>>> Error in binding the answers: [{result}] <<<<<<<<<<<<<<<<<<"
                 )
@@ -948,6 +1001,14 @@ class KGQAn:
         # TODO: check for URI validity
         return resource_URI, resource_name
 
+    def postprocess_answer_if_needed(self, v_result):
+        for binding in v_result["results"]["bindings"]:
+            if "datatype" in binding[self.target_variable]:
+                if "gYear" in binding[self.target_variable]["datatype"]:
+                    if int(binding[self.target_variable]["value"]) > 0:
+                        obj = datetime.datetime.strptime(binding[self.target_variable]["value"], "%Y")
+                        binding[self.target_variable]["value"] = str(obj.date())
+        return v_result
 
 if __name__ == "__main__":
     my_kgqan = KGQAn()

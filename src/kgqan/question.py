@@ -248,6 +248,10 @@ class Answer:
     def boolean(self):
         return self._answer["boolean"]
 
+    @property
+    def triples(self):
+        return self._answer["triples"]
+
     @sparql.setter
     def sparql(self, value):
         self._answer["sparql"] = value

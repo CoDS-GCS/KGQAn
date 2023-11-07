@@ -21,7 +21,7 @@ class EndPoint:
             "format": "application/json",
             "CXML_redir_for_subjs": "121",
             "CXML_redir_for_hrefs": "",
-            "timeout": "30000",
+            "timeout": "40000",
             "debug": "on",
             "run": "+Run+Query+",
         }
@@ -43,7 +43,7 @@ class EndPoint:
     # 1) boolean indicating if the answer type is compatible with the answer)
     # 2) The result after being parsed
     # 3) boolean to indicate if we should gather the answers for logging or not, currently it is True for JSON and False for XML
-    def parse_result(self, result, answer_data_type, target_variable):
+    def parse_result(self, result, answer_data_type, target_variable, triples):
         v_result = json.loads(result)
         v_result, types = self.extract_types(v_result, target_variable)
         if self.filtration_enabled:
@@ -96,9 +96,13 @@ class EndPoint:
                 if "date" in answer["uri"]["datatype"]:
                     return True
                 elif "gYear" in answer["uri"]["datatype"]:
-                    if int(answer["uri"]["value"]) > 0:
-                        obj = datetime.datetime.strptime(answer["uri"]["value"], "%Y")
-                        answer["uri"]["value"] = str(obj.date())
+                    try:
+                        if int(answer["uri"]["value"]) > 0:
+                            obj = datetime.datetime.strptime(answer["uri"]["value"], "%Y")
+                            answer["uri"]["value"] = str(obj.date())
+                    except Exception as e:
+                        print("Parsing year not possible")
+                        return True
                     return True
         return False
 
@@ -165,6 +169,13 @@ class EndPoint:
             "wiki Articles",
             "hypernym",
             "aliases",
+            "was Derived From",
+            "label",
+            "see Also",
+            "comment",
+            "same As",
+            "different From",
+            "first"
         ]
         filtered_uris = []
         filtered_names = []
@@ -185,14 +196,15 @@ class EndPoint:
         predicate_names = list()
         for binding in result_bindings:
             predicate_URI = binding["p"]["value"]
-            uri_path = urlparse(predicate_URI).path
-            predicate_name = os.path.basename(uri_path)
-            p = re.compile(r"(_|\([^()]*\))")
-            predicate_name = p.sub(" ", predicate_name)
+            predicate_name = self.get_name(predicate_URI)
+            # uri_path = urlparse(predicate_URI).path
+            # predicate_name = os.path.basename(uri_path)
+            # p = re.compile(r"(_|\([^()]*\))")
+            # predicate_name = p.sub(" ", predicate_name)
             p2 = re.compile(r"([a-z0-9])([A-Z])")
             predicate_name = p2.sub(r"\1 \2", predicate_name)
-            if not predicate_name.strip():
-                continue
+            # if not predicate_name.strip():
+            #     continue
             predicate_names.append(predicate_name)
             predicate_URIs.append(predicate_URI)
         return predicate_URIs, predicate_names

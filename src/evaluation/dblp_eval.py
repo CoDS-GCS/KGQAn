@@ -38,6 +38,9 @@ if __name__ == '__main__':
     total_understanding_time = 0
     total_linking_time = 0
     total_execution_time = 0
+    total_query_selection_time = 0
+    total_query_execution_time = 0
+    total_num_queries_executed = 0
 
     # The main param:
     # max no of vertices and edges to annotate the PGP
@@ -71,7 +74,7 @@ if __name__ == '__main__':
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
         try:
-            answers, _, _, understanding_time, linking_time, execution_time\
+            answers, _, _, understanding_time, linking_time, execution_time, query_selection_time, num_queries_executed\
                 = MyKGQAn.ask(question_text=question_text,
                               question_id=question['id'], knowledge_graph='dblp')
         except Exception as e:
@@ -96,7 +99,11 @@ if __name__ == '__main__':
         total_time = total_time + (et - st)
         total_understanding_time = total_understanding_time + understanding_time
         total_linking_time = total_linking_time + linking_time
-        total_execution_time = total_execution_time + execution_time
+        if total_execution_time < 100:
+            total_execution_time = total_execution_time + execution_time
+            total_query_selection_time = total_query_selection_time + query_selection_time
+            total_query_execution_time = total_query_execution_time + (execution_time - query_selection_time)
+        total_num_queries_executed = total_num_queries_executed + num_queries_executed
         text = colored(f'[DONE!! in {et - st:.2f} SECs]', 'green', attrs=['bold', 'reverse', 'blink', 'dark'])
         cprint(f"== {text} ==")
 
@@ -107,16 +114,23 @@ if __name__ == '__main__':
     cprint(f"== Understanding : {qc} questions, Total Time == {total_understanding_time}, Average Time == {total_understanding_time / qc} ")
     cprint(f"== Linking : {qc} questions, Total Time == {total_linking_time}, Average Time == {total_linking_time / qc} ")
     cprint(f"== Execution : {qc} questions, Total Time == {total_execution_time}, Average Time == {total_execution_time / qc}")
-    response_time = [{"Question Understanding": total_understanding_time / qc,
-                      "Linking": total_linking_time / qc,
-                      "Execution": total_execution_time / qc}]
+    cprint(f"== Query Selection : {qc} questions, Total Time == {total_query_selection_time}, Average Time == {(total_query_selection_time / qc)*1000} ms")
+    cprint(f"== Query Execution : {qc} questions, Total Time == {total_query_execution_time}, Average Time == {(total_query_execution_time / qc)*1000} ms")
+    cprint(f"== Queries Executed : {qc} questions, Total Number == {total_num_queries_executed}, Average Number == {(total_num_queries_executed / qc)}")
+    response_time = [{"Question Understanding": (total_understanding_time / qc) * 1000,
+                      "Linking": (total_linking_time / qc ) * 1000,
+                      "Execution": (total_execution_time / qc ) * 1000,
+                      "Query Selection": (total_execution_time / qc) * 1000,
+                      "Query Execution": (total_execution_time / qc) * 1000,
+                      "Number of queries": total_num_queries_executed / qc
+                      }]
     
     with open(os.path.join(file_dir, f'output/dblp.json'), encoding='utf-8', mode='w') as rfobj:
         json.dump(kgqan_qald9, rfobj)
         rfobj.write('\n')
 
     field_names = response_time[0].keys()
-    with open(os.path.join(file_dir, f'output/dblp_response_time.csv'), mode='w', newline='') as file:
+    with open(os.path.join(file_dir, f'output/dblp_response_time_ms.csv'), mode='w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=field_names)
         writer.writeheader()
         writer.writerows(response_time)

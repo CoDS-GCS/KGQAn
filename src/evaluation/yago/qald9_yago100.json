@@ -767,7 +767,7 @@
       ],
       "onlydbo": true,
       "query": {
-        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT ?date WHERE { ?company rdfs:label \"De Beers\"@en . ?company schema:foundingDate ?date}   "
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>SELECT xsd:date(?date) WHERE { ?company rdfs:label \"De Beers\"@en . ?company schema:foundingDate ?date}   "
       },
       "answers": [
         {
@@ -780,8 +780,9 @@
             "bindings": [
               {
                 "uri": {
-                  "type": "literal",
-                  "value": "1888"
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1888-01-01"
                 }
               }
             ]
@@ -1637,7 +1638,7 @@
       ],
       "onlydbo": true,
       "query": {
-        "sparql": "PREFIX yago: <http://yago-knowledge.org/resource/>  PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE { ?company rdfs:label \"Jack Wolfskin\"@en . ?company schema:foundingDate ?date} "
+        "sparql": "PREFIX yago: <http://yago-knowledge.org/resource/>  PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE { ?company rdfs:label \"Jack Wolfskin\"@en . ?company schema:foundingDate ?date} "
       },
       "answers": [
         {
@@ -1650,8 +1651,9 @@
             "bindings": [
               {
                 "uri": {
-                  "type": "literal",
-                  "value": "1981"
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1981-01-01"
                 }
               }
             ]
@@ -1713,7 +1715,7 @@
       ],
       "onlydbo": true,
       "query": {
-        "sparql": "PREFIX yago: <http://yago-knowledge.org/resource/>  PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {   ?country rdfs:label \"Paraguay\"@en .   ?country schema:foundingDate ?date} "
+        "sparql": "PREFIX yago: <http://yago-knowledge.org/resource/>  PREFIX schema: <http://schema.org/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE {   ?country rdfs:label \"Paraguay\"@en .   ?country schema:foundingDate ?date} "
       },
       "answers": [
         {
@@ -1726,8 +1728,9 @@
             "bindings": [
               {
                 "uri": {
-                  "type": "literal",
-                  "value": "1811"
+                  "type": "typed-literal",
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1811-01-01"
                 }
               }
             ]
@@ -3974,7 +3977,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?n WHERE { ?u rdfs:label \"Naoya Nomura\"@en. ?u schema:nationality ?n}"
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?n WHERE { ?u rdfs:label \"Naoya Nomura\"@en. ?u schema:birthPlace ?n}"
       },
       "answers": [
         {
@@ -3991,7 +3994,7 @@
               {
                 "n": {
                   "type": "uri",
-                  "value": "http://yago-knowledge.org/resource/Japan"
+                  "value": "http://yago-knowledge.org/resource/Kanazawa"
                 }
               }
             ]
@@ -4362,7 +4365,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Delta\"@en. ?country schema:foundingDate ?date}"
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE {?country rdfs:label \"Delta\"@en. ?country schema:foundingDate ?date}"
       },
       "answers": [
         {
@@ -4379,8 +4382,8 @@
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1906"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1906-01-01"
                 }
               },
               {
@@ -4393,22 +4396,22 @@
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1879"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1879-01-01"
                 }
               },
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1744"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1744-01-01"
                 }
               },
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1997"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1997-01-01"
                 }
               }
             ]
@@ -4743,7 +4746,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingDate ?date}"
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE {?country rdfs:label \"Davichi\"@en. ?country schema:foundingDate ?date}"
       },
       "answers": [
         {
@@ -4760,8 +4763,8 @@
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "2008"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "2008-01-01"
                 }
               }
             ]
@@ -5678,7 +5681,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Battersea Dogs and Cats Home\"@en. ?country schema:foundingDate ?date}"
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE {?country rdfs:label \"Battersea Dogs and Cats Home\"@en. ?country schema:foundingDate ?date}"
       },
       "answers": [
         {
@@ -5695,8 +5698,8 @@
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1860"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1860-01-01"
                 }
               }
             ]
@@ -6409,7 +6412,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct ?date WHERE {?c rdfs:label \"Carlo Giuliani\"@en; schema:deathDate ?date}"
+        "sparql": "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT distinct xsd:date(?date) WHERE {?c rdfs:label \"Carlo Giuliani\"@en; schema:deathDate ?date}"
       },
       "answers": [
         {
@@ -6751,7 +6754,7 @@
         }
       ],
       "query": {
-        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT ?date WHERE {?country rdfs:label \"Western University\"@en. ?country schema:foundingDate ?date}"
+        "sparql": "PREFIX schema:<http://schema.org/> PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT xsd:date(?date) WHERE {?country rdfs:label \"Western University\"@en. ?country schema:foundingDate ?date}"
       },
       "answers": [
         {
@@ -6768,8 +6771,8 @@
               {
                 "date": {
                   "type": "typed-literal",
-                  "datatype": "http://www.w3.org/2001/XMLSchema#gYear",
-                  "value": "1991"
+                  "datatype": "http://www.w3.org/2001/XMLSchema#date",
+                  "value": "1991-01-01"
                 }
               }
             ]
