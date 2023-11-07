@@ -119,7 +119,7 @@ if __name__ == '__main__':
         # question_text = 'Which movies starring Brad Pitt were directed by Guy Ritchie?'
         # question_text = 'When did the Boston Tea Party take place and led by whom?'
         try:
-            answers, _, _, understanding_time, linking_time, execution_time\
+            answers, _, _, understanding_time, linking_time, execution_time, is_boolean\
                 = MyKGQAn.ask(question_text=question_text, answer_type=question['answertype'],
                               question_id=question['id'], knowledge_graph='dbpedia')
         except Exception as e:
@@ -128,13 +128,22 @@ if __name__ == '__main__':
 
         all_bindings = list()
         for answer in answers:
-            if answer['results'] and answer['results']['bindings']:
+            if is_boolean:
+                all_bindings.append(bool(answer['boolean']))
+            elif answer['results'] and answer['results']['bindings']:
                 all_bindings.extend(answer['results']['bindings'])
 
         try:
-            if 'results' in question['answers'][0]:
-                question['answers'][0]['results']['bindings'] = all_bindings.copy()
-                all_bindings.clear()
+            if len(all_bindings) > 0:
+                if is_boolean:
+                    value = True if True in all_bindings else False
+                    question['answers'][0]['boolean'] = value
+                    all_bindings.clear()
+                elif 'results' in question['answers'][0]:
+                    question['answers'][0]['results']['bindings'] = all_bindings.copy()
+                    all_bindings.clear()
+            else:
+                question['answers'] = []
         except:
             question['answers'] = []
 

@@ -150,7 +150,7 @@ class KGQAn:
         # if no named entity you should return here
         if len(self.question.query_graph) == 0:
             logger.log_info("[NO Named-entity or NO Relation Detected]")
-            return [], [], [], understanding_end - understanding_start, 0, 0
+            return [], [], [], understanding_end - understanding_start, 0, 0, self.question.answer_datatype == "boolean"
         linking_start = time.time()
         self.extract_possible_V_and_E()
         linking_end = time.time()
@@ -171,6 +171,7 @@ class KGQAn:
             understanding_end - understanding_start,
             linking_end - linking_start,
             execution_end - execution_start,
+            self.question.answer_datatype == "boolean"
         )
 
     def detect_question_and_answer_type(self):
@@ -201,6 +202,12 @@ class KGQAn:
             self.question.answer_type = "boolean"
             self.question.answer_datatype = "boolean"
         elif self.question.text.lower().startswith("does "):
+            self.question.answer_type = "boolean"
+            self.question.answer_datatype = "boolean"
+        elif self.question.text.lower().startswith("was "):
+            self.question.answer_type = "boolean"
+            self.question.answer_datatype = "boolean"
+        elif self.question.text.lower().startswith("were "):
             self.question.answer_type = "boolean"
             self.question.answer_datatype = "boolean"
         elif self.question.text.lower().startswith("who are "):
@@ -717,10 +724,10 @@ class KGQAn:
             node2_uris = []
             relation_uris = []
             for n1_uri, predicate, n2_uri in star_query:
-                if predicate[1]:
-                    ask_triple.append(f"<{n2_uri}> <{predicate[0]}> <{n1_uri}>")
-                else:
-                    ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
+                #if predicate[1]:
+                #    ask_triple.append(f"<{n2_uri}> <{predicate[0]}> <{n1_uri}>")
+                #else:
+                ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
                 node1_uris.append(n1_uri)
                 node2_uris.append(n2_uri)
                 relation_uris.append(predicate[0])
