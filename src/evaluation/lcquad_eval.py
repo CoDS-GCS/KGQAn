@@ -115,7 +115,7 @@ if __name__ == '__main__':
         et = time.time()
         total_time = total_time + (et - st)
         total_understanding_time = total_understanding_time + understanding_time
-        if total_execution_time < 100:
+        if execution_time < 100:
             total_execution_time = total_execution_time + execution_time
             total_query_selection_time = total_query_selection_time + query_selection_time
             total_query_execution_time = total_query_execution_time + (execution_time - query_selection_time)
