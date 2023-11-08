@@ -731,7 +731,7 @@ class KGQAn:
             relation_uris = []
             for n1_uri, predicate, n2_uri in star_query:
                 # direction was decided in generation of BGP step
-                print(predicate)
+                #print(predicate)
                 ask_triple.append(f"<{n1_uri}> <{predicate[0]}> <{n2_uri}>")
                 # if predicate[1]:
                 #     ask_triple.append(f"<{n2_uri}> <{predicate[0]}> <{n1_uri}>")

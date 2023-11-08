@@ -130,8 +130,8 @@ if __name__ == '__main__':
     response_time = [{"Question Understanding": (total_understanding_time / qc) * 1000,
                       "Linking": (total_linking_time / qc ) * 1000,
                       "Execution": (total_execution_time / qc ) * 1000,
-                      "Query Selection": (total_execution_time / qc) * 1000,
-                      "Query Execution": (total_execution_time / qc) * 1000,
+                      "Query Selection": (total_query_selection_time / qc) * 1000,
+                      "Query Execution": (total_query_execution_time / qc) * 1000,
                       "Number of queries": total_num_queries_executed / qc
                       }]
     with open(os.path.join(file_dir, f'output/qald.json'), encoding='utf-8', mode='w') as rfobj:

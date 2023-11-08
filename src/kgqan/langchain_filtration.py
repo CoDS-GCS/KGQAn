@@ -5,10 +5,9 @@ from langchain.chains import LLMChain
 import os
 import re
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 access_token = "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"
 torch.set_default_tensor_type(torch.DoubleTensor)
-
 
 
 def get_openAI_llm():
