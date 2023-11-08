@@ -131,6 +131,8 @@ class KGQAn:
 
 
         """
+        self.query_selection_end = 0
+        self.num_queries_executed = 0
         # to solve Memory Leak issue
         self.v_uri_scores = defaultdict(float)
         logger.log_info(f"Question: {question_text}")
@@ -180,7 +182,7 @@ class KGQAn:
             understanding_end - understanding_start,
             linking_end - linking_start,
             execution_end - execution_start,
-            self.query_selection_end - query_selection_start,
+            self.query_selection_end - query_selection_start if self.query_selection_end != 0 else 0,
             self.num_queries_executed
         )
 
