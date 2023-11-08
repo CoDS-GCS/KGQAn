@@ -237,3 +237,15 @@ class EndPoint:
         json_object["results"]["bindings"] = final_binding
 
         return json_object, types
+
+    def get_name(self, predicate):
+        # pattern = r'/([^/#]+)[/#]?$'
+        # pattern = r'/|#([^/#]+)$'
+        # pattern = r'/|#([^/#]+)$|([^/#]+)$'
+        pattern = r'[#/]([^/#]+)$'
+        match = re.search(pattern, predicate)
+        if match:
+            return match.group(1)
+        else:
+            return ""
+ 
