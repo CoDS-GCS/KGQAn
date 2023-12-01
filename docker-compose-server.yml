@@ -17,6 +17,7 @@ services:
       - '8899:8899'
     volumes:
       - ./data/output_pred21_8_30:/app/model
+      - ./src:/app
     environment:
       - WORD_EMBEDDING_HOST=word_embd_server
       - WORD_EMBEDDING_PORT=9600
@@ -24,8 +25,6 @@ services:
       - word_embd_server
     networks:
       - kgqan_network
-    volumes:
-    - ./src:/app
 
 networks:
   kgqan_network:

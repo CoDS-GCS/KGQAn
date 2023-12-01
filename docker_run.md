@@ -9,10 +9,14 @@
 - Docker Compose: Verify that you have Docker Compose installed by running the following command:
 
 ```shell
-docker-compose version
+docker compose version
 ```
 - If Docker Compose is not installed, you can follow the instructions to install it:
  - [Install Docker Compose](https://docs.docker.com/compose/install/)
+ - Used docker version : 24.0.7
+ - Used `docker compose` version : v2.21.0
+ - Use `docker compose` v2 (new go based utility) not `docker-compose` v1 (python based)
+ - Used OS : Ubuntu : 20.06.6 LTS Focal Fossa
 
 
 ## Setup Instructions
@@ -33,17 +37,18 @@ cd KGQAn
 ## *Note* : KGQAn server depends on Word Embedding Server, Word Embedding server takes arround ~3.5 minute time to load w2v file. So there is 300 seconds delay in docker run.
 
 ## Build and run the services using Docker Compose:
+- ** There is wait time of 300 sec, for model loading before starting server or evaluation scripts**
 - Make sure you are in the root directory of the project.
 - To start KGQAn in server mode use docker-compose-server.yml
 ```shell
-docker-compose -f docker-compose-server.yml up --build
+docker compose -f docker-compose-server.yml up --build
 ```
 
 - To start KGQAn in evaluation mode use docker-compose-evaluation.yml
 ```shell
-docker-compose -f docker-compose-evaluation.yml up --build
+docker compose -f docker-compose-evaluation.yml up --build
 ```
-- If you faced any error running the previous docker-compose commands due to a versioning error, adjust the version paramater in the `.yml` file according to your version of docker-compose: https://docs.docker.com/compose/compose-file/compose-versioning/ 
+- If you faced any error running the previous `docker compose` commands due to a versioning error, adjust the version paramater in the `.yml` file according to your version of docker-compose: https://docs.docker.com/compose/compose-file/compose-versioning/ 
 - The evaluation results for benchmarks [QALD, DBLP, LCQUAD, YAGO, MAG] will be stored in src/evaluation/output/evaluation_results.csv
 - It will be in below format
 ```csv
@@ -61,5 +66,5 @@ curl -X POST -H "Content-Type: application/json" -d '{"question": "Who founded I
 ## Clean up:
 - To stop and remove the running Docker containers, use the following command:
 ```shell
-docker-compose down
+docker compose down
 ```
