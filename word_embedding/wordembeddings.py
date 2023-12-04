@@ -20,9 +20,9 @@ class WordEmbeddings:
         self.w, self.vocab, self.ivocab = self.load_vocab()
 
     def load_vocab(self):
-        with open(self.model_path, "r") as f:
+        with open(self.model_path, "r", encoding='utf8') as f:
             words = [x.rstrip().split(" ")[0] for x in f.readlines()]
-        with open(self.model_path, "r") as f:
+        with open(self.model_path, "r", encoding='utf8') as f:
             vectors = {}
             for line in f:
                 vals = line.rstrip().split(" ")

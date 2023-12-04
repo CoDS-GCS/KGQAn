@@ -17,6 +17,8 @@ Running KGQAn
   1. Docker Setup
   2. Local Setup
 
+To reproduce the values in the paper, you can [check](reproducability/Instructions.md)
+
 Running KGQAn in Docker mode 
 ------------
 - - - - 
@@ -40,7 +42,6 @@ pip install -r requirements.txt
 - Run the following command to execute the data download script:
 - This script will download the trained models and any necessary data for the services.
 ```shell
-# run in docker environment
 ./data_download.sh local
 ```
 
@@ -78,7 +79,7 @@ from kgqan import KGQAn
 my_kgqan = KGQAn()
 answers = my_kgqan.ask(question_text=question_text, question_id=question['id'], knowledge_graph=knowledge_graph)
 ```
-* check `evaluation/qald9eval.py` as an example.
+* check `evaluation/qald9_eval.py` as an example.
 * To run the benchmarks, you need to
   * deploy a Virtuoso Endpoint (04-2016 for Qald 9 and 10-2016 for Lcquad)
   * Update the url of the KG in `knowledge_graph_to_uri` that can be found in `src/kgqan.py` 
@@ -89,7 +90,7 @@ To run KGQAn in this mode:
 1. Open the KGQAn server by running the following command from the `src` directory
 ```
 conda activate kgqan
-python -m kgqan.kgqan_server.server
+python -m kgqan.server
 ```
 2. Wait until the following message shows to be sure the server is running successfully
 ```
