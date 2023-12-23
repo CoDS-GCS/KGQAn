@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   word_embd_server:
-    build: ./word_embedding
+    image: ozxx33/kgqan_word_embedding
     ports:
       - '9600:9600'
     volumes:
@@ -10,9 +10,7 @@ services:
       - kgqan_network
 
   kgqan_server:
-    build: 
-      context: ./src
-      dockerfile: Dockerfile.evaluation
+    image: ozxx33/kgqan_evaluation
     ports:
       - '8899:8899'
     volumes:
