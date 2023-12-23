@@ -16,7 +16,8 @@ RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv && \
     . ~/.bashrc && \
     rbenv install 2.7.0 && \
     rbenv global 2.7.0 && \
-    gem install bundler nokogiri mustache multiset
+    gem install bundler -v 2.4.22 && \
+    gem install nokogiri mustache multiset
 
 ADD requirements.txt ./app/requirements.txt
 RUN pip3 install --upgrade pip 
