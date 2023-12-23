@@ -2,7 +2,6 @@ version: '3.9'
 services:
   word_embd_server:
     image: ozxx33/kgqan_word_embedding
-    platform: linux/amd64
     ports:
       - '9600:9600'
     volumes:
@@ -12,7 +11,6 @@ services:
 
   kgqan_server:
     image: ozxx33/kgqan_server
-    platform: linux/amd64
     ports:
       - '8899:8899'
     volumes:
