@@ -3,7 +3,6 @@ Reproducing Results in Paper
 To reproduce the results in the paper, you need to follow the process explained here from the root directory of the proect
 The following process needs to be followed from the `KGQAn` directory
 
-### Run in Docker Mode
 1._**Source Code and Benchmarks**_
 
 - The code is available at the following GitHub Repository: https://github.com/CoDS-GCS/KGQAn.git 
@@ -88,6 +87,20 @@ The following process needs to be followed from the `KGQAn` directory
    2. Downloading the required files + creating the docker image + enabling the servers ~30 minutes (depends on the internet connection speed)
    2. Running the five benchmarks and evaluating their results + Filtering and Linking experiments ~ 8 hours
    3. Producing the Figures ~5 minutes
+
+### Mapping Between Experiments and Paper Results
+The final outputs produced after all experiments finish running are saved in two main files:
+1. `src/evaluation/output/evaluation_results.csv`: This file contains the results of 9 Experiments:  1) QALD, 2) LCQuAD, 3)YAGO, 4) DBLP, 5)MAG, 6)QALD with filtration disabled, 7)LCQUAD with filtration disabled, 8)Entity Linking, 9)Relation Linking
+2. `src/evaluation/output/evaluation_response_time.csv`: Response time for running the main experiment 
+
+Here is the mapping between the Experiments and the Tables and Figures of the Paper
+
+| Table / Figure | Experiment                                 |
+|----------------|--------------------------------------------|
+| Table 3        | `evaluation_results.csv`: Experiments 1-5  |
+| Figure 7       | `evaluation_response_time.csv`             |
+ | Figure 9       | `evaluation_results.csv`: Experiments 8, 9 | 
+| Figure 10 | `evaluation_results.csv`: Experiments 1,2, 6, 7|
 
 
 
