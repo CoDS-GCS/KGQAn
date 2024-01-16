@@ -25,7 +25,7 @@ The following process needs to be followed from the `KGQAn` directory
     - For KGQAn to run, we will need around 32GB of RAM to start the server at the begining, after the start up no special hardware is needed
 4. _**Detailed fully automated scripts**_
       Choose between steps 1&2, step 1 runs in the docker mode, step 2 runs in the local mode. step3 produce the figures using the output values
-      1. To get the results in docker mode: **docker_run.sh**:
+      1.  To get the results in docker mode: **docker_run.sh**:
          - The docker script for creating the container and running the evaluation scripts of the five benchmarks and producing their results
          ```shell
          ./docker_run.sh
@@ -48,30 +48,33 @@ The following process needs to be followed from the `KGQAn` directory
          - If you encountered an error while running this script due to the `docker compose` command, you can install it from [here](https://docs.docker.com/compose/install/) 
          - If you have a problem running the docker compose line because of permission errors, you can follow the solution from [here][https://docs.docker.com/engine/install/linux-postinstall/] 
          - If you have a problem running the script because of `Version in "./docker-compose-evaluation.yml"` Error, you can replace the 'version' parameter in `docker-compose-server.yml` and `docker-compose-evaluation.yml`
-      2. To get the results in local mode **local_run.sh**:
-         - A prerequisite to running in this mode is to run the semantic affinity server using this commands: 
-         ```
-            conda activate kgqan
-            python word_embedding/server.py 127.0.0.1 9600
-           ```
-           ```shell
-              ./local_run.sh
-           ```
-         - It runs each of the benchmarks evaluation python script to produce the Json output
-         - It evaluates the produced Json against the ground truth values
-      3. **figures_generation.sh**:
-            - First create a virtual environment and install the required dependencies 
-            ```shell
-            conda create --name figures python==3.7
-            conda activate figures
-            pip install matplotlib pandas traitlets
-            ./figures_generation.sh
-            ```
-            - The generation script is responsible for generating the four figures as pdf file in this directory, The generated figures are:
-              1. **question understanding quality**: The values here were obtained manually by checking the logs for KGQAn and existing systems
-              2. **Linking quality**: To produce the figure, the scores of the entity linking and relation linking are obtained from `evaluation_result.csv`. The values are organized in the following order [Entity Precision, Entity Recall, Entity F1, Relation Precision, Relation Recall, Relation F1]
-              3. **Filtering quality**: To produce the figure, the scores of QALD-no-filtration, LCQAUD-no-filtration, QALD and LCQAUD  are obtained from `evaluation_result.csv`. The values are organized in the following order [QALD Precision, QALD Recall, QALD F1, LCQuAD Precision, LCQUAD Recall, LCQUAD F1]
-              4. **Response time per benchmark**: To produce the figure, the response times are obtained from `evaluation_response_time.csv`. The values are organized in the following orders [QALD, LCQuAD, YAGO, DBLP, MAG].
+         
+           **If you do not want to run in a docker mode then you can run in local mode using the following steps:**
+            - To get the results in local mode **local_run.sh**:
+            - A prerequisite to running in this mode is to run the semantic affinity server using this commands: 
+               ```
+               conda activate kgqan
+               python word_embedding/server.py 127.0.0.1 9600
+              ```
+              ```shell
+                 ./local_run.sh
+              ```
+            - It runs each of the benchmarks evaluation python script to produce the Json output
+            - It evaluates the produced Json against the ground truth values
+
+      2. **figures_generation.sh**:
+               - First create a virtual environment and install the required dependencies 
+               ```shell
+               conda create --name figures python==3.7
+               conda activate figures
+               pip install matplotlib pandas traitlets
+               ./figures_generation.sh
+               ```
+               - The generation script is responsible for generating the four figures as pdf file in this directory, The generated figures are:
+                 1. **question understanding quality**: The values here were obtained manually by checking the logs for KGQAn and existing systems
+                 2. **Linking quality**: To produce the figure, the scores of the entity linking and relation linking are obtained from `evaluation_result.csv`. The values are organized in the following order [Entity Precision, Entity Recall, Entity F1, Relation Precision, Relation Recall, Relation F1]
+                 3. **Filtering quality**: To produce the figure, the scores of QALD-no-filtration, LCQAUD-no-filtration, QALD and LCQAUD  are obtained from `evaluation_result.csv`. The values are organized in the following order [QALD Precision, QALD Recall, QALD F1, LCQuAD Precision, LCQUAD Recall, LCQUAD F1]
+                 4. **Response time per benchmark**: To produce the figure, the response times are obtained from `evaluation_response_time.csv`. The values are organized in the following orders [QALD, LCQuAD, YAGO, DBLP, MAG].
 5. _**Documentation**_
    - Each script contains its documentaion for all steps performed
 6. _**A single master script**_:
