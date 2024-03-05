@@ -117,6 +117,7 @@ class MyServer(BaseHTTPRequestHandler):
 def main():
     webServer = HTTPServer((hostName, serverPort), MyServer)
     logger.log_info("Server started http://%s:%s" % (hostName, serverPort))
+    print("Server started http://%s:%s" % (hostName, serverPort))
 
     try:
         webServer.serve_forever()
