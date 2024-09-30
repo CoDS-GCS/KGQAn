@@ -47,7 +47,7 @@ rm "$data_dir/$file_name" # remove the zip
 #    fi
 #done
 
-if [ "$mode" = "local" ] | [ "$mode" = "docker" ]; then
+if [ "$mode" = "local" ] || [ "$mode" = "docker" ]; then
     echo "Running Copy commands to run locally"
     # copy the file to the respective target path
     word_embedding_path="word_embedding/data"
